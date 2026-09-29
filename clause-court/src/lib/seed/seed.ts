@@ -8,7 +8,7 @@ import {
   SEED_RULING,
   planSeedClauses,
 } from './dataset'
-import type { AmbiguitySignal } from '@/types'
+import type { AmbiguitySignal, WorkflowTransitionLogEntry } from '@/types'
 
 // =============================================
 // SEED EXECUTOR
@@ -77,6 +77,32 @@ export async function seedDemoData(): Promise<SeedResult> {
   // pointer. The edges are attached in step 7, once the precedent is written.
   for (const clause of SEED_CLAUSES) {
     const planEntry = plan.get(clause._id)
+    const status = planEntry?.status ?? 'draft'
+    const signals = (planEntry?.signals ?? []) as AmbiguitySignal[]
+    const transitionLog: WorkflowTransitionLogEntry[] = [
+      {
+        _key: 'seed-tl-init',
+        from: 'created',
+        to: 'draft',
+        actor: 'Policy Author',
+        actorType: 'human',
+        timestamp: '2026-09-29T10:00:00.000Z',
+        note: 'Initial policy clause created.',
+      },
+    ]
+
+    if (status === 'flagged') {
+      transitionLog.push({
+        _key: 'seed-tl-flagged',
+        from: 'draft',
+        to: 'flagged',
+        actor: 'Deterministic Ambiguity Engine',
+        actorType: 'deterministic',
+        timestamp: '2026-09-29T10:05:00.000Z',
+        note: `Flagged with ${signals.length} inspectable ambiguity signal${signals.length === 1 ? '' : 's'}.`,
+      })
+    }
+
     await sanityClient.createOrReplace({
       _id: clause._id,
       _type: 'clause',
@@ -84,11 +110,12 @@ export async function seedDemoData(): Promise<SeedResult> {
       text: clause.text,
       category: clause.category,
       caseNumber: clause.caseNumber,
-      status: planEntry?.status ?? 'draft',
-      ambiguitySignals: (planEntry?.signals ?? []) as AmbiguitySignal[],
+      status,
+      ambiguitySignals: signals,
       definitions: clause.definitions.map(ref),
       debates: [],
       currentRuling: null,
+      transitionLog,
     })
   }
 
@@ -160,6 +187,44 @@ export async function seedDemoData(): Promise<SeedResult> {
       status: 'ruled',
       currentRuling: ref(SEED_RULING._id),
       debates: [ref('debate-refund-policy')],
+      transitionLog: [
+        {
+          _key: 'seed-tl-init',
+          from: 'created',
+          to: 'draft',
+          actor: 'Policy Author',
+          actorType: 'human',
+          timestamp: '2026-09-18T09:00:00.000Z',
+          note: 'Initial refund policy clause created.',
+        },
+        {
+          _key: 'seed-tl-flagged',
+          from: 'draft',
+          to: 'flagged',
+          actor: 'Deterministic Ambiguity Engine',
+          actorType: 'deterministic',
+          timestamp: '2026-09-18T09:05:00.000Z',
+          note: 'Flagged: vague quantifier "reasonable time".',
+        },
+        {
+          _key: 'seed-tl-debated',
+          from: 'flagged',
+          to: 'debated',
+          actor: 'AI Debate Chamber',
+          actorType: 'system',
+          timestamp: '2026-09-18T09:12:41.000Z',
+          note: 'Debate concluded between Advocate A and Advocate B.',
+        },
+        {
+          _key: 'seed-tl-ruled',
+          from: 'debated',
+          to: 'ruled',
+          actor: `Judge ${SEED_RULING.judgeName}`,
+          actorType: 'human',
+          timestamp: '2026-09-18T09:15:00.000Z',
+          note: SEED_RULING.customRuling || 'Ruling issued after debate chamber hearing.',
+        },
+      ],
     })
     .commit()
 

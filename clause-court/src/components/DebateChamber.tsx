@@ -736,6 +736,34 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                   />
                 </div>
 
+                <div
+                  style={{
+                    padding: '10px 14px',
+                    background: 'rgba(201, 168, 76, 0.08)',
+                    border: '1px solid rgba(201, 168, 76, 0.25)',
+                    borderRadius: '8px',
+                    fontSize: '0.78rem',
+                    color: 'var(--text-secondary)',
+                    marginBottom: '20px',
+                    lineHeight: '1.45',
+                  }}
+                >
+                  <div
+                    style={{
+                      color: 'var(--gold-400)',
+                      fontWeight: '700',
+                      marginBottom: '2px',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.68rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    ⚖ Prototype Notice & Legal Disclaimer (PRD §31)
+                  </div>
+                  This ruling establishes structured institutional precedent within Clause Court. Generated arguments and interpretations are synthetic AI reviews and do not constitute formal legal counsel or legally binding court orders.
+                </div>
+
                 <button
                   id="submit-ruling-btn"
                   className="btn btn--primary btn--lg btn--full"

@@ -40,6 +40,7 @@ export async function GET(req: Request) {
   return Response.json({
     status,
     meta: WORKFLOW_STATE_META[status],
+    transitionLog: clause.transitionLog ?? [],
     transitions: availableTransitions(status, 'human').map((t) => ({
       to: t.to,
       label: t.label,
@@ -55,7 +56,7 @@ export async function GET(req: Request) {
  * other route in the app: the ruling pipeline stops at `ruled` on purpose.
  */
 export async function POST(req: Request) {
-  let body: { clauseId?: string; to?: string }
+  let body: { clauseId?: string; to?: string; actor?: string; note?: string }
 
   try {
     body = await req.json()
@@ -63,7 +64,7 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Request body must be JSON' }, { status: 400 })
   }
 
-  const { clauseId, to } = body
+  const { clauseId, to, actor, note } = body
   if (!clauseId || !to) {
     return Response.json(
       { error: 'clauseId and to are required' },
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await advanceClauseWorkflow(clauseId, to)
+    const result = await advanceClauseWorkflow(clauseId, to, { actor, note })
 
     // Publishing a case is the moment its precedent stops being a private note
     // and becomes citable, so the lineage is re-derived here too.

@@ -3,7 +3,7 @@ import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
 import { schemaTypes } from './src/sanity/schemaTypes'
 import { clauseDocumentActions } from './src/sanity/ClauseWorkflowActions'
-import { deskStructure } from './src/sanity/structure'
+import { deskStructure, defaultDocumentNode } from './src/sanity/structure'
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'your-project-id'
 const dataset = process.env.SANITY_STUDIO_DATASET || process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
@@ -18,7 +18,10 @@ export default defineConfig({
   // route in the app router for it to mount at.
 
   plugins: [
-    structureTool({ structure: deskStructure }),
+    structureTool({
+      structure: deskStructure,
+      defaultDocumentNode,
+    }),
     visionTool({ defaultApiVersion: '2024-01-01' }),
   ],
 

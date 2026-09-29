@@ -1,4 +1,4 @@
-import { detectAmbiguity } from '@/lib/ambiguity/detector'
+import { detectAmbiguity } from '../ambiguity/detector.ts'
 import type { AmbiguitySignal } from '@/types'
 
 // =============================================
