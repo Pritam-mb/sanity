@@ -1,0 +1,188 @@
+import { defineArrayMember, defineField, defineType } from 'sanity'
+import { WORKFLOW_STATES, WORKFLOW_STATE_META } from '../workflow'
+
+/**
+ * A single unit of policy or contract language that may be ambiguous.
+ *
+ * `ambiguitySignals` is written by the deterministic engine only. It is never
+ * produced by an LLM — that separation is the point of the product (§26).
+ */
+export const clauseType = defineType({
+  name: 'clause',
+  title: 'Clause',
+  type: 'document',
+  icon: () => '📋',
+  groups: [
+    { name: 'content', title: 'Content', default: true },
+    { name: 'analysis', title: 'Deterministic Analysis' },
+    { name: 'graph', title: 'Reference Graph' },
+    { name: 'workflow', title: 'Workflow' },
+  ],
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      group: 'content',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'text',
+      title: 'Clause Text',
+      type: 'text',
+      rows: 5,
+      group: 'content',
+      description:
+        'The exact language under review. The ambiguity engine scans this text character by character.',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'category',
+      title: 'Category',
+      type: 'string',
+      group: 'content',
+      options: {
+        list: [
+          'Refund Policy',
+          'Service Level Agreement',
+          'Support Policy',
+          'Data Policy',
+          'Billing',
+          'Technical',
+          'Security',
+          'Legal',
+          'Compliance',
+          'Usage Policy',
+        ],
+      },
+    }),
+    defineField({
+      name: 'caseNumber',
+      title: 'Case Number',
+      type: 'string',
+      group: 'content',
+      description: 'Court-style reference, e.g. #0042.',
+    }),
+
+    // ─── Deterministic analysis ────────────────────────
+    defineField({
+      name: 'ambiguitySignals',
+      title: 'Ambiguity Signals',
+      type: 'array',
+      group: 'analysis',
+      readOnly: true,
+      description:
+        'Written exclusively by the deterministic ambiguity engine. Each signal names the rule that fired, the exact term, and its character offset.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'ambiguitySignal',
+          fields: [
+            defineField({
+              name: 'type',
+              title: 'Signal Type',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Vague Quantifier (Rule A)', value: 'vague_quantifier' },
+                  { title: 'Missing Definition (Rule B)', value: 'missing_definition' },
+                  { title: 'Conditional Ambiguity (Rule D)', value: 'conditional_ambiguity' },
+                  { title: 'Conflicting Reference (Rule C)', value: 'conflicting_reference' },
+                ],
+              },
+            }),
+            defineField({ name: 'term', title: 'Term', type: 'string' }),
+            defineField({
+              name: 'position',
+              title: 'Character Offset',
+              type: 'number',
+              description: 'Where the term appears in the clause text.',
+            }),
+            defineField({ name: 'message', title: 'Message', type: 'text', rows: 2 }),
+            defineField({
+              name: 'ruleLabel',
+              title: 'Rule',
+              type: 'string',
+              description: 'Human-readable rule that produced this signal.',
+            }),
+          ],
+          preview: {
+            select: { title: 'term', rule: 'ruleLabel', type: 'type' },
+            prepare({ title, rule, type }) {
+              return {
+                title: `"${title ?? '?'}"`,
+                subtitle: `${rule ?? type ?? 'signal'}`,
+              }
+            },
+          },
+        }),
+      ],
+    }),
+
+    // ─── Reference graph ───────────────────────────────
+    defineField({
+      name: 'definitions',
+      title: 'Definitions In Use',
+      type: 'array',
+      group: 'graph',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'definition' }] })],
+      description:
+        'Linked definition documents. A term listed here satisfies the Missing Definition rule.',
+    }),
+    defineField({
+      name: 'citedPrecedent',
+      title: 'Cites Precedent',
+      type: 'array',
+      group: 'graph',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'precedent' }] })],
+      description:
+        'Prior human rulings this clause is argued against. This field is what makes the precedent graph load-bearing rather than decorative.',
+    }),
+    defineField({
+      name: 'debates',
+      title: 'Debates',
+      type: 'array',
+      group: 'graph',
+      readOnly: true,
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'debate' }] })],
+    }),
+    defineField({
+      name: 'currentRuling',
+      title: 'Current Ruling',
+      type: 'reference',
+      group: 'graph',
+      readOnly: true,
+      to: [{ type: 'ruling' }],
+    }),
+
+    // ─── Workflow ──────────────────────────────────────
+    defineField({
+      name: 'status',
+      title: 'Workflow State',
+      type: 'string',
+      group: 'workflow',
+      initialValue: 'draft',
+      options: {
+        list: WORKFLOW_STATES.map((state) => ({
+          title: `${WORKFLOW_STATE_META[state].icon}  ${WORKFLOW_STATE_META[state].label}`,
+          value: state,
+        })),
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      caseNumber: 'caseNumber',
+      status: 'status',
+      category: 'category',
+    },
+    prepare({ title, caseNumber, status, category }) {
+      return {
+        title: `${caseNumber ? `${caseNumber} · ` : ''}${title ?? 'Untitled clause'}`,
+        subtitle: `${WORKFLOW_STATE_META[status as keyof typeof WORKFLOW_STATE_META]?.label ?? status ?? 'draft'} — ${category ?? 'uncategorized'}`,
+      }
+    },
+  },
+})
