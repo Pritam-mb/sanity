@@ -40,6 +40,7 @@ Fill in `.env.local`:
 | `NEXT_PUBLIC_SANITY_DATASET` | everything | `production` or `development` |
 | `SANITY_API_TOKEN` | writing | Editor access. Server-only — never prefix with `NEXT_PUBLIC_` |
 | `GEMINI_API_KEY` | debates | Server-only. The debate chamber errors clearly without it |
+| `GEMINI_MODEL` | debates | Optional. Defaults to `gemini-2.5-flash`. The PRD names 2.0 Flash, which Google has retired — see below |
 | `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET` | Studio | Falls back to the `NEXT_PUBLIC_*` values |
 | `NEXT_PUBLIC_SANITY_READ_TOKEN` | private datasets | Optional |
 
@@ -48,6 +49,12 @@ Then start the app and seed the demo dataset:
 ```bash
 npm run dev
 ```
+
+> **Note on the model.** The PRD specifies Gemini 2.0 Flash. That model has been
+> retired by Google and now returns `404 This model is no longer available`. The
+> app uses `gemini-2.5-flash` instead, and reads the name from the single
+> `GEMINI_MODEL` variable so the model can be changed without hunting through the
+> code. If a debate ever fails with a 404, check this value first.
 
 Visit `http://localhost:3000` and press **⟳ Reset Demo** (or `POST /api/seed`).
 This creates 12 clauses, 4 definitions, 3 flagged by the ambiguity engine, and one

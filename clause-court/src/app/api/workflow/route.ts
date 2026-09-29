@@ -1,8 +1,12 @@
 import { sanityClient } from '@/lib/sanity/client'
 import { advanceClauseWorkflow } from '@/lib/ruling/createRuling'
 import { recountCitations } from '@/lib/seed/seed'
-import { availableTransitions, WORKFLOW_STATE_META } from '@/sanity/workflow'
-import { isWorkflowState } from '@/sanity/workflow'
+import {
+  availableTransitions,
+  isWorkflowState,
+  WORKFLOW_STATE_META,
+  WorkflowViolationError,
+} from '@/sanity/workflow'
 
 export const dynamic = 'force-dynamic'
 
@@ -80,6 +84,14 @@ export async function POST(req: Request) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Transition failed'
-    return Response.json({ error: message }, { status: 409 })
+
+    if (error instanceof WorkflowViolationError) {
+      return Response.json(
+        { error: message, from: error.from, to: error.to },
+        { status: 409 }
+      )
+    }
+
+    return Response.json({ error: message }, { status: 500 })
   }
 }

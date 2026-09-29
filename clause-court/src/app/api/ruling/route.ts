@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createRuling } from '@/lib/ruling/createRuling'
+import { WorkflowViolationError } from '@/sanity/workflow'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -86,6 +87,25 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Failed to create ruling'
+
+    // A refused transition is the state machine working as designed, not a
+    // server fault, so it must not be reported as one.
+    if (error instanceof WorkflowViolationError) {
+      return NextResponse.json(
+        { error: message, from: error.from, to: error.to },
+        { status: 409 }
+      )
+    }
+
+    // A ruling that names a debate with no stored arguments is a bad request
+    // too — the client asked to rule on a hearing that does not exist.
+    if (
+      error instanceof Error &&
+      error.message.includes('does not have both advocate arguments')
+    ) {
+      return NextResponse.json({ error: message }, { status: 400 })
+    }
+
     console.error('Ruling creation error:', error)
     return NextResponse.json({ error: message }, { status: 500 })
   }

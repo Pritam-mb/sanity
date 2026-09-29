@@ -136,6 +136,26 @@ export function isAutomaticTransition(
 }
 
 /**
+ * A refused workflow transition.
+ *
+ * Distinct from a plain `Error` because a refusal is not a server fault — it is
+ * the state machine working. Routes can catch this and answer `409 Conflict`
+ * rather than `500`, so a rejected request is not reported as a crash and does
+ * not light up error monitoring as if the app had broken.
+ */
+export class WorkflowViolationError extends Error {
+  readonly from: string
+  readonly to: string
+
+  constructor(message: string, from: string, to: string) {
+    super(message)
+    this.name = 'WorkflowViolationError'
+    this.from = from
+    this.to = to
+  }
+}
+
+/**
  * Throws unless the transition is legal *and* owned by a human.
  *
  * The ownership check is the approval gate. Every human-owned step also sets
@@ -149,20 +169,24 @@ export function assertHumanTransition(
 ): void {
   const transition = findTransition(from, to)
   if (!transition) {
-    throw new Error(
-      `Illegal workflow transition: ${String(from)} -> ${String(to)}`
+    throw new WorkflowViolationError(
+      `Illegal workflow transition: ${String(from)} -> ${String(to)}`,
+      String(from),
+      String(to)
     )
   }
   if (transition.owner !== 'human') {
-    throw new Error(
-      `Transition ${transition.from} -> ${transition.to} is performed by the ${
-        transition.owner
-      } pipeline and cannot be approved by hand. It can only be reached by running that step.`
+    throw new WorkflowViolationError(
+      `Transition ${transition.from} -> ${transition.to} is performed by the ${transition.owner} pipeline and cannot be approved by hand. It can only be reached by running that step.`,
+      transition.from,
+      transition.to
     )
   }
   if (!transition.requiresConfirmation) {
-    throw new Error(
-      `Transition ${transition.from} -> ${transition.to} must be confirmed by a human`
+    throw new WorkflowViolationError(
+      `Transition ${transition.from} -> ${transition.to} must be confirmed by a human`,
+      transition.from,
+      transition.to
     )
   }
 }

@@ -136,12 +136,17 @@ export const DASHBOARD_QUERY = `
   }
 `
 
+// Every list projection is wrapped in coalesce(). An empty or absent array
+// dereferences to `null` in GROQ, not `[]`, so a clause that cites no precedent
+// would hand the client a null and any `.includes()` on it would throw. Coercing
+// at the query keeps the null-shape out of the data rather than guarding for it
+// in every consumer.
 export const GRAPH_QUERY = `
   {
     "clauses": *[_type == "clause"] {
       _id, title, status, caseNumber,
-      "citedPrecedentIds": citedPrecedent[]._ref,
-      "rulingIds": *[_type == "ruling" && clause._ref == ^._id]._id
+      "citedPrecedentIds": coalesce(citedPrecedent[]._ref, []),
+      "rulingIds": coalesce(*[_type == "ruling" && clause._ref == ^._id]._id, [])
     },
     "rulings": *[_type == "ruling"] {
       _id, judgeName, _createdAt,
@@ -151,7 +156,7 @@ export const GRAPH_QUERY = `
       _id, title, holding, citationCount,
       "rulingId": ruling._ref,
       "sourceClauseId": sourceClause._ref,
-      "citesPrecedentIds": citesPrecedent[]._ref
+      "citesPrecedentIds": coalesce(citesPrecedent[]._ref, [])
     }
   }
 `

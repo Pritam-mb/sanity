@@ -11,6 +11,25 @@ function getGeminiClient() {
   return new GoogleGenerativeAI(apiKey)
 }
 
+/**
+ * The model used for every advocate call and for the dissent.
+ *
+ * The PRD specifies Gemini 2.0 Flash, but that model has been retired by Google
+ * and now returns `404 no longer available` — the app would have failed on its
+ * first real debate. The id is read from the environment so the model can be
+ * moved again without a code change, defaulting to a Flash tier that is fast
+ * enough to stream two arguments in sequence.
+ */
+const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+
+/** Every call goes through here so the model id exists in exactly one place. */
+function getModel(jsonMode: boolean) {
+  return getGeminiClient().getGenerativeModel({
+    model: MODEL,
+    generationConfig: jsonMode ? { responseMimeType: 'application/json' } : undefined,
+  })
+}
+
 // =============================================
 // ADVOCATE PROMPTS
 // =============================================
@@ -141,6 +160,11 @@ Return ONLY valid JSON:
 // =============================================
 // GENERATE DEBATE (STREAMING)
 // =============================================
+//
+// Superseded by `generateInterpretationStream` in `runDebate.ts`, which streams
+// one advocate at a time so Advocate B can be given A's finished argument
+// before it speaks. Kept because it remains the only path that returns both
+// streams over a single call, which the quality gate has not yet replaced.
 
 export async function generateDebateStream(
   clauseId: string,
@@ -150,8 +174,7 @@ export async function generateDebateStream(
   onChunkA: (chunk: string) => void,
   onChunkB: (chunk: string) => void,
 ): Promise<DebateOutput> {
-  const genAI = getGeminiClient()
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+  const model = getModel(true)
 
   // Generate Advocate A first (for context to give B)
   const promptA = buildAdvocateAPrompt(clauseText, ambiguitySignals, precedents)
@@ -209,8 +232,10 @@ export async function generateInterpretationStream(
   onToken: (token: string) => void,
   opposingArgument?: string
 ): Promise<InterpretationOutput> {
-  const genAI = getGeminiClient()
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+  // JSON mode is on even though the raw stream is displayed: the stream is
+  // parsed into a document afterwards, and a model that was never constrained
+  // to JSON produces prose that fails to parse and loses the whole argument.
+  const model = getModel(true)
 
   const prompt =
     side === 'A'
@@ -247,11 +272,7 @@ export async function generateDebate(
   ambiguitySignals: Array<{ term: string; message: string }>,
   precedents: Precedent[]
 ): Promise<DebateOutput> {
-  const genAI = getGeminiClient()
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    generationConfig: { responseMimeType: 'application/json' },
-  })
+  const model = getModel(true)
 
   // Generate A
   const promptA = buildAdvocateAPrompt(clauseText, ambiguitySignals, precedents)
@@ -288,11 +309,7 @@ export async function generateDissent(
   losingAdvocate: AdvocateSide,
   losingArgument: string
 ): Promise<DissentOutput> {
-  const genAI = getGeminiClient()
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    generationConfig: { responseMimeType: 'application/json' },
-  })
+  const model = getModel(true)
 
   const prompt = buildDissentPrompt(clauseText, ruling, losingAdvocate, losingArgument)
   const result = await model.generateContent(prompt)

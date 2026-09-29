@@ -71,6 +71,10 @@ export async function seedDemoData(): Promise<SeedResult> {
     planSeedClauses().map((entry) => [entry._id, entry])
   )
 
+  // `citedPrecedent` is deliberately omitted here. Those references point at the
+  // seeded precedent, which does not exist yet — and Sanity enforces reference
+  // integrity, rejecting the whole mutation rather than storing a dangling
+  // pointer. The edges are attached in step 7, once the precedent is written.
   for (const clause of SEED_CLAUSES) {
     const planEntry = plan.get(clause._id)
     await sanityClient.createOrReplace({
@@ -83,7 +87,6 @@ export async function seedDemoData(): Promise<SeedResult> {
       status: planEntry?.status ?? 'draft',
       ambiguitySignals: (planEntry?.signals ?? []) as AmbiguitySignal[],
       definitions: clause.definitions.map(ref),
-      citedPrecedent: clause.citedPrecedent.map(ref),
       debates: [],
       currentRuling: null,
     })
@@ -160,15 +163,55 @@ export async function seedDemoData(): Promise<SeedResult> {
     })
     .commit()
 
-  // ─── 8. Recount citations from the documents themselves ───
+  // ─── 8. Attach the citation edges ─────────────────────────
+  // Now that the precedent exists, every clause that cites it can reference it.
+  // This is the edge the killer demo depends on, so it is written explicitly
+  // rather than left implicit — and asserted below rather than assumed.
+  const citingClauses = SEED_CLAUSES.filter((c) => c.citedPrecedent.length > 0)
+  for (const clause of citingClauses) {
+    await sanityClient
+      .patch(clause._id)
+      .set({ citedPrecedent: clause.citedPrecedent.map(ref) })
+      .commit()
+  }
+
+  // ─── 9. Recount citations from the documents themselves ───
   // citationCount is derived, never incremented by hand — otherwise it drifts
   // from the reference graph and the number on the card becomes a lie.
   await recountCitations()
 
-  const flagged = [...plan.values()].filter((e) => e.signals?.length)
-  const ambiguousTerms = [
-    ...new Set(flagged.flatMap((e) => (e.signals ?? []).map((s) => s.term))),
-  ]
+  // Counted from the documents as stored, not from the plan that wrote them.
+  // The refund clause carries ambiguity signals but has since been ruled, so
+  // counting "clauses with signals" would report 4 flagged when the dataset
+  // holds 3 — a summary that overstates its own subject is worse than none.
+  const persisted = await sanityClient.fetch<{ flagged: number; terms: string[] }>(`{
+    "flagged": count(*[_type == "clause" && status == "flagged"]),
+    "terms": array::unique(
+      *[_type == "clause" && status == "flagged"].ambiguitySignals[].term
+    )
+  }`)
+  const flaggedClauses = persisted?.flagged ?? 0
+  const ambiguousTerms = persisted?.terms ?? []
+
+  // ─── 10. Verify the reference graph actually closed ───────
+  // A seed that reports success while its citation edge is dangling has failed
+  // at the only thing it exists to demonstrate. Cheap to check, so check it.
+  const unresolved = await sanityClient.fetch<Array<{ _id: string; missing: string }>>(
+    `*[_type == $type && count(citedPrecedent[]._ref[@ in *[_type == "precedent"]._id]) < count(citedPrecedent)]{
+      "_id": _id,
+      "missing": citedPrecedent[]._ref[@ in *[_type == "precedent"]._id == false]
+    }`,
+    { type: 'clause' }
+  )
+
+  const dangling = unresolved.flatMap((c) => c.missing ?? [])
+  if (dangling.length > 0) {
+    throw new Error(
+      `Seed produced dangling precedent references: ${[
+        ...new Set(dangling),
+      ].join(', ')}`
+    )
+  }
 
   return {
     definitions: SEED_DEFINITIONS.length,
@@ -177,7 +220,7 @@ export async function seedDemoData(): Promise<SeedResult> {
     debates: 1,
     rulings: 1,
     precedents: 1,
-    flaggedClauses: flagged.length,
+    flaggedClauses,
     ambiguousTerms,
   }
 }
