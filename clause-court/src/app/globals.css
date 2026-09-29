@@ -836,3 +836,69 @@ code {
   font-size: 0.7rem;
   padding: 0 var(--space-2);
 }
+
+/* =============================================
+   ACCESSIBILITY & UTILITIES (PRD §32)
+   ============================================= */
+
+/* Keyboard Focus Indicators */
+:focus-visible {
+  outline: 2px solid var(--gold-400);
+  outline-offset: 3px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--gold-400);
+  outline-offset: 2px;
+}
+
+/* Accessible Skip Link */
+.skip-link {
+  position: absolute;
+  top: -999px;
+  left: 20px;
+  background: var(--gold-400);
+  color: var(--text-inverse);
+  padding: 10px 18px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  z-index: 100000;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: top 0.15s ease-out;
+}
+
+.skip-link:focus {
+  top: 20px;
+}
+
+/* Screen Reader Only Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

@@ -1,5 +1,11 @@
-import type { StructureBuilder, StructureResolver } from 'sanity/structure'
+import type {
+  DefaultDocumentNodeResolver,
+  StructureBuilder,
+  StructureResolver,
+} from 'sanity/structure'
 import { WORKFLOW_STATES, WORKFLOW_STATE_META } from './workflow'
+import { ClauseCourtPreview } from './components/ClauseCourtPreview'
+import { ClauseWorkflowPanel } from './components/ClauseWorkflowPanel'
 
 /**
  * Desk structure that mirrors the courtroom process.
@@ -84,4 +90,21 @@ export const deskStructure: StructureResolver = (S: StructureBuilder) => {
   ])
 }
 
+/**
+ * Custom views for Clause documents in Studio (PRD §36 & §46 Priority 1):
+ * - Live Court Preview: embedded interactive preview of the clause in Clause Court
+ * - Workflow & Audit Log: App SDK panel showing state machine and transition audit trail
+ */
+export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, { schemaType }) => {
+  if (schemaType === 'clause') {
+    return S.document().views([
+      S.view.form(),
+      S.view.component(ClauseCourtPreview).title('Live Court Preview'),
+      S.view.component(ClauseWorkflowPanel).title('Workflow & Audit Log'),
+    ])
+  }
+  return S.document().views([S.view.form()])
+}
+
 export default deskStructure
+

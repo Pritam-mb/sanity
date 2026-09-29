@@ -170,6 +170,55 @@ export const clauseType = defineType({
       },
       validation: (Rule) => Rule.required(),
     }),
+    defineField({
+      name: 'transitionLog',
+      title: 'Workflow Transition Log',
+      type: 'array',
+      group: 'workflow',
+      readOnly: true,
+      description:
+        'Immutable audit trail of state transitions, recording the actor, prior state, new state, timestamp, and human rationale.',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'workflowTransitionEntry',
+          title: 'Transition Entry',
+          fields: [
+            defineField({ name: 'from', title: 'From State', type: 'string' }),
+            defineField({ name: 'to', title: 'To State', type: 'string' }),
+            defineField({
+              name: 'actor',
+              title: 'Actor',
+              type: 'string',
+              description: 'Human reviewer name, judge, or system engine.',
+            }),
+            defineField({
+              name: 'actorType',
+              title: 'Actor Type',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Human Reviewer / Judge', value: 'human' },
+                  { title: 'Deterministic Engine', value: 'deterministic' },
+                  { title: 'AI / System Pipeline', value: 'system' },
+                ],
+              },
+            }),
+            defineField({ name: 'timestamp', title: 'Timestamp', type: 'datetime' }),
+            defineField({ name: 'note', title: 'Note / Rationale', type: 'text', rows: 2 }),
+          ],
+          preview: {
+            select: { from: 'from', to: 'to', actor: 'actor', timestamp: 'timestamp' },
+            prepare({ from, to, actor, timestamp }) {
+              return {
+                title: `${from ?? 'init'} → ${to ?? '?'}`,
+                subtitle: `${actor ?? 'Unknown'} · ${timestamp ? new Date(timestamp).toLocaleString() : ''}`,
+              }
+            },
+          },
+        }),
+      ],
+    }),
   ],
   preview: {
     select: {

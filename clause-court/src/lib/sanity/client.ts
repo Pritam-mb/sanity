@@ -25,6 +25,7 @@ export const CLAUSE_LIST_QUERY = `
     _id, _type, _createdAt, _updatedAt, _rev,
     title, text, category, status, caseNumber,
     ambiguitySignals,
+    "transitionLog": coalesce(transitionLog, []),
     "definitionCount": count(definitions),
     "currentRuling": currentRuling->{
       _id, judgeName, customRuling, chosenInterpretation->{_id, title, side}
@@ -40,6 +41,7 @@ export const CLAUSE_BY_ID_QUERY = `
     _id, _type, _createdAt, _updatedAt, _rev,
     title, text, category, status, caseNumber,
     ambiguitySignals,
+    "transitionLog": coalesce(transitionLog, []),
     "definitions": definitions[]->{_id, term, definition, category},
     "citedPrecedent": citedPrecedent[]->{
       _id, title, holding, reasoning, applicableTerms,

@@ -9,6 +9,7 @@ import {
   Precedent,
   AmbiguitySignal,
   Clause,
+  WorkflowTransitionLogEntry,
 } from '@/types'
 
 // =============================================
@@ -139,12 +140,24 @@ export async function createRuling(
     .set({ precedentId: precedent._id })
     .commit()
 
+  const rulingLogEntry: WorkflowTransitionLogEntry = {
+    _key: `tl-ruled-${Date.now()}`,
+    from: 'debated',
+    to: 'ruled',
+    actor: `Judge ${judgeName}`,
+    actorType: 'human',
+    timestamp: new Date().toISOString(),
+    note: customRuling?.trim() || `Ruling issued. Precedent created: "${buildPrecedentTitle(clause, applicableTerms)}"`,
+  }
+
   await sanityClient
     .patch(clauseId)
     .set({
       status: 'ruled',
       currentRuling: ref(ruling._id),
     })
+    .setIfMissing({ transitionLog: [] })
+    .append('transitionLog', [rulingLogEntry])
     .commit()
 
   // ─── 5. Recount citations from the graph, not from a counter ──
@@ -285,20 +298,45 @@ async function resolveCitedPrecedent(
  */
 export async function advanceClauseWorkflow(
   clauseId: string,
-  to: string
-): Promise<{ from: string; to: string }> {
+  to: string,
+  options?: {
+    actor?: string
+    note?: string
+  }
+): Promise<{ from: string; to: string; entry: WorkflowTransitionLogEntry }> {
   const clause = await sanityClient.getDocument(clauseId)
   if (!clause) throw new Error(`Clause ${clauseId} not found`)
 
   const from = clause.status
   assertHumanTransition(from, to)
 
+  const actor = options?.actor?.trim() || 'Human Reviewer'
+  const defaultNote =
+    to === 'resolved'
+      ? 'Human approval gate: accepted ruling and marked clause resolved.'
+      : to === 'published'
+        ? 'Final approval: published clause to live institutional repository.'
+        : `Approved transition to ${to}.`
+  const note = options?.note?.trim() || defaultNote
+
+  const entry: WorkflowTransitionLogEntry = {
+    _key: `tl-${to}-${Date.now()}`,
+    from,
+    to,
+    actor,
+    actorType: 'human',
+    timestamp: new Date().toISOString(),
+    note,
+  }
+
   await sanityClient
     .patch(clauseId)
     .set({ status: to })
+    .setIfMissing({ transitionLog: [] })
+    .append('transitionLog', [entry])
     .commit()
 
-  return { from, to }
+  return { from, to, entry }
 }
 
 // =============================================

@@ -282,7 +282,7 @@ function RulingCard({ ruling }: { ruling: RecentRuling }) {
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
             Judge: {ruling.judgeName}
           </span>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }} suppressHydrationWarning>
             {new Date(ruling._createdAt).toLocaleDateString()}
           </span>
         </div>

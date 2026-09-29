@@ -6,6 +6,7 @@ import type {
   AmbiguitySignal,
   PrecedentWithRelevance,
   InterpretationOutput,
+  WorkflowTransitionLogEntry,
 } from '@/types'
 
 // =============================================
@@ -122,6 +123,17 @@ async function persistDebate(
   const existingDebates: Array<{ _ref: string }> =
     (clauseDoc?.debates as Array<{ _ref: string }> | undefined) ?? []
 
+  const priorStatus = (clauseDoc?.status as string) || 'flagged'
+  const debateLogEntry: WorkflowTransitionLogEntry = {
+    _key: `tl-debated-${Date.now()}`,
+    from: priorStatus,
+    to: 'debated',
+    actor: 'AI Debate Chamber',
+    actorType: 'system',
+    timestamp: new Date().toISOString(),
+    note: `Advocate A ("${debate.interpretationA.title}") and Advocate B ("${debate.interpretationB.title}") completed hearing.`,
+  }
+
   await sanityClient
     .patch(clauseId)
     .set({
@@ -130,6 +142,8 @@ async function persistDebate(
         ? existingDebates
         : [...existingDebates, ref(debateDoc._id)],
     })
+    .setIfMissing({ transitionLog: [] })
+    .append('transitionLog', [debateLogEntry])
     .commit()
 
   return {

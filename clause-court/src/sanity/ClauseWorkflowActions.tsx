@@ -46,7 +46,28 @@ function createTransitionAction(transition: WorkflowTransition): DocumentActionC
     const run = useCallback(async () => {
       setBusy(true)
       try {
-        patch.execute([{ set: { status: to } }])
+        const draft = props.draft as unknown as { transitionLog?: unknown[] } | null
+        const published = props.published as unknown as { transitionLog?: unknown[] } | null
+        const existingLog = (draft?.transitionLog ?? published?.transitionLog ?? []) as unknown[]
+
+        const newEntry = {
+          _key: `tl-studio-${Date.now()}`,
+          from,
+          to,
+          actor: 'Sanity Studio Reviewer',
+          actorType: transition.owner,
+          timestamp: new Date().toISOString(),
+          note: transition.description,
+        }
+
+        patch.execute([
+          {
+            set: {
+              status: to,
+              transitionLog: [...existingLog, newEntry],
+            },
+          },
+        ])
         // `resolved` and `published` are terminal-enough states that the
         // document should exist in the public dataset. Intermediate steps
         // stay as drafts so nothing becomes publicly visible early.
@@ -57,7 +78,7 @@ function createTransitionAction(transition: WorkflowTransition): DocumentActionC
       } finally {
         setBusy(false)
       }
-    }, [patch, publish, to])
+    }, [patch, publish, to, from, props.draft, props.published])
 
     // Hooks above must run on every render, so the "wrong state" check has to
     // come after them — returning early first would change the hook order

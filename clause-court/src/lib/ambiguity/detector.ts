@@ -1,4 +1,4 @@
-import { AmbiguityReport, AmbiguitySignal, AmbiguitySignalType } from '@/types'
+import type { AmbiguityReport, AmbiguitySignal, AmbiguitySignalType } from '@/types'
 
 // =============================================
 // VAGUE QUANTIFIER RULE — Rule A

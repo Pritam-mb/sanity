@@ -7,6 +7,7 @@ import type {
   AmbiguityReport,
   AmbiguitySignal,
   PrecedentWithRelevance,
+  WorkflowTransitionLogEntry,
 } from '@/types'
 import {
   getSignalTypeLabel,
@@ -33,6 +34,7 @@ export interface ClauseDetailData {
   caseNumber: string
   status: string
   ambiguitySignals?: AmbiguitySignal[]
+  transitionLog?: WorkflowTransitionLogEntry[]
   definitions?: Array<{ _id: string; term: string; definition: string }>
   citedPrecedent?: Array<{
     _id: string
@@ -79,8 +81,13 @@ export default function ClauseDetailClient({
   const [transitions, setTransitions] = useState<
     Array<{ to: string; label: string; description: string }>
   >([])
+  const [transitionLog, setTransitionLog] = useState<WorkflowTransitionLogEntry[]>(
+    clause.transitionLog ?? []
+  )
   const [working, setWorking] = useState(false)
   const [gateError, setGateError] = useState<string | null>(null)
+  const [reviewerName, setReviewerName] = useState('Human Reviewer')
+  const [reviewerNote, setReviewerNote] = useState('')
 
   const hasRuling = Boolean(clause.currentRuling)
   const signals = ambiguityReport.signals
@@ -99,6 +106,9 @@ export default function ClauseDetailClient({
         if (cancelled || !data) return
         setTransitions(data.transitions ?? [])
         if (isWorkflow(data.status)) setStatus(data.status)
+        if (Array.isArray(data.transitionLog) && data.transitionLog.length > 0) {
+          setTransitionLog(data.transitionLog)
+        }
       })
       .catch(() => undefined)
     return () => {
@@ -110,9 +120,12 @@ export default function ClauseDetailClient({
     async (to: string, label: string) => {
       const description =
         transitions.find((t) => t.to === to)?.description ?? label
+      const actor = reviewerName.trim() || 'Human Reviewer'
+      const note = reviewerNote.trim() || undefined
+
       if (
         !window.confirm(
-          `${label}\n\n${description}\n\nThis is a human approval step. Continue?`
+          `${label}\n\n${description}\n\nReviewer: ${actor}\nThis is a human approval step. Continue?`
         )
       ) {
         return
@@ -124,13 +137,17 @@ export default function ClauseDetailClient({
         const res = await fetch('/api/workflow', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clauseId: clause._id, to }),
+          body: JSON.stringify({ clauseId: clause._id, to, actor, note }),
         })
         const data = await res.json()
         if (!res.ok) throw new Error(data.error ?? 'Transition failed')
 
         setStatus(data.to)
+        if (data.entry) {
+          setTransitionLog((prev) => [...prev, data.entry])
+        }
         setTransitions((prev) => prev.filter((t) => t.to !== to))
+        setReviewerNote('')
         router.refresh()
       } catch (e) {
         setGateError(e instanceof Error ? e.message : 'Transition failed')
@@ -138,7 +155,7 @@ export default function ClauseDetailClient({
         setWorking(false)
       }
     },
-    [clause._id, router, transitions]
+    [clause._id, router, transitions, reviewerName, reviewerNote]
   )
 
   return (
@@ -462,8 +479,89 @@ export default function ClauseDetailClient({
             <SectionLabel>Human approval gate</SectionLabel>
             <p style={{ fontSize: '0.88rem', marginBottom: '16px' }}>
               This clause is <strong>{status}</strong>. Only a person can move it
-              forward from here — the AI cannot resolve or publish a clause.
+              forward from here — the AI cannot resolve or publish a clause. Every approval
+              is recorded in the institutional audit log below.
             </p>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: '12px',
+                marginBottom: '16px',
+                padding: '12px',
+                background: 'var(--bg-raised)',
+                borderRadius: '8px',
+                border: '1px solid var(--border-subtle)',
+              }}
+            >
+              <div>
+                <label
+                  htmlFor="reviewer-name-input"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.75rem',
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--gold-300)',
+                    marginBottom: '4px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  Reviewer Name / Identity
+                </label>
+                <input
+                  id="reviewer-name-input"
+                  type="text"
+                  value={reviewerName}
+                  onChange={(e) => setReviewerName(e.target.value)}
+                  placeholder="e.g. Legal Counsel, Reviewer Name"
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: '6px',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.85rem',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="reviewer-note-input"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.75rem',
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--gold-300)',
+                    marginBottom: '4px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                  }}
+                >
+                  Approval Note / Rationale (Optional)
+                </label>
+                <input
+                  id="reviewer-note-input"
+                  type="text"
+                  value={reviewerNote}
+                  onChange={(e) => setReviewerNote(e.target.value)}
+                  placeholder="e.g. Confirmed precedent holding applies"
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: '6px',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.85rem',
+                  }}
+                />
+              </div>
+            </div>
+
             {gateError && (
               <div
                 role="alert"
@@ -495,6 +593,9 @@ export default function ClauseDetailClient({
             </div>
           </section>
         )}
+
+        {/* ─── Workflow Transition Audit Log ─────────────── */}
+        <WorkflowAuditTrail log={transitionLog} />
 
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <Link
@@ -665,5 +766,290 @@ function SignalCard({ signal }: { signal: AmbiguitySignal }) {
         {signal.message}
       </p>
     </div>
+  )
+}
+
+function WorkflowAuditTrail({ log }: { log: WorkflowTransitionLogEntry[] }) {
+  const sortedLog = [...log].sort((a, b) => {
+    const timeA = new Date(a.timestamp).getTime() || 0
+    const timeB = new Date(b.timestamp).getTime() || 0
+    return timeB - timeA // Most recent transition at top
+  })
+
+  return (
+    <section
+      className="card"
+      style={{
+        borderColor: 'var(--border-default)',
+        background: 'var(--bg-panel)',
+        marginBottom: '24px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '10px',
+          marginBottom: '16px',
+        }}
+      >
+        <div>
+          <SectionLabel>📜 Institutional Audit Trail</SectionLabel>
+          <h3 style={{ fontSize: '1.05rem', margin: '2px 0 4px', color: 'var(--text-primary)' }}>
+            Workflow Transition Log
+          </h3>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            Immutable audit record of institutional lifecycle changes, engine flags, and human approvals.
+          </p>
+        </div>
+        <span
+          style={{
+            fontSize: '0.75rem',
+            padding: '4px 10px',
+            borderRadius: '100px',
+            background: 'var(--bg-raised)',
+            border: '1px solid var(--border-subtle)',
+            color: 'var(--gold-400)',
+            fontFamily: 'var(--font-mono)',
+          }}
+        >
+          {log.length} recorded transition{log.length === 1 ? '' : 's'}
+        </span>
+      </div>
+
+      {sortedLog.length === 0 ? (
+        <div
+          style={{
+            padding: '24px',
+            textAlign: 'center',
+            background: 'var(--bg-card)',
+            borderRadius: '8px',
+            border: '1px dashed var(--border-subtle)',
+            color: 'var(--text-muted)',
+            fontSize: '0.85rem',
+          }}
+        >
+          No transitions logged yet for this clause. State changes will appear here automatically.
+        </div>
+      ) : (
+        <div
+          style={{
+            position: 'relative',
+            paddingLeft: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+          }}
+        >
+          {/* Vertical timeline spine */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '12px',
+              bottom: '12px',
+              left: '9px',
+              width: '2px',
+              background: 'linear-gradient(to bottom, var(--gold-400), var(--border-subtle))',
+            }}
+          />
+
+          {sortedLog.map((entry, idx) => {
+            const actorType =
+              entry.actorType ??
+              (entry.actor?.toLowerCase().includes('engine')
+                ? 'deterministic'
+                : entry.actor?.toLowerCase().includes('chamber') || entry.actor?.toLowerCase().includes('ai')
+                  ? 'system'
+                  : 'human')
+
+            const actorIcon =
+              actorType === 'human' ? '👤' : actorType === 'deterministic' ? '⚙️' : '🤖'
+            const actorBadgeColor =
+              actorType === 'human'
+                ? 'var(--gold-400)'
+                : actorType === 'deterministic'
+                  ? 'var(--danger)'
+                  : 'var(--advocate-a)'
+            const actorBadgeBg =
+              actorType === 'human'
+                ? 'var(--gold-glow)'
+                : actorType === 'deterministic'
+                  ? 'var(--danger-dim)'
+                  : 'var(--advocate-a-dim)'
+
+            const toState = entry.to as WorkflowState
+            const stateMeta = WORKFLOW_STATE_META[toState]
+
+            return (
+              <div
+                key={entry._key ?? `log-${idx}`}
+                style={{
+                  position: 'relative',
+                  background: 'var(--bg-card)',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-subtle)',
+                  padding: '14px 16px',
+                }}
+              >
+                {/* Timeline node dot */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: '-20px',
+                    top: '18px',
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '50%',
+                    background:
+                      toState === 'flagged'
+                        ? 'var(--danger)'
+                        : toState === 'ruled'
+                          ? 'var(--gold-400)'
+                          : toState === 'resolved' || toState === 'published'
+                            ? 'var(--success)'
+                            : 'var(--advocate-a)',
+                    border: '2px solid var(--bg-panel)',
+                    boxShadow: '0 0 6px rgba(0,0,0,0.6)',
+                  }}
+                />
+
+                {/* Header row: Transition + Timestamp */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span
+                      style={{
+                        fontSize: '0.75rem',
+                        fontWeight: '600',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        background: 'var(--bg-raised)',
+                        color: 'var(--text-secondary)',
+                        fontFamily: 'var(--font-mono)',
+                      }}
+                    >
+                      {entry.from}
+                    </span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>→</span>
+                    <span
+                      style={{
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        background:
+                          toState === 'flagged'
+                            ? 'var(--danger-dim)'
+                            : toState === 'ruled'
+                              ? 'var(--gold-glow)'
+                              : toState === 'resolved' || toState === 'published'
+                                ? 'var(--success-dim)'
+                                : 'var(--bg-raised)',
+                        color:
+                          toState === 'flagged'
+                            ? 'var(--danger)'
+                            : toState === 'ruled'
+                              ? 'var(--gold-300)'
+                              : toState === 'resolved' || toState === 'published'
+                                ? 'var(--success)'
+                                : 'var(--text-primary)',
+                        fontFamily: 'var(--font-mono)',
+                        border: '1px solid var(--border-subtle)',
+                      }}
+                    >
+                      {stateMeta?.icon ? `${stateMeta.icon} ` : ''}
+                      {stateMeta?.label ?? entry.to}
+                    </span>
+                  </div>
+
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--text-muted)',
+                      fontFamily: 'var(--font-mono)',
+                    }}
+                    suppressHydrationWarning
+                  >
+                    {entry.timestamp
+                      ? new Date(entry.timestamp).toLocaleString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : 'Unknown date'}
+                  </span>
+                </div>
+
+                {/* Actor row */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '0.85rem',
+                    marginBottom: entry.note ? '8px' : '0',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <span style={{ fontSize: '0.9rem' }}>{actorIcon}</span>
+                  <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                    {entry.actor}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.65rem',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      background: actorBadgeBg,
+                      color: actorBadgeColor,
+                      border: `1px solid ${actorBadgeColor}40`,
+                      fontFamily: 'var(--font-mono)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                    }}
+                  >
+                    {actorType === 'human'
+                      ? 'Human Authority'
+                      : actorType === 'deterministic'
+                        ? 'Deterministic Engine'
+                        : 'AI Pipeline'}
+                  </span>
+                </div>
+
+                {/* Note / Rationale */}
+                {entry.note && (
+                  <div
+                    style={{
+                      fontSize: '0.82rem',
+                      color: 'var(--text-secondary)',
+                      lineHeight: '1.5',
+                      padding: '8px 12px',
+                      background: 'var(--bg-raised)',
+                      borderRadius: '6px',
+                      borderLeft: '3px solid var(--gold-400)',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    &ldquo;{entry.note}&rdquo;
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </section>
   )
 }

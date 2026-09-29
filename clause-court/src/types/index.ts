@@ -62,6 +62,16 @@ export interface Definition extends SanityDocument {
   category?: string
 }
 
+export interface WorkflowTransitionLogEntry {
+  _key?: string
+  from: ClauseStatus | string
+  to: ClauseStatus | string
+  actor: string
+  actorType?: 'human' | 'deterministic' | 'system'
+  timestamp: string
+  note?: string
+}
+
 export interface Clause extends SanityDocument {
   _type: 'clause'
   title: string
@@ -74,6 +84,7 @@ export interface Clause extends SanityDocument {
   currentRuling?: Ruling | null
   caseNumber: string
   ambiguitySignals?: AmbiguitySignal[]
+  transitionLog?: WorkflowTransitionLogEntry[]
 }
 
 export interface Interpretation extends SanityDocument {
