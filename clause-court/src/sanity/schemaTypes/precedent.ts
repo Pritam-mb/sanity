@@ -96,6 +96,38 @@ export const precedentType = defineType({
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'precedent' }] })],
       description: 'Earlier rulings this one was argued against. Forms the precedent lineage.',
     }),
+
+    // ─── Council provenance + lifecycle (v2) ───────────
+    defineField({
+      name: 'council',
+      title: 'Deciding Council',
+      type: 'reference',
+      group: 'graph',
+      to: [{ type: 'council' }],
+      description: 'Set for council precedents. Empty for single-judge precedents.',
+    }),
+    defineField({
+      name: 'voteSummary',
+      title: 'Vote Summary',
+      type: 'string',
+      group: 'graph',
+      readOnly: true,
+      description: 'e.g. "decided by council, 4 to 1".',
+    }),
+    defineField({
+      name: 'status',
+      title: 'Lifecycle Status',
+      type: 'string',
+      group: 'scope',
+      initialValue: 'active',
+      options: {
+        list: [
+          { title: 'Active', value: 'active' },
+          { title: 'Superseded', value: 'superseded' },
+          { title: 'Overruled', value: 'overruled' },
+        ],
+      },
+    }),
   ],
   preview: {
     select: {

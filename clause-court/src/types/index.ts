@@ -15,6 +15,7 @@ export type AmbiguitySignalType =
   | 'missing_definition'
   | 'conditional_ambiguity'
   | 'conflicting_reference'
+  | 'company_standard'
 
 export type AdvocateSide = 'A' | 'B'
 
@@ -83,6 +84,7 @@ export interface Clause extends SanityDocument {
   debates?: Debate[]
   currentRuling?: Ruling | null
   caseNumber: string
+  submittedBy?: string
   ambiguitySignals?: AmbiguitySignal[]
   transitionLog?: WorkflowTransitionLogEntry[]
 }

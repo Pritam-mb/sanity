@@ -87,6 +87,50 @@ export const deskStructure: StructureResolver = (S: StructureBuilder) => {
     S.documentTypeListItem('definition')
       .title('📖  Definitions')
       .child(S.documentTypeList('definition').title('Definitions')),
+
+    S.documentTypeListItem('companyStandard')
+      .title('🏛  Company Standards')
+      .child(S.documentTypeList('companyStandard').title('Company Standards')),
+
+    S.divider(),
+
+    S.documentTypeListItem('council')
+      .title('🏛  Council')
+      .child(S.documentTypeList('council').title('Council')),
+
+    S.documentTypeListItem('councilMember')
+      .title('🪑  Council Members')
+      .child(S.documentTypeList('councilMember').title('Council Members')),
+
+    S.documentTypeListItem('session')
+      .title('🏟  Sessions')
+      .child(S.documentTypeList('session').title('Sessions')),
+
+    S.documentTypeListItem('position')
+      .title('📍  Positions')
+      .child(S.documentTypeList('position').title('Positions')),
+
+    S.documentTypeListItem('councilOption')
+      .title('🗳  Council Options')
+      .child(S.documentTypeList('councilOption').title('Council Options')),
+
+    S.documentTypeListItem('vote')
+      .title('✅  Votes')
+      .child(S.documentTypeList('vote').title('Votes')),
+
+    S.documentTypeListItem('approval')
+      .title('✍  Approvals')
+      .child(S.documentTypeList('approval').title('Approvals')),
+
+    S.documentTypeListItem('comment')
+      .title('💬  Comments')
+      .child(S.documentTypeList('comment').title('Comments')),
+
+    S.divider(),
+
+    S.documentTypeListItem('regulation')
+      .title('📜  Regulations & Benchmarks')
+      .child(S.documentTypeList('regulation').title('Regulations & Benchmarks')),
   ])
 }
 

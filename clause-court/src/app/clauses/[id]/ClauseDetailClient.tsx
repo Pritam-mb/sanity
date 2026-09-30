@@ -32,6 +32,7 @@ export interface ClauseDetailData {
   text: string
   category: string
   caseNumber: string
+  submittedBy?: string | null
   status: string
   ambiguitySignals?: AmbiguitySignal[]
   transitionLog?: WorkflowTransitionLogEntry[]
@@ -67,12 +68,14 @@ interface Props {
   clause: ClauseDetailData
   ambiguityReport: AmbiguityReport
   relevantPrecedent: PrecedentWithRelevance[]
+  sessions: Array<{ _id: string; status: string; round: string | null; deadline: string | null }>
 }
 
 export default function ClauseDetailClient({
   clause,
   ambiguityReport,
   relevantPrecedent,
+  sessions,
 }: Props) {
   const router = useRouter()
   const [status, setStatus] = useState<WorkflowState>(
@@ -195,9 +198,34 @@ export default function ClauseDetailClient({
               {clause.caseNumber} · {clause.category}
             </div>
             <h1 style={{ marginBottom: '8px' }}>{clause.title}</h1>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+              Submitted by{' '}
+              <span style={{ color: 'var(--gold-300)', fontWeight: '600' }}>
+                {clause.submittedBy || 'Unknown author'}
+              </span>
+            </p>
           </div>
           <StatusChip status={status} />
         </header>
+
+        {/* ─── Current situation — judge summary + next action ─── */}
+        <CaseSituation
+          status={status}
+          clauseId={clause._id}
+          signalCount={signals.length}
+          debateCount={(clause.debates ?? []).length}
+          rulingJudge={clause.currentRuling?.judgeName ?? null}
+          rulingHolding={
+            clause.currentRuling?.customRuling ||
+            clause.currentRuling?.chosenInterpretation?.title ||
+            null
+          }
+          priorPrecedentCount={relevantPrecedent.length}
+          citingCount={(clause.citedPrecedent ?? []).length}
+        />
+
+        {/* ─── Council deliberation ─────────────────────── */}
+        <SessionCard clauseId={clause._id} sessions={sessions} />
 
         {/* ─── Clause text with highlighted signals ─────── */}
         <section className="card card--gold" style={{ marginBottom: '24px' }}>
@@ -470,10 +498,12 @@ export default function ClauseDetailClient({
         {/* ─── Human approval gate ──────────────────────── */}
         {transitions.length > 0 && (
           <section
+            id="approval-gate"
             className="card"
             style={{
               borderColor: 'var(--border-gold)',
               marginBottom: '24px',
+              scrollMarginTop: '80px',
             }}
           >
             <SectionLabel>Human approval gate</SectionLabel>
@@ -615,6 +645,269 @@ export default function ClauseDetailClient({
 }
 
 // ─── Sub-components ──────────────────────────────────────────
+
+// Council deliberation card: link open sessions, or let the chair open one.
+// Opening requires the chair's identity (picked in the nav switcher).
+function SessionCard({
+  clauseId,
+  sessions,
+}: {
+  clauseId: string
+  sessions: Array<{ _id: string; status: string; round: string | null; deadline: string | null }>
+}) {
+  const router = useRouter()
+  const [working, setWorking] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const open = sessions.filter((s) => s.status !== 'released')
+
+  async function openSession() {
+    const match = document.cookie.match(/cc_member=([^;]+)/)
+    if (!match) {
+      setError('Pick an identity in the navigation bar first — only the chair can open a session.')
+      return
+    }
+    setWorking(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clauseId, chairMemberId: decodeURIComponent(match[1]) }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Could not open a session')
+      router.push(`/chamber/${data.id}`)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not open a session')
+      setWorking(false)
+    }
+  }
+
+  return (
+    <section className="card" style={{ borderColor: 'var(--border-gold)', marginBottom: '24px' }} aria-label="Council deliberation">
+      <SectionLabel>🏟 Council deliberation</SectionLabel>
+      {open.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {open.map((s) => (
+            <Link key={s._id} href={`/chamber/${s._id}`} style={{ textDecoration: 'none' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', padding: '12px 16px', background: 'var(--bg-raised)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                <div>
+                  <div style={{ fontWeight: '600' }}>Deliberation chamber</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    {s.status}{s.round ? ` · ${s.round} round` : ''}
+                  </div>
+                </div>
+                <span style={{ color: 'var(--gold-400)' }}>Enter →</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <>
+          <p style={{ fontSize: '0.88rem', marginBottom: '12px' }}>
+            No council session yet. The chair can open a deliberation — blind positions first,
+            then the vote, then the two-person approval.
+          </p>
+          {error && (
+            <p role="alert" style={{ fontSize: '0.85rem', color: 'var(--danger)', marginBottom: '10px' }}>
+              ⚠ {error}
+            </p>
+          )}
+          <button className="btn btn--primary btn--sm" disabled={working} onClick={openSession}>
+            {working ? '⟳ Opening…' : '🏟 Open council session'}
+          </button>
+        </>
+      )}
+    </section>
+  )
+}
+
+// Plain-language brief for the judge: where this case stands, what has
+// already happened, and whether any human action is still needed.
+function CaseSituation({
+  status,
+  clauseId,
+  signalCount,
+  debateCount,
+  rulingJudge,
+  rulingHolding,
+  priorPrecedentCount,
+  citingCount,
+}: {
+  status: WorkflowState
+  clauseId: string
+  signalCount: number
+  debateCount: number
+  rulingJudge: string | null
+  rulingHolding: string | null
+  priorPrecedentCount: number
+  citingCount: number
+}) {
+  const facts: string[] = []
+  if (signalCount > 0) {
+    facts.push(
+      `${signalCount} ambiguity signal${signalCount === 1 ? '' : 's'} found by the deterministic scan`
+    )
+  }
+  if (priorPrecedentCount > 0) {
+    facts.push(
+      `${priorPrecedentCount} prior ruling${priorPrecedentCount === 1 ? '' : 's'} will inform the debate`
+    )
+  }
+  if (debateCount > 0) {
+    facts.push(
+      `${debateCount} hearing${debateCount === 1 ? '' : 's'} on file — both advocates argued`
+    )
+  }
+  if (rulingJudge) {
+    facts.push(
+      `Judge ${rulingJudge} ruled${rulingHolding ? `: “${rulingHolding}”` : ''}`
+    )
+  }
+  if (citingCount > 0) {
+    facts.push(
+      `Cited by ${citingCount} later clause${citingCount === 1 ? '' : 's'} as precedent`
+    )
+  }
+  if (facts.length === 0) {
+    facts.push('No flags, hearings, or rulings recorded yet')
+  }
+
+  const action = SITUATION_ACTION[status]
+
+  return (
+    <section
+      className="card"
+      aria-label="Current case situation"
+      style={{
+        borderColor: action.needed ? 'var(--border-gold)' : 'rgba(16,185,129,0.3)',
+        background: action.needed
+          ? 'linear-gradient(135deg, var(--bg-card), rgba(201,168,76,0.05))'
+          : 'var(--success-dim)',
+        marginBottom: '24px',
+      }}
+    >
+      <SectionLabel>📋 Current situation — judge brief</SectionLabel>
+      <p
+        style={{
+          color: 'var(--text-primary)',
+          fontSize: '1.02rem',
+          fontWeight: '600',
+          lineHeight: '1.5',
+          marginBottom: '10px',
+        }}
+      >
+        {action.headline}
+      </p>
+      <ul
+        style={{
+          listStyle: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+          marginBottom: '14px',
+        }}
+      >
+        {facts.map((fact) => (
+          <li
+            key={fact}
+            style={{
+              display: 'flex',
+              gap: '8px',
+              fontSize: '0.87rem',
+              color: 'var(--text-secondary)',
+              lineHeight: '1.5',
+            }}
+          >
+            <span aria-hidden="true" style={{ color: 'var(--gold-400)' }}>
+              ▸
+            </span>
+            {fact}
+          </li>
+        ))}
+      </ul>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          flexWrap: 'wrap',
+          padding: '12px 14px',
+          borderRadius: '8px',
+          background: action.needed ? 'var(--gold-glow)' : 'rgba(16,185,129,0.12)',
+          border: `1px solid ${action.needed ? 'var(--border-gold)' : 'rgba(16,185,129,0.25)'}`,
+        }}
+      >
+        <span aria-hidden="true" style={{ fontSize: '1.1rem' }}>
+          {action.needed ? '👉' : '✅'}
+        </span>
+        <p style={{ fontSize: '0.87rem', color: 'var(--text-primary)', flex: '1 1 220px' }}>
+          <strong>{action.needed ? 'Action needed: ' : 'No action needed — '}</strong>
+          {action.detail}
+        </p>
+        {action.needed && action.cta && (
+          <Link
+            href={action.ctaHref ?? `/debate/${clauseId}`}
+            className="btn btn--primary btn--sm"
+          >
+            {action.cta}
+          </Link>
+        )}
+      </div>
+    </section>
+  )
+}
+
+interface SituationAction {
+  headline: string
+  needed: boolean
+  detail: string
+  cta?: string
+  ctaHref?: string
+}
+
+const SITUATION_ACTION: Record<WorkflowState, SituationAction> = {
+  draft: {
+    headline: 'This case has not entered the court yet.',
+    needed: false,
+    detail:
+      'the ambiguity scan runs automatically on review — nothing is required from you right now.',
+  },
+  flagged: {
+    headline: 'This case is waiting for its hearing.',
+    needed: true,
+    detail:
+      'send the clause to the two advocates so they can argue its competing readings.',
+    cta: '⚔ Enter Debate Chamber',
+  },
+  debated: {
+    headline: 'Both advocates have argued — the court awaits your ruling.',
+    needed: true,
+    detail:
+      'read the two interpretations and adopt one side or write a custom ruling. Only a human can rule.',
+    cta: '🔨 Issue Ruling',
+  },
+  ruled: {
+    headline: 'A ruling is on record — it still needs your approval.',
+    needed: true,
+    detail:
+      'the AI cannot resolve a case by itself. Review the ruling below and approve the resolution in the gate.',
+    cta: '✓ Review Approval Gate',
+    ctaHref: '#approval-gate',
+  },
+  resolved: {
+    headline: 'Approved — one step left before this becomes live precedent.',
+    needed: true,
+    detail: 'publish the clause so the ruling goes live and future debates can cite it.',
+    cta: '✓ Review Approval Gate',
+    ctaHref: '#approval-gate',
+  },
+  published: {
+    headline: 'Case closed — this ruling is live precedent.',
+    needed: false,
+    detail: 'future clauses with similar wording will automatically cite it in their debates.',
+  },
+}
 
 function isWorkflow(value: unknown): value is WorkflowState {
   return (

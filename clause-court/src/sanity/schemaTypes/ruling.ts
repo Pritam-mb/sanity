@@ -33,9 +33,8 @@ export const rulingType = defineType({
       type: 'reference',
       group: 'holding',
       description:
-        'The debate this ruling decides. The advocates’ arguments are read back from this document, so a ruling always records what was actually argued.',
+        'The debate this ruling decides. Empty for council rulings, which are decided in a session instead.',
       to: [{ type: 'debate' }],
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'chosenInterpretation',
@@ -116,6 +115,37 @@ export const rulingType = defineType({
       group: 'graph',
       readOnly: true,
       description: 'Denormalized pointer to the precedent this ruling produced.',
+    }),
+
+    // ─── Council decision (v2) ─────────────────────────
+    defineField({
+      name: 'session',
+      title: 'Deciding Session',
+      type: 'reference',
+      group: 'graph',
+      to: [{ type: 'session' }],
+      description: 'Set for council rulings. Empty for single-judge rulings.',
+    }),
+    defineField({
+      name: 'tally',
+      title: 'Vote Tally',
+      type: 'object',
+      group: 'graph',
+      readOnly: true,
+      fields: [
+        defineField({ name: 'winnerOption', title: 'Winning Option', type: 'string' }),
+        defineField({ name: 'votesCast', title: 'Votes Cast', type: 'number' }),
+        defineField({ name: 'winnerSharePct', title: 'Winner Share (%)', type: 'number' }),
+        defineField({ name: 'requiredSeatsMet', title: 'Required Seats Met', type: 'boolean' }),
+      ],
+    }),
+    defineField({
+      name: 'dissentingMembers',
+      title: 'Dissenting Members',
+      type: 'array',
+      group: 'dissent',
+      of: [{ type: 'reference', to: [{ type: 'councilMember' }] }],
+      description: 'Human dissents from the minority. The AI dissent above is separate and optional.',
     }),
   ],
   preview: {

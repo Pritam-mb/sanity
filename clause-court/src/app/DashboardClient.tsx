@@ -9,9 +9,12 @@ type StatsData = DashboardStats
 interface Props {
   stats: StatsData | null
   error: string | null
+  viewerName: string | null
+  queue: Array<{ sessionId: string; clauseTitle: string; caseNumber: string; action: string; detail: string; deadline: string | null }>
+  openSessionCount: number
 }
 
-export default function DashboardClient({ stats, error }: Props) {
+export default function DashboardClient({ stats, error, viewerName, queue, openSessionCount }: Props) {
   const [resetting, setResetting] = useState(false)
   const [resetMessage, setResetMessage] = useState('')
 
@@ -73,6 +76,46 @@ export default function DashboardClient({ stats, error }: Props) {
         </div>
 
         <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, var(--border-gold), transparent)', margin: '8px 0 40px' }} />
+
+        {/* ─── Your move ─────────────────────────────── */}
+        <section aria-label="Your move" style={{ marginBottom: '40px' }}>
+          <h3 style={{ marginBottom: '6px', fontFamily: 'var(--font-heading)' }}>
+            Your move{viewerName ? `, ${viewerName}` : ''}
+          </h3>
+          {!viewerName ? (
+            <div className="card">
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                🪪 Pick an identity in the navigation bar to see the sessions waiting on you.
+                {openSessionCount > 0 && ` ${openSessionCount} session${openSessionCount === 1 ? '' : 's'} open right now.`}
+              </p>
+            </div>
+          ) : queue.length === 0 ? (
+            <div className="card">
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                ✅ Nothing waiting on you. {openSessionCount > 0 && `${openSessionCount} session${openSessionCount === 1 ? '' : 's'} still open.`}
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+              {queue.map((item) => (
+                <Link key={`${item.sessionId}-${item.action}`} href={`/chamber/${item.sessionId}`} style={{ textDecoration: 'none' }}>
+                  <div className="card card--gold" style={{ cursor: 'pointer' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--gold-400)', marginBottom: '4px' }}>
+                      {item.caseNumber} · {item.action.toUpperCase()}
+                    </div>
+                    <div style={{ fontWeight: '600', marginBottom: '4px' }}>{item.clauseTitle}</div>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{item.detail}</div>
+                    {item.deadline && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }} suppressHydrationWarning>
+                        Due {new Date(item.deadline).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
 
         {/* ─── Error State ─────────────────────────── */}
         {error && (

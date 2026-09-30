@@ -1,11 +1,17 @@
 import { sanityClient } from '@/lib/sanity/client'
 import {
   SEED_CLAUSES,
+  SEED_COUNCIL,
   SEED_DEFINITIONS,
   SEED_DOCUMENT_TYPES,
   SEED_INTERPRETATIONS,
+  SEED_MEMBERS,
+  SEED_POSITIONS,
   SEED_PRECEDENT,
+  SEED_REGULATIONS,
   SEED_RULING,
+  SEED_SESSION,
+  SEED_STANDARDS,
   planSeedClauses,
 } from './dataset'
 import type { AmbiguitySignal, WorkflowTransitionLogEntry } from '@/types'
@@ -34,6 +40,11 @@ export interface SeedResult {
   precedents: number
   flaggedClauses: number
   ambiguousTerms: string[]
+  councils: number
+  members: number
+  regulations: number
+  sessions: number
+  positions: number
 }
 
 async function wipeDataset(): Promise<number> {
@@ -63,6 +74,25 @@ export async function seedDemoData(): Promise<SeedResult> {
     await sanityClient.createOrReplace(definition)
   }
 
+  // ─── 1b. Company standards (Rule E) ─────────────────────────
+  for (const standard of SEED_STANDARDS) {
+    await sanityClient.createOrReplace(standard)
+  }
+
+  // ─── 1c. The policy council + its members ───────────────────
+  for (const member of SEED_MEMBERS) {
+    await sanityClient.createOrReplace(member)
+  }
+  await sanityClient.createOrReplace({
+    ...SEED_COUNCIL,
+    chair: ref(SEED_COUNCIL.chair),
+  })
+
+  // ─── 1d. Knowledge base: regulations & benchmarks ──────────
+  for (const regulation of SEED_REGULATIONS) {
+    await sanityClient.createOrReplace(regulation)
+  }
+
   // ─── 2. Clauses, with engine-computed signals ─────────────
   // The ambiguity report is produced by the deterministic engine, not by hand.
   // Seeding through the same code path the app uses means the dashboard and a
@@ -75,6 +105,23 @@ export async function seedDemoData(): Promise<SeedResult> {
   // seeded precedent, which does not exist yet — and Sanity enforces reference
   // integrity, rejecting the whole mutation rather than storing a dangling
   // pointer. The edges are attached in step 7, once the precedent is written.
+  // Who put each case forward. The seed transition log already credits a
+  // "Policy Author"; this makes the same attribution visible on the case page.
+  const SUBMITTED_BY: Record<string, string> = {
+    'clause-refund-policy': 'Aisha Khan',
+    'clause-service-interruption': 'Dev Okafor',
+    'clause-priority-support': 'Priya Raman',
+    'clause-data-retention': 'Lena Fischer',
+    'clause-payment-terms': 'Aisha Khan',
+    'clause-api-rate-limit': 'Dev Okafor',
+    'clause-password-policy': 'Marcus Chen',
+    'clause-sla-uptime': 'Dev Okafor',
+    'clause-ip-ownership': 'Sofia Marino',
+    'clause-termination-notice': 'Sofia Marino',
+    'clause-geographic-restrictions': 'Lena Fischer',
+    'clause-support-sla': 'Priya Raman',
+  }
+
   for (const clause of SEED_CLAUSES) {
     const planEntry = plan.get(clause._id)
     const status = planEntry?.status ?? 'draft'
@@ -110,6 +157,7 @@ export async function seedDemoData(): Promise<SeedResult> {
       text: clause.text,
       category: clause.category,
       caseNumber: clause.caseNumber,
+      submittedBy: SUBMITTED_BY[clause._id] ?? 'Policy Team',
       status,
       ambiguitySignals: signals,
       definitions: clause.definitions.map(ref),
@@ -245,6 +293,27 @@ export async function seedDemoData(): Promise<SeedResult> {
   // from the reference graph and the number on the card becomes a lie.
   await recountCitations()
 
+  // ─── 9b. Demo deliberation: blind round on the "promptly" clause ──
+  // Members, clause and council all exist by now, so references resolve.
+  await sanityClient.createOrReplace({
+    ...SEED_SESSION,
+    clause: ref(SEED_SESSION.clause),
+    council: ref(SEED_SESSION.council),
+  })
+  for (const position of SEED_POSITIONS) {
+    await sanityClient.createOrReplace({
+      ...position,
+      member: ref(position.member),
+      clause: ref(position.clause),
+      session: ref(position.session),
+      basisPrecedent: [],
+    })
+  }
+  await sanityClient
+    .patch('clause-service-interruption')
+    .set({ session: ref(SEED_SESSION._id) })
+    .commit()
+
   // Counted from the documents as stored, not from the plan that wrote them.
   // The refund clause carries ambiguity signals but has since been ruled, so
   // counting "clauses with signals" would report 4 flagged when the dataset
@@ -287,6 +356,11 @@ export async function seedDemoData(): Promise<SeedResult> {
     precedents: 1,
     flaggedClauses,
     ambiguousTerms,
+    councils: 1,
+    members: SEED_MEMBERS.length,
+    regulations: SEED_REGULATIONS.length,
+    sessions: 1,
+    positions: SEED_POSITIONS.length,
   }
 }
 

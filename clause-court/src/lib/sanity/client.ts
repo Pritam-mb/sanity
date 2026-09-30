@@ -23,7 +23,7 @@ export const sanityReadClient = createClient({
 export const CLAUSE_LIST_QUERY = `
   *[_type == "clause"] | order(_createdAt desc) {
     _id, _type, _createdAt, _updatedAt, _rev,
-    title, text, category, status, caseNumber,
+    title, text, category, status, caseNumber, submittedBy,
     ambiguitySignals,
     "transitionLog": coalesce(transitionLog, []),
     "definitionCount": count(definitions),
@@ -39,7 +39,7 @@ export const CLAUSE_LIST_QUERY = `
 export const CLAUSE_BY_ID_QUERY = `
   *[_type == "clause" && _id == $id][0] {
     _id, _type, _createdAt, _updatedAt, _rev,
-    title, text, category, status, caseNumber,
+    title, text, category, status, caseNumber, submittedBy,
     ambiguitySignals,
     "transitionLog": coalesce(transitionLog, []),
     "definitions": definitions[]->{_id, term, definition, category},
@@ -119,6 +119,15 @@ export const PRECEDENT_BY_ID_QUERY = `
     "citedBy": *[_type == "clause" && references(^._id)] | order(_createdAt asc) {
       _id, title, text, caseNumber, category, status
     }
+  }
+`
+
+// Company standards for Rule E. Fetched wherever the engine runs so a new
+// standard takes effect on the next page load — no redeploy.
+export const STANDARDS_QUERY = `
+  *[_type == "companyStandard"] {
+    title,
+    "bannedPhrases": coalesce(bannedPhrases, [])
   }
 `
 

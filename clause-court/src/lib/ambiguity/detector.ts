@@ -64,12 +64,28 @@ function singularize(word: string): string {
 }
 
 // =============================================
+// RULE E — COMPANY STANDARDS
+// =============================================
+//
+// A company standard is a house rule stored as a Sanity `companyStandard`
+// document: phrases the organisation has banned from its own policies
+// (e.g. "best efforts", "as soon as possible"). The engine checks the clause
+// against every standard the same deterministic way it checks its built-in
+// lists — adding a company rule is a CMS edit, never a model change.
+
+export interface CompanyStandard {
+  title: string
+  bannedPhrases: string[]
+}
+
+// =============================================
 // MAIN DETECTION FUNCTION
 // =============================================
 
 export function detectAmbiguity(
   clauseText: string,
-  definitions: DefinedTerm[] = []
+  definitions: DefinedTerm[] = [],
+  standards: CompanyStandard[] = []
 ): AmbiguityReport {
   const signals: AmbiguitySignal[] = []
   const textLower = clauseText.toLowerCase()
@@ -145,6 +161,28 @@ export function detectAmbiguity(
     }
   }
 
+  // ─── Rule E: Company Standards ─────────────────────
+  // House-banned phrases, checked literally and case-insensitively. Each hit
+  // names the standard that forbids it, so the flag reads as company policy
+  // rather than a generic complaint.
+  for (const standard of standards) {
+    const title = standard.title?.trim() || 'Company standard'
+    for (const rawPhrase of standard.bannedPhrases ?? []) {
+      const phrase = rawPhrase?.trim().toLowerCase()
+      if (!phrase) continue
+      const idx = textLower.indexOf(phrase)
+      if (idx !== -1) {
+        signals.push({
+          type: 'company_standard' as AmbiguitySignalType,
+          term: rawPhrase.trim(),
+          position: idx,
+          message: `The phrase "${rawPhrase.trim()}" is banned by "${title}". Company policy requires concrete wording here.`,
+          ruleLabel: `Company Standard (Rule E): ${title}`,
+        })
+      }
+    }
+  }
+
   // Deduplicate by term+position
   const unique = signals.filter(
     (sig, idx, arr) =>
@@ -168,6 +206,7 @@ export function getSignalTypeLabel(type: AmbiguitySignalType): string {
     missing_definition: 'Missing Definition',
     conditional_ambiguity: 'Conditional Ambiguity',
     conflicting_reference: 'Conflicting Reference',
+    company_standard: 'Company Standard',
   }
   return labels[type] || type
 }
@@ -178,6 +217,7 @@ export function getSignalTypeColor(type: AmbiguitySignalType): string {
     missing_definition: 'var(--warning)',
     conditional_ambiguity: 'var(--info)',
     conflicting_reference: 'var(--advocate-b)',
+    company_standard: 'var(--gold-400)',
   }
   return colors[type] || 'var(--text-muted)'
 }

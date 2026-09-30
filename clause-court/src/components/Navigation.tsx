@@ -2,11 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import MemberSwitcher from './MemberSwitcher'
 
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: '⚡' },
   { href: '/clauses', label: 'Clauses', icon: '📋' },
+  { href: '/council', label: 'Council', icon: '🏛' },
   { href: '/precedents', label: 'Precedents', icon: '⚖' },
+  { href: '/knowledge', label: 'Knowledge', icon: '📜' },
   { href: '/graph', label: 'Graph', icon: '🕸' },
 ]
 
@@ -42,6 +45,7 @@ export default function Navigation() {
         </ul>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <MemberSwitcher />
           <span
             style={{
               fontFamily: 'var(--font-mono)',

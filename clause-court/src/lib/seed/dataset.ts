@@ -2,6 +2,42 @@ import { detectAmbiguity } from '../ambiguity/detector.ts'
 import type { AmbiguitySignal } from '@/types'
 
 // =============================================
+// COMPANY STANDARDS (Rule E)
+// =============================================
+//
+// House rules stored as data, not code. The engine checks every clause
+// against these banned-phrase lists. None of the phrases below appear in the
+// 12 seeded clauses, so the demo's "3 flagged" count is unchanged — the
+// standards only fire on future cases that use forbidden wording.
+
+export interface SeedCompanyStandard {
+  _id: string
+  _type: 'companyStandard'
+  title: string
+  description: string
+  bannedPhrases: string[]
+}
+
+export const SEED_STANDARDS: SeedCompanyStandard[] = [
+  {
+    _id: 'std-plain-language',
+    _type: 'companyStandard',
+    title: 'House Plain-Language Standard',
+    description:
+      'Commitment language must be measurable. "Best efforts" and open-ended speed promises are banned — state a number and a unit instead.',
+    bannedPhrases: ['best efforts', 'as soon as possible'],
+  },
+  {
+    _id: 'std-support-response',
+    _type: 'companyStandard',
+    title: 'Support Response Standard',
+    description:
+      'Support commitments must name a response window. Vague timing promises are banned.',
+    bannedPhrases: ['at the earliest convenience', 'whenever feasible'],
+  },
+]
+
+// =============================================
 // CLAUSE COURT — DEMO DATASET
 // =============================================
 //
@@ -207,6 +243,335 @@ export const SEED_CLAUSES: SeedClause[] = [
 ]
 
 // =============================================
+// THE POLICY COUNCIL (v2)
+// =============================================
+//
+// Five seats, 60% quorum, simple-majority threshold, and Legal + Security as
+// required seats — the demo council from the v2 walkthrough. Members double
+// as the demo identity switcher ("view as Priya, Arjun, Meera…") until real
+// sign-in exists.
+
+export interface SeedCouncilMember {
+  _id: string
+  _type: 'councilMember'
+  name: string
+  seat: string
+  active: boolean
+  bio: string
+}
+
+export const SEED_COUNCIL = {
+  _id: 'council-policy',
+  _type: 'council' as const,
+  name: 'Policy Council',
+  description:
+    'Settles ambiguous policy wording. Legal and Security must always be heard; the chair runs procedure and cannot override a vote.',
+  seats: ['Legal', 'Security', 'Operations', 'Vendor Management', 'Finance'],
+  quorumPct: 60,
+  thresholdPct: 50,
+  requiredSeats: ['Legal', 'Security'],
+  chair: 'member-dev-okafor',
+}
+
+export const SEED_MEMBERS: SeedCouncilMember[] = [
+  {
+    _id: 'member-arjun-mehta',
+    _type: 'councilMember',
+    name: 'Arjun Mehta',
+    seat: 'Legal',
+    active: true,
+    bio: 'Corporate counsel. Guards enforceability and regulatory floors.',
+  },
+  {
+    _id: 'member-meera-nair',
+    _type: 'councilMember',
+    name: 'Meera Nair',
+    seat: 'Security',
+    active: true,
+    bio: 'Security lead. Reads every window as incident-response time.',
+  },
+  {
+    _id: 'member-priya-raman',
+    _type: 'councilMember',
+    name: 'Priya Raman',
+    seat: 'Operations',
+    active: true,
+    bio: 'Support operations. Balances severity against team capacity.',
+  },
+  {
+    _id: 'member-sofia-marino',
+    _type: 'councilMember',
+    name: 'Sofia Marino',
+    seat: 'Vendor Management',
+    active: true,
+    bio: 'Owns vendor relationships. Speaks for what partners can actually meet.',
+  },
+  {
+    _id: 'member-dev-okafor',
+    _type: 'councilMember',
+    name: 'Dev Okafor',
+    seat: 'Finance',
+    active: true,
+    bio: 'Council chair. Runs procedure, holds no veto and casts no deciding vote.',
+  },
+]
+
+// =============================================
+// KNOWLEDGE BASE — regulations & benchmarks (v2)
+// =============================================
+//
+// Illustrative demo data: thresholds must be verified against official
+// sources before any real reliance. Numeric floors are enforced by
+// `checkLegalFloor`; entries without a floor still serve as cited basis.
+
+export interface SeedRegulation {
+  _id: string
+  _type: 'regulation'
+  title: string
+  reference: string
+  kind: 'regulation' | 'benchmark'
+  description: string
+  floorValue: number | null
+  floorUnit: string | null
+  appliesTo: string[]
+  illustrative: boolean
+}
+
+export const SEED_REGULATIONS: SeedRegulation[] = [
+  {
+    _id: 'reg-gdpr-33',
+    _type: 'regulation',
+    title: 'Breach notification to the supervisory authority',
+    reference: 'GDPR Art. 33',
+    kind: 'regulation',
+    description: 'Personal-data breaches must be notified without undue delay and within 72 hours of awareness.',
+    floorValue: 72,
+    floorUnit: 'hours',
+    appliesTo: ['Data Policy', 'Security'],
+    illustrative: true,
+  },
+  {
+    _id: 'reg-gdpr-34',
+    _type: 'regulation',
+    title: 'Breach communication to data subjects',
+    reference: 'GDPR Art. 34',
+    kind: 'regulation',
+    description: 'High-risk breaches must be communicated without undue delay. No numeric floor stated.',
+    floorValue: null,
+    floorUnit: null,
+    appliesTo: ['Data Policy', 'Security'],
+    illustrative: true,
+  },
+  {
+    _id: 'reg-ccpa-response',
+    _type: 'regulation',
+    title: 'Consumer request response window',
+    reference: 'CCPA / CPRA',
+    kind: 'regulation',
+    description: 'Businesses must respond to verifiable consumer requests within 45 days.',
+    floorValue: 45,
+    floorUnit: 'calendar_days',
+    appliesTo: ['Data Policy', 'Compliance'],
+    illustrative: true,
+  },
+  {
+    _id: 'reg-hipaa-breach',
+    _type: 'regulation',
+    title: 'Breach notification to individuals',
+    reference: 'HIPAA Breach Notification Rule',
+    kind: 'regulation',
+    description: 'Covered entities must notify affected individuals within 60 days of discovering a breach.',
+    floorValue: 60,
+    floorUnit: 'calendar_days',
+    appliesTo: ['Data Policy', 'Compliance'],
+    illustrative: true,
+  },
+  {
+    _id: 'reg-pci-patches',
+    _type: 'regulation',
+    title: 'Critical security patches',
+    reference: 'PCI DSS v4',
+    kind: 'regulation',
+    description: 'Critical vulnerabilities should be remediated within one month of discovery.',
+    floorValue: 30,
+    floorUnit: 'calendar_days',
+    appliesTo: ['Security', 'Technical'],
+    illustrative: true,
+  },
+  {
+    _id: 'reg-soc2-incident',
+    _type: 'regulation',
+    title: 'Incident response procedures',
+    reference: 'SOC 2 CC7.3',
+    kind: 'regulation',
+    description: 'Incidents must follow documented response procedures. No numeric floor stated.',
+    floorValue: null,
+    floorUnit: null,
+    appliesTo: ['Security', 'Service Level Agreement'],
+    illustrative: true,
+  },
+  {
+    _id: 'reg-dora-incident',
+    _type: 'regulation',
+    title: 'Major-incident initial notification',
+    reference: 'EU DORA',
+    kind: 'regulation',
+    description: 'Major ICT incidents require an early notification within hours. Verify the current threshold.',
+    floorValue: 4,
+    floorUnit: 'hours',
+    appliesTo: ['Security', 'Compliance'],
+    illustrative: true,
+  },
+  {
+    _id: 'bench-p1-response',
+    _type: 'regulation',
+    title: 'P1 incident first response',
+    reference: 'Industry benchmark',
+    kind: 'benchmark',
+    description: 'Common enterprise target: acknowledge a critical incident within 1 business hour.',
+    floorValue: 1,
+    floorUnit: 'business_hours',
+    appliesTo: ['Service Level Agreement', 'Support Policy'],
+    illustrative: true,
+  },
+  {
+    _id: 'bench-support-first-response',
+    _type: 'regulation',
+    title: 'Enterprise support first response',
+    reference: 'Industry benchmark',
+    kind: 'benchmark',
+    description: 'Common enterprise target: first human response within 8 business hours.',
+    floorValue: 8,
+    floorUnit: 'business_hours',
+    appliesTo: ['Support Policy'],
+    illustrative: true,
+  },
+  {
+    _id: 'bench-sla-uptime',
+    _type: 'regulation',
+    title: 'Monthly uptime commitment',
+    reference: 'Industry benchmark',
+    kind: 'benchmark',
+    description: '99.9% monthly uptime is the standard enterprise commitment. No proposal floor.',
+    floorValue: null,
+    floorUnit: null,
+    appliesTo: ['Service Level Agreement'],
+    illustrative: true,
+  },
+]
+
+// =============================================
+// DEMO DELIBERATION (v2)
+// =============================================
+//
+// A live blind round on the "promptly" clause (#0043): five members,
+// 4 / 8 / 8 / 24 / 48 business hours. Opening the chamber shows the
+// spectrum and the deterministic summary with zero clicks.
+
+export const SEED_SESSION = {
+  _id: 'session-promptly-deliberation',
+  _type: 'session' as const,
+  clause: 'clause-service-interruption',
+  council: 'council-policy',
+  status: 'deliberation' as const,
+  round: 'blind' as const,
+  deadline: '2026-10-07T18:00:00.000Z',
+}
+
+export interface SeedPosition {
+  _id: string
+  _type: 'position'
+  member: string
+  clause: string
+  session: string
+  stance: 'support-A' | 'support-B' | 'custom'
+  proposedValue: number
+  unit: string
+  rationale: string
+  confidence: number
+  basisNote: string | null
+  round: 'blind' | 'open'
+}
+
+export const SEED_POSITIONS: SeedPosition[] = [
+  {
+    _id: 'pos-arjun-promptly',
+    _type: 'position',
+    member: 'member-arjun-mehta',
+    clause: 'clause-service-interruption',
+    session: 'session-promptly-deliberation',
+    stance: 'support-A',
+    proposedValue: 4,
+    unit: 'business_hours',
+    rationale:
+      'The incident clock starts at discovery, not at acknowledgement. Every hour widens the blast radius and the disclosure exposure, so the window must be the shortest the team can credibly staff.',
+    confidence: 4,
+    basisNote: 'GDPR Art. 33 — 72h',
+    round: 'blind',
+  },
+  {
+    _id: 'pos-priya-promptly',
+    _type: 'position',
+    member: 'member-priya-raman',
+    clause: 'clause-service-interruption',
+    session: 'session-promptly-deliberation',
+    stance: 'custom',
+    proposedValue: 8,
+    unit: 'business_hours',
+    rationale:
+      'Eight business hours covers a full shift handover: the on-call engineer triages, and the next shift restores. Shorter windows fail on nights and weekends.',
+    confidence: 3,
+    basisNote: null,
+    round: 'blind',
+  },
+  {
+    _id: 'pos-meera-promptly',
+    _type: 'position',
+    member: 'member-meera-nair',
+    clause: 'clause-service-interruption',
+    session: 'session-promptly-deliberation',
+    stance: 'custom',
+    proposedValue: 8,
+    unit: 'business_hours',
+    rationale:
+      'Eight hours keeps us inside every applicable notification floor with margin, while remaining a promise the team can keep during an actual incident.',
+    confidence: 5,
+    basisNote: 'GDPR Art. 33 — 72h',
+    round: 'blind',
+  },
+  {
+    _id: 'pos-dev-promptly',
+    _type: 'position',
+    member: 'member-dev-okafor',
+    clause: 'clause-service-interruption',
+    session: 'session-promptly-deliberation',
+    stance: 'support-B',
+    proposedValue: 24,
+    unit: 'business_hours',
+    rationale:
+      'Restoration involves vendors and change control, not just our team. A 24-hour window prices honestly instead of committing to heroics.',
+    confidence: 2,
+    basisNote: null,
+    round: 'blind',
+  },
+  {
+    _id: 'pos-sofia-promptly',
+    _type: 'position',
+    member: 'member-sofia-marino',
+    clause: 'clause-service-interruption',
+    session: 'session-promptly-deliberation',
+    stance: 'support-B',
+    proposedValue: 48,
+    unit: 'business_hours',
+    rationale:
+      'Small vendors cannot staff round-the-clock response. Forty-eight hours is the longest window partners will sign without a price increase.',
+    confidence: 3,
+    basisNote: null,
+    round: 'blind',
+  },
+]
+
+// =============================================
 // THE SEEDED LITIGATION
 // =============================================
 //
@@ -306,6 +671,16 @@ export const SEED_DOCUMENT_TYPES = [
   'ruling',
   'precedent',
   'definition',
+  'companyStandard',
+  'council',
+  'councilMember',
+  'session',
+  'position',
+  'comment',
+  'councilOption',
+  'vote',
+  'approval',
+  'regulation',
 ] as const
 
 export interface SeedPlanEntry {
@@ -323,7 +698,8 @@ export interface SeedPlanEntry {
  */
 export function planSeedClauses(
   definitions: SeedDefinition[] = SEED_DEFINITIONS,
-  clauses: SeedClause[] = SEED_CLAUSES
+  clauses: SeedClause[] = SEED_CLAUSES,
+  standards: SeedCompanyStandard[] = SEED_STANDARDS
 ): SeedPlanEntry[] {
   const byId = new Map(definitions.map((d) => [d._id, d]))
 
@@ -333,7 +709,11 @@ export function planSeedClauses(
       .filter((d): d is SeedDefinition => Boolean(d))
       .map((d) => ({ term: d.term }))
 
-    const report = detectAmbiguity(clause.text, linked)
+    const report = detectAmbiguity(
+      clause.text,
+      linked,
+      standards.map((s) => ({ title: s.title, bannedPhrases: s.bannedPhrases }))
+    )
     const alreadyRuled = clause._id === 'clause-refund-policy'
 
     return {

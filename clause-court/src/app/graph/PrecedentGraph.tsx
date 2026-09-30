@@ -18,7 +18,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css'
 
 // =============================================
-// PRECEDENT GRAPH
+// PRECEDENT GRAPH — premium edition
 // =============================================
 //
 // Four columns, read left to right:
@@ -31,41 +31,66 @@ import 'reactflow/dist/style.css'
 // system accumulates institutional reasoning instead of restarting per debate.
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ClauseNode({ data }: NodeProps<any>) {
+function ClauseNode({ data, selected }: NodeProps<any>) {
   return (
-    <div className={`graph-node graph-node--clause ${data.dim ? 'graph-node--dim' : ''}`}>
-      <Handle type="target" position={Position.Left} className="graph-handle" />
-      <div className="graph-node__eyebrow">{data.caseNumber ?? 'CLAUSE'}</div>
-      <div className="graph-node__title">{data.label}</div>
+    <div
+      className={`gnp gnp--clause${selected ? ' gnp--selected' : ''}`}
+    >
+      <Handle type="target" position={Position.Left} className="gnp-handle" />
+      <div className="gnp-top">
+        <span className="gnp-medallion gnp-medallion--clause" aria-hidden="true">
+          ⚖
+        </span>
+        <span className="gnp-eyebrow">{data.caseNumber ?? 'CLAUSE'}</span>
+      </div>
+      <div className="gnp-title">{data.label}</div>
       <span className={`badge badge--${data.status}`}>{data.status}</span>
-      <Handle type="source" position={Position.Right} className="graph-handle" />
+      <Handle type="source" position={Position.Right} className="gnp-handle" />
     </div>
   )
 }
 
-function RulingNode({ data }: NodeProps) {
+function RulingNode({ data, selected }: NodeProps) {
   return (
-    <div className="graph-node graph-node--ruling">
-      <Handle type="target" position={Position.Left} className="graph-handle" />
-      <div className="graph-node__eyebrow">🔨 RULING</div>
-      <div className="graph-node__title">{data.label as string}</div>
-      <div className="graph-node__meta">{data.judge as string}</div>
-      <Handle type="source" position={Position.Right} className="graph-handle" />
+    <div
+      className={`gnp gnp--ruling${selected ? ' gnp--selected' : ''}`}
+    >
+      <Handle type="target" position={Position.Left} className="gnp-handle" />
+      <div className="gnp-top">
+        <span className="gnp-medallion gnp-medallion--ruling" aria-hidden="true">
+          🔨
+        </span>
+        <span className="gnp-eyebrow">RULING</span>
+      </div>
+      <div className="gnp-title">{data.label as string}</div>
+      <div className="gnp-meta">{data.judge as string}</div>
+      <Handle type="source" position={Position.Right} className="gnp-handle" />
     </div>
   )
 }
 
-function PrecedentNode({ data }: NodeProps) {
+function PrecedentNode({ data, selected }: NodeProps) {
   return (
-    <div className="graph-node graph-node--precedent">
-      <Handle type="target" position={Position.Left} className="graph-handle" />
-      <div className="graph-node__eyebrow">📚 PRECEDENT</div>
-      <div className="graph-node__title">{data.label as string}</div>
-      <div className="graph-node__meta">{data.holding as string}</div>
-      <span className="graph-node__cite">
+    <div
+      className={`gnp gnp--precedent${selected ? ' gnp--selected' : ''}`}
+    >
+      <Handle type="target" position={Position.Left} className="gnp-handle" />
+      <div className="gnp-top">
+        <span
+          className="gnp-medallion gnp-medallion--precedent"
+          aria-hidden="true"
+        >
+          📚
+        </span>
+        <span className="gnp-eyebrow">PRECEDENT</span>
+      </div>
+      <div className="gnp-title">{data.label as string}</div>
+      <div className="gnp-meta gnp-meta--clamp">{data.holding as string}</div>
+      <span className="gnp-cite">
+        <span className="gnp-cite-dot" aria-hidden="true" />
         cited by {data.citationCount as number}
       </span>
-      <Handle type="source" position={Position.Right} className="graph-handle" />
+      <Handle type="source" position={Position.Right} className="gnp-handle" />
     </div>
   )
 }
@@ -110,8 +135,8 @@ export interface GraphData {
   precedents: GraphPrecedent[]
 }
 
-const COLUMN_X = { clause: 0, ruling: 380, precedent: 760, dependent: 1200 }
-const ROW_HEIGHT = 150
+const COLUMN_X = { clause: 0, ruling: 400, precedent: 800, dependent: 1260 }
+const ROW_HEIGHT = 180
 
 function buildGraph(data: GraphData): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = []
@@ -177,10 +202,10 @@ function buildGraph(data: GraphData): { nodes: Node[]; edges: Edge[] } {
       target: `ruling:${ruling._id}`,
       type: 'smoothstep',
       markerEnd: { type: MarkerType.ArrowClosed, color: '#c9a84c' },
-      style: { stroke: '#c9a84c', strokeWidth: 1.6 },
+      style: { stroke: '#c9a84c', strokeWidth: 2 },
       label: 'produced',
-      labelStyle: { fill: '#5a6080', fontSize: 10 },
-      labelBgStyle: { fill: '#131720' },
+      labelStyle: { fill: '#c9a84c', fontSize: 10, fontFamily: 'JetBrains Mono, monospace' },
+      labelBgStyle: { fill: '#141009' },
     })
   })
 
@@ -191,7 +216,7 @@ function buildGraph(data: GraphData): { nodes: Node[]; edges: Edge[] } {
       position: { x: COLUMN_X.precedent, y: i * ROW_HEIGHT },
       data: {
         label: precedent.title,
-        holding: truncate(precedent.holding, 70),
+        holding: truncate(precedent.holding, 90),
         citationCount: precedent.citationCount ?? 0,
         href: `/precedents/${precedent._id}`,
       },
@@ -204,10 +229,10 @@ function buildGraph(data: GraphData): { nodes: Node[]; edges: Edge[] } {
         target: `precedent:${precedent._id}`,
         type: 'smoothstep',
         markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' },
-        style: { stroke: '#10b981', strokeWidth: 1.6 },
+        style: { stroke: '#10b981', strokeWidth: 2 },
         label: 'became',
-        labelStyle: { fill: '#5a6080', fontSize: 10 },
-        labelBgStyle: { fill: '#131720' },
+        labelStyle: { fill: '#10b981', fontSize: 10, fontFamily: 'JetBrains Mono, monospace' },
+        labelBgStyle: { fill: '#08130e' },
       })
     }
 
@@ -220,11 +245,12 @@ function buildGraph(data: GraphData): { nodes: Node[]; edges: Edge[] } {
         source: `precedent:${precedent._id}`,
         target: `clause:${citingClauseId}`,
         type: 'smoothstep',
-        markerEnd: { type: MarkerType.ArrowClosed, color: '#3b82f6' },
-        style: { stroke: '#3b82f6', strokeWidth: 2, strokeDasharray: '5 4' },
-        label: 'cites',
-        labelStyle: { fill: '#60a5fa', fontSize: 10, fontWeight: 600 },
-        labelBgStyle: { fill: '#131720' },
+        animated: true,
+        markerEnd: { type: MarkerType.ArrowClosed, color: '#60a5fa' },
+        style: { stroke: '#3b82f6', strokeWidth: 2.5, strokeDasharray: '6 4' },
+        label: 'cites ★',
+        labelStyle: { fill: '#93c5fd', fontSize: 10, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' },
+        labelBgStyle: { fill: '#0a1226' },
       })
     }
 
@@ -239,10 +265,10 @@ function buildGraph(data: GraphData): { nodes: Node[]; edges: Edge[] } {
         target: `precedent:${precedent._id}`,
         type: 'smoothstep',
         markerEnd: { type: MarkerType.ArrowClosed, color: '#c9a84c' },
-        style: { stroke: '#c9a84c', strokeWidth: 1.2, strokeDasharray: '2 4' },
+        style: { stroke: '#c9a84c', strokeWidth: 1.5, strokeDasharray: '3 5' },
         label: 'inherits',
-        labelStyle: { fill: '#5a6080', fontSize: 10 },
-        labelBgStyle: { fill: '#131720' },
+        labelStyle: { fill: '#8a7a45', fontSize: 10, fontFamily: 'JetBrains Mono, monospace' },
+        labelBgStyle: { fill: '#141009' },
       })
     }
   })
@@ -273,109 +299,96 @@ export default function PrecedentGraph({
     [router]
   )
 
-  const citationEdges = edges.filter((e) => e.label === 'cites').length
+  const citationEdges = edges.filter((e) => e.id.startsWith('e-precedent-clause')).length
   const isEmpty = nodes.length === 0
 
   return (
-    <div style={{ padding: '40px 0 60px' }}>
+    <div className="graph-page">
       <div className="container container--wide">
-        <nav
-          aria-label="Breadcrumb"
-          style={{
-            display: 'flex',
-            gap: '8px',
-            marginBottom: '20px',
-            fontSize: '0.8rem',
-            color: 'var(--text-muted)',
-          }}
-        >
-          <Link href="/" style={{ color: 'var(--text-muted)' }}>
+        <nav aria-label="Breadcrumb" className="graph-crumb animate-fade-in">
+          <Link href="/" className="graph-crumb__link">
             Dashboard
           </Link>
-          <span aria-hidden="true">›</span>
-          <span style={{ color: 'var(--gold-400)' }}>Precedent Graph</span>
+          <span aria-hidden="true" className="graph-crumb__sep">›</span>
+          <span className="graph-crumb__current">Precedent Graph</span>
         </nav>
 
-        <header style={{ marginBottom: '24px' }}>
-          <div className="court-case-number">REFERENCE GRAPH</div>
-          <h1 style={{ marginBottom: '12px' }}>
-            How rulings <span style={{ color: 'var(--gold-400)' }}>accumulate</span>
+        <header className="graph-hero animate-fade-in">
+          <div className="graph-hero__eyebrow">
+            <span className="graph-hero__rule" aria-hidden="true" />
+            REFERENCE GRAPH · LIVE FROM SANITY
+            <span className="graph-hero__rule" aria-hidden="true" />
+          </div>
+          <h1 className="graph-hero__title">
+            How rulings{' '}
+            <em className="graph-hero__accent">accumulate</em>
           </h1>
-          <p style={{ maxWidth: '680px' }}>
-            Every edge below is a real Sanity reference. The dashed blue edges
-            are the ones that matter: a precedent being picked up by a clause
+          <p className="graph-hero__sub">
+            Every edge below is a real Sanity reference — clause to ruling to
+            precedent, and back to a future clause. The glowing blue edges are
+            the ones that matter: a precedent being picked up by a clause
             written after the ruling existed.
           </p>
+          <div className="graph-chain" aria-hidden="true">
+            <span className="graph-chain__chip graph-chain__chip--clause">Clause</span>
+            <span className="graph-chain__arrow">→</span>
+            <span className="graph-chain__chip graph-chain__chip--ruling">Ruling</span>
+            <span className="graph-chain__arrow">→</span>
+            <span className="graph-chain__chip graph-chain__chip--precedent">Precedent</span>
+            <span className="graph-chain__arrow">→</span>
+            <span className="graph-chain__chip graph-chain__chip--future">Future clause</span>
+          </div>
         </header>
 
         {error && (
-          <div
-            className="card"
-            style={{
-              borderColor: 'var(--danger)',
-              background: 'var(--danger-dim)',
-              marginBottom: '20px',
-            }}
-          >
-            <p style={{ color: 'var(--danger)' }}>⚠ {error}</p>
+          <div className="card graph-error" role="alert">
+            <p>⚠ {error}</p>
           </div>
         )}
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-            gap: '12px',
-            marginBottom: '20px',
-          }}
-        >
-          <LegendTile label="Clauses" value={data.clauses.length} color="var(--text-primary)" />
-          <LegendTile label="Rulings" value={data.rulings.length} color="var(--gold-400)" />
-          <LegendTile label="Precedents" value={data.precedents.length} color="var(--success)" />
-          <LegendTile
+        <div className="graph-stats animate-fade-in">
+          <StatTile label="Clauses" value={data.clauses.length} accent="clause" />
+          <StatTile label="Rulings" value={data.rulings.length} accent="ruling" />
+          <StatTile label="Precedents" value={data.precedents.length} accent="precedent" />
+          <StatTile
             label="Precedent citations"
             value={citationEdges}
-            color="var(--advocate-a)"
+            accent="cites"
+            star
           />
         </div>
 
         {isEmpty ? (
-          <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>🕸</div>
-            <h4 style={{ marginBottom: '8px' }}>The graph is empty</h4>
-            <p style={{ color: 'var(--text-muted)', maxWidth: '480px', margin: '0 auto' }}>
+          <div className="card graph-empty animate-scale-in">
+            <div className="graph-empty__ring" aria-hidden="true">🕸</div>
+            <h4>The graph is empty</h4>
+            <p>
               Nothing has been ruled yet. Seed the demo data and litigate a
               flagged clause — the graph fills in as rulings accumulate.
             </p>
           </div>
         ) : (
-          <div
-            className="graph-canvas"
-            style={{
-              height: '620px',
-              border: '1px solid var(--border-default)',
-              borderRadius: 'var(--radius-lg)',
-              overflow: 'hidden',
-              background: 'var(--bg-panel)',
-            }}
-          >
+          <div className="graph-canvas animate-fade-in">
+            <div className="graph-canvas__glow" aria-hidden="true" />
             <ReactFlow
               nodes={nodes}
               edges={edges}
               nodeTypes={nodeTypes}
               onNodeClick={onNodeClick}
               fitView
-              fitViewOptions={{ padding: 0.2 }}
+              fitViewOptions={{ padding: 0.22 }}
               proOptions={{ hideAttribution: true }}
               nodesDraggable
               nodesConnectable={false}
               elementsSelectable
+              minZoom={0.4}
+              maxZoom={1.6}
             >
               <Background
                 variant={BackgroundVariant.Dots}
-                gap={22}
-                size={1}
-                color="rgba(255,255,255,0.07)"
+                gap={26}
+                size={1.4}
+                color="rgba(201,168,76,0.14)"
               />
               <Controls showInteractive={false} />
               <MiniMap
@@ -388,64 +401,49 @@ export default function PrecedentGraph({
                       ? '#c9a84c'
                       : '#3b82f6'
                 }
-                maskColor="rgba(13, 15, 20, 0.85)"
+                maskColor="rgba(8, 10, 15, 0.82)"
+                style={{
+                  background: 'rgba(13, 15, 20, 0.9)',
+                  border: '1px solid rgba(201,168,76,0.25)',
+                  borderRadius: '12px',
+                }}
               />
             </ReactFlow>
           </div>
         )}
 
-        <div
-          style={{
-            display: 'flex',
-            gap: '20px',
-            flexWrap: 'wrap',
-            marginTop: '16px',
-            fontSize: '0.78rem',
-            color: 'var(--text-muted)',
-          }}
-        >
+        <div className="graph-legend">
           <LegendKey color="#c9a84c" label="clause → ruling → precedent" />
-          <LegendKey color="#3b82f6" label="precedent cited by a later clause" dashed />
-          <span>Click any node to open it.</span>
+          <LegendKey color="#3b82f6" label="precedent cited by a later clause ★" dashed glow />
+          <span className="graph-legend__hint">Click any node to open it.</span>
         </div>
       </div>
     </div>
   )
 }
 
-function LegendTile({
+function StatTile({
   label,
   value,
-  color,
+  accent,
+  star = false,
 }: {
   label: string
   value: number
-  color: string
+  accent: 'clause' | 'ruling' | 'precedent' | 'cites'
+  star?: boolean
 }) {
   return (
-    <div className="card" style={{ padding: '14px 16px' }}>
-      <div
-        style={{
-          fontFamily: 'var(--font-heading)',
-          fontSize: '1.7rem',
-          fontWeight: '700',
-          color,
-          lineHeight: 1,
-          marginBottom: '4px',
-        }}
-      >
+    <div className={`graph-stat graph-stat--${accent}`}>
+      <div className="graph-stat__value">
         {value}
+        {star && value > 0 && (
+          <span className="graph-stat__star" aria-label="killer feature">
+            ★
+          </span>
+        )}
       </div>
-      <div
-        style={{
-          fontSize: '0.72rem',
-          color: 'var(--text-muted)',
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-        }}
-      >
-        {label}
-      </div>
+      <div className="graph-stat__label">{label}</div>
     </div>
   )
 }
@@ -454,22 +452,30 @@ function LegendKey({
   color,
   label,
   dashed = false,
+  glow = false,
 }: {
   color: string
   label: string
   dashed?: boolean
+  glow?: boolean
 }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-      <svg width="26" height="8" aria-hidden="true">
+    <span className="graph-legend__key">
+      <svg
+        width="30"
+        height="8"
+        aria-hidden="true"
+        style={glow ? { filter: `drop-shadow(0 0 4px ${color})` } : undefined}
+      >
         <line
           x1="0"
           y1="4"
-          x2="26"
+          x2="30"
           y2="4"
           stroke={color}
-          strokeWidth="2"
-          strokeDasharray={dashed ? '5 4' : undefined}
+          strokeWidth="2.5"
+          strokeDasharray={dashed ? '6 4' : undefined}
+          strokeLinecap="round"
         />
       </svg>
       {label}

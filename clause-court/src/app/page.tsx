@@ -1,4 +1,6 @@
 import { sanityClient, DASHBOARD_QUERY } from '@/lib/sanity/client'
+import { getOpenSessions, yourMoveQueue } from '@/lib/council/chamber'
+import { getViewerMember } from '@/lib/council/viewer'
 import DashboardClient from './DashboardClient'
 import type { DashboardStats } from '@/types'
 
@@ -15,5 +17,17 @@ export default async function DashboardPage() {
     error = e instanceof Error ? e.message : 'Failed to load dashboard data'
   }
 
-  return <DashboardClient stats={stats} error={error} />
+  const viewer = await getViewerMember().catch(() => null)
+  const openSessions = await getOpenSessions()
+  const queue = viewer ? yourMoveQueue(openSessions, viewer._id) : []
+
+  return (
+    <DashboardClient
+      stats={stats}
+      error={error}
+      viewerName={viewer?.name ?? null}
+      queue={queue}
+      openSessionCount={openSessions.length}
+    />
+  )
 }

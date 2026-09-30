@@ -1,5 +1,5 @@
-import { sanityClient, CLAUSE_BY_ID_QUERY } from '@/lib/sanity/client'
-import { detectAmbiguity } from '@/lib/ambiguity/detector'
+import { sanityClient, CLAUSE_BY_ID_QUERY, STANDARDS_QUERY } from '@/lib/sanity/client'
+import { detectAmbiguity, type CompanyStandard } from '@/lib/ambiguity/detector'
 import { findRelevantPrecedent } from '@/lib/precedent/findRelevant'
 import ClauseDetailClient, { type ClauseDetailData } from './ClauseDetailClient'
 import { notFound } from 'next/navigation'
@@ -31,7 +31,11 @@ export default async function ClauseDetailPage({ params }: Props) {
 
   const definitions = (clause.definitions ?? []).map((d) => ({ term: d.term ?? '' }))
 
-  const ambiguityReport = detectAmbiguity(clause.text ?? '', definitions)
+  const standards = await sanityClient
+    .fetch<CompanyStandard[]>(STANDARDS_QUERY)
+    .catch(() => [])
+
+  const ambiguityReport = detectAmbiguity(clause.text ?? '', definitions, standards)
 
   const relevantPrecedent = await findRelevantPrecedent(
     id,
@@ -39,11 +43,19 @@ export default async function ClauseDetailPage({ params }: Props) {
     ambiguityReport.signals
   ).catch(() => [])
 
+  const sessions = await sanityClient
+    .fetch<Array<{ _id: string; status: string; round: string | null; deadline: string | null }>>(
+      `*[_type == "session" && clause._ref == $id] | order(_createdAt desc) {_id, status, round, deadline}`,
+      { id }
+    )
+    .catch(() => [])
+
   return (
     <ClauseDetailClient
       clause={clause}
       ambiguityReport={ambiguityReport}
       relevantPrecedent={relevantPrecedent}
+      sessions={sessions}
     />
   )
 }

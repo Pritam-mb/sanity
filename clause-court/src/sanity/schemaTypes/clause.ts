@@ -63,6 +63,14 @@ export const clauseType = defineType({
       group: 'content',
       description: 'Court-style reference, e.g. #0042.',
     }),
+    defineField({
+      name: 'submittedBy',
+      title: 'Submitted By',
+      type: 'string',
+      group: 'content',
+      description:
+        'The person who put this case forward for review. Shown on the case page as its attribution.',
+    }),
 
     // ─── Deterministic analysis ────────────────────────
     defineField({
@@ -88,6 +96,7 @@ export const clauseType = defineType({
                   { title: 'Missing Definition (Rule B)', value: 'missing_definition' },
                   { title: 'Conditional Ambiguity (Rule D)', value: 'conditional_ambiguity' },
                   { title: 'Conflicting Reference (Rule C)', value: 'conflicting_reference' },
+                  { title: 'Company Standard (Rule E)', value: 'company_standard' },
                 ],
               },
             }),
@@ -153,6 +162,25 @@ export const clauseType = defineType({
       group: 'graph',
       readOnly: true,
       to: [{ type: 'ruling' }],
+    }),
+    defineField({
+      name: 'session',
+      title: 'Deliberation Session',
+      type: 'reference',
+      group: 'graph',
+      readOnly: true,
+      to: [{ type: 'session' }],
+      description: 'The council session deliberating this clause, if one is open.',
+    }),
+    defineField({
+      name: 'stale',
+      title: 'Stale Precedent Warning',
+      type: 'boolean',
+      group: 'workflow',
+      readOnly: true,
+      initialValue: false,
+      description:
+        'Set when a precedent this clause relies on was superseded or overruled.',
     }),
 
     // ─── Workflow ──────────────────────────────────────
