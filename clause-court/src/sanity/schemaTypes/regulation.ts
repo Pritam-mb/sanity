@@ -11,7 +11,6 @@ export const regulationType = defineType({
   name: 'regulation',
   title: 'Regulation / Benchmark',
   type: 'document',
-  icon: () => '📜',
   fields: [
     defineField({
       name: 'title',

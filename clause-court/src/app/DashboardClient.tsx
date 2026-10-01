@@ -26,14 +26,14 @@ export default function DashboardClient({ stats, error, viewerName, queue, openS
       const res = await fetch('/api/seed', { method: 'POST' })
       const data = await res.json()
       if (data.success) {
-        setResetMessage('✓ Demo reset! Refreshing...')
+        setResetMessage('Demo reset successfully. Refreshing...')
         setTimeout(() => window.location.reload(), 1200)
       } else {
-        setResetMessage('✗ Reset failed: ' + data.error)
+        setResetMessage('Reset failed: ' + data.error)
       }
     } catch (e) {
       setResetMessage(
-        '✗ ' + (e instanceof Error ? e.message : 'Reset failed')
+        e instanceof Error ? e.message : 'Reset failed'
       )
     } finally {
       setResetting(false)
@@ -57,7 +57,7 @@ export default function DashboardClient({ stats, error, viewerName, queue, openS
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
             <Link href="/clauses" className="btn btn--primary btn--lg">
-              ⚖ Open Flagged Clauses
+              Open Flagged Clauses
             </Link>
             <button
               className="btn btn--ghost"
@@ -65,7 +65,7 @@ export default function DashboardClient({ stats, error, viewerName, queue, openS
               disabled={resetting}
               id="demo-reset-btn"
             >
-              {resetting ? '⟳ Resetting...' : '⟳ Reset Demo'}
+              {resetting ? 'Resetting...' : 'Reset Demo'}
             </button>
           </div>
           {resetMessage && (
@@ -85,14 +85,14 @@ export default function DashboardClient({ stats, error, viewerName, queue, openS
           {!viewerName ? (
             <div className="card">
               <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                🪪 Pick an identity in the navigation bar to see the sessions waiting on you.
+                Pick an identity in the navigation bar to see the sessions waiting on you.
                 {openSessionCount > 0 && ` ${openSessionCount} session${openSessionCount === 1 ? '' : 's'} open right now.`}
               </p>
             </div>
           ) : queue.length === 0 ? (
             <div className="card">
               <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                ✅ Nothing waiting on you. {openSessionCount > 0 && `${openSessionCount} session${openSessionCount === 1 ? '' : 's'} still open.`}
+                No pending actions waiting on you. {openSessionCount > 0 && `${openSessionCount} session${openSessionCount === 1 ? '' : 's'} still open.`}
               </p>
             </div>
           ) : (
@@ -120,7 +120,7 @@ export default function DashboardClient({ stats, error, viewerName, queue, openS
         {/* ─── Error State ─────────────────────────── */}
         {error && (
           <div className="card" style={{ borderColor: 'var(--danger)', background: 'var(--danger-dim)', marginBottom: '32px' }}>
-            <h4 style={{ color: 'var(--danger)', marginBottom: '8px' }}>⚠ Sanity Connection Error</h4>
+            <h4 style={{ color: 'var(--danger)', marginBottom: '8px' }}>Sanity Connection Error</h4>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{error}</p>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '8px' }}>
               Make sure your <code>.env.local</code> has <code>NEXT_PUBLIC_SANITY_PROJECT_ID</code> and <code>SANITY_API_TOKEN</code> set.
@@ -138,38 +138,32 @@ export default function DashboardClient({ stats, error, viewerName, queue, openS
           <StatCard
             value={stats?.totalClauses ?? '—'}
             label="Total Clauses"
-            icon="📋"
             color="var(--text-primary)"
           />
           <StatCard
             value={stats?.flaggedClauses ?? '—'}
             label="Need Review"
-            icon="⚠"
             color="var(--danger)"
             highlight={stats?.flaggedClauses ? stats.flaggedClauses > 0 : false}
           />
           <StatCard
             value={stats?.activeDebates ?? '—'}
             label="Active Debates"
-            icon="⚡"
             color="var(--advocate-a)"
           />
           <StatCard
             value={stats?.totalRulings ?? '—'}
             label="Rulings Issued"
-            icon="🔨"
             color="var(--gold-400)"
           />
           <StatCard
             value={stats?.totalPrecedents ?? '—'}
             label="Precedents"
-            icon="⚖"
             color="var(--success)"
           />
           <StatCard
             value={stats?.resolvedClauses ?? '—'}
             label="Resolved"
-            icon="✓"
             color="var(--success)"
           />
         </div>
@@ -189,7 +183,6 @@ export default function DashboardClient({ stats, error, viewerName, queue, openS
                 ))
               ) : (
                 <div className="card" style={{ textAlign: 'center', padding: '48px 24px' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⚖</div>
                   <p style={{ color: 'var(--text-muted)' }}>
                     No rulings yet. Start a debate to create the first ruling.
                   </p>
@@ -209,24 +202,18 @@ export default function DashboardClient({ stats, error, viewerName, queue, openS
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <ActionCard
                 href="/clauses?filter=flagged"
-                icon="⚠"
                 title="Review Flagged Clauses"
                 description="Open clauses with detected ambiguity signals"
-                color="var(--danger)"
               />
               <ActionCard
                 href="/precedents"
-                icon="📚"
                 title="Browse Precedents"
                 description="View all human-approved rulings and their citations"
-                color="var(--gold-400)"
               />
               <ActionCard
                 href="/graph"
-                icon="🕸"
                 title="Precedent Graph"
                 description="Visualize how rulings connect to future clauses"
-                color="var(--success)"
               />
             </div>
 
@@ -270,30 +257,29 @@ export default function DashboardClient({ stats, error, viewerName, queue, openS
 
 // ─── Sub-components ──────────────────────────────────────────
 
-function StatCard({ value, label, icon, color, highlight = false }: {
+function StatCard({ value, label, color, highlight = false }: {
   value: number | string
   label: string
-  icon: string
   color: string
   highlight?: boolean
 }) {
   return (
     <div className={`card ${highlight ? 'card--gold' : ''}`} style={{
       textAlign: 'center',
+      padding: '24px 16px',
       boxShadow: highlight ? '0 0 20px rgba(239, 68, 68, 0.1)' : undefined,
     }}>
-      <div style={{ fontSize: '1.4rem', marginBottom: '8px' }}>{icon}</div>
       <div style={{
         fontFamily: 'var(--font-heading)',
-        fontSize: '2.2rem',
+        fontSize: '2.4rem',
         fontWeight: '700',
         color,
         lineHeight: 1,
-        marginBottom: '6px',
+        marginBottom: '10px',
       }}>
         {value}
       </div>
-      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+      <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
         {label}
       </div>
     </div>
@@ -334,37 +320,22 @@ function RulingCard({ ruling }: { ruling: RecentRuling }) {
   )
 }
 
-function ActionCard({ href, icon, title, description, color }: {
+function ActionCard({ href, title, description }: {
   href: string
-  icon: string
   title: string
   description: string
-  color: string
 }) {
   return (
     <Link href={href} style={{ textDecoration: 'none' }}>
       <div className="card" style={{
         display: 'flex',
         gap: '16px',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         cursor: 'pointer',
-        padding: '16px',
+        padding: '16px 20px',
+        transition: 'all 200ms ease',
       }}>
-        <div style={{
-          width: '40px',
-          height: '40px',
-          borderRadius: '10px',
-          background: `${color}18`,
-          border: `1px solid ${color}30`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.1rem',
-          flexShrink: 0,
-        }}>
-          {icon}
-        </div>
-        <div>
+        <div style={{ flex: 1 }}>
           <div style={{ fontWeight: '600', fontSize: '0.9rem', marginBottom: '4px', color: 'var(--text-primary)' }}>
             {title}
           </div>
@@ -372,7 +343,7 @@ function ActionCard({ href, icon, title, description, color }: {
             {description}
           </div>
         </div>
-        <span style={{ marginLeft: 'auto', color: 'var(--text-muted)', fontSize: '0.8rem', alignSelf: 'center' }}>→</span>
+        <span style={{ color: 'var(--gold-400)', fontSize: '1rem' }}>→</span>
       </div>
     </Link>
   )

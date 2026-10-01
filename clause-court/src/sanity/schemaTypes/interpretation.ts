@@ -10,7 +10,6 @@ export const interpretationType = defineType({
   name: 'interpretation',
   title: 'Interpretation',
   type: 'document',
-  icon: () => '⚖',
   groups: [
     { name: 'argument', title: 'Argument', default: true },
     { name: 'evidence', title: 'Evidence' },
@@ -88,7 +87,7 @@ export const interpretationType = defineType({
     },
     prepare({ side, title, clause }) {
       return {
-        title: `${side === 'B' ? '🟡 Advocate B' : '🔵 Advocate A'} — ${title ?? 'Untitled'}`,
+        title: `${side === 'B' ? 'Advocate B' : 'Advocate A'} — ${title ?? 'Untitled'}`,
         subtitle: clause ?? 'Orphaned interpretation',
       }
     },

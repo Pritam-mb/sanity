@@ -197,32 +197,32 @@ export const WORKFLOW_STATE_META: Record<
 > = {
   draft: {
     label: 'Draft',
-    icon: '○',
+    icon: 'draft',
     description: 'Clause is being written. Not yet analyzed.',
   },
   flagged: {
     label: 'Flagged',
-    icon: '⚠',
+    icon: 'flagged',
     description: 'The deterministic engine found an inspectable ambiguity signal.',
   },
   debated: {
     label: 'Debated',
-    icon: '⚡',
+    icon: 'debated',
     description: 'Two advocates have argued opposing interpretations. No ruling yet.',
   },
   ruled: {
     label: 'Ruled',
-    icon: '🔨',
+    icon: 'ruled',
     description: 'A human judge ruled. Awaiting human approval to resolve.',
   },
   resolved: {
     label: 'Resolved',
-    icon: '✓',
+    icon: 'resolved',
     description: 'The human approved the ruling. The clause now has an effective meaning.',
   },
   published: {
     label: 'Published',
-    icon: '✓✓',
+    icon: 'published',
     description: 'Released. The ruling is live precedent.',
   },
 }

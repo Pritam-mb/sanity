@@ -65,7 +65,7 @@ export function ClauseWorkflowPanel({ document }: DocumentViewProps) {
               App SDK Workflow & Governance Panel (PRD §16, §36)
             </div>
             <h2 style={{ fontSize: '1.25rem', marginTop: '4px', color: '#e8eaf0' }}>
-              State: {meta.label} {meta.icon}
+              State: {meta.label}
             </h2>
           </div>
 
@@ -152,7 +152,6 @@ export function ClauseWorkflowPanel({ document }: DocumentViewProps) {
                   }`,
                 }}
               >
-                {i < currentIdx ? '✓ ' : ''}
                 {WORKFLOW_STATE_META[step].label}
               </div>
               {i < WORKFLOW_STATES.length - 1 && (
@@ -182,7 +181,7 @@ export function ClauseWorkflowPanel({ document }: DocumentViewProps) {
               marginBottom: '6px',
             }}
           >
-            ⚖ Human Authority & Approval Gate Rules
+            Human Authority & Approval Gate Rules
           </div>
           <p style={{ fontSize: '0.85rem', color: '#9aa0b8', lineHeight: '1.5' }}>
             {meta.description} The <code>ruled → resolved</code> transition is an explicit human approval gate:
@@ -202,7 +201,7 @@ export function ClauseWorkflowPanel({ document }: DocumentViewProps) {
             }}
           >
             <h3 style={{ fontSize: '1rem', color: '#e8eaf0' }}>
-              📜 Institutional Transition Audit Trail ({log.length})
+              Institutional Transition Audit Trail ({log.length})
             </h3>
             <span
               style={{

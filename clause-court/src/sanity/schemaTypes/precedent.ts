@@ -12,7 +12,6 @@ export const precedentType = defineType({
   name: 'precedent',
   title: 'Precedent',
   type: 'document',
-  icon: () => '📚',
   groups: [
     { name: 'holding', title: 'Holding', default: true },
     { name: 'scope', title: 'Scope' },

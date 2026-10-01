@@ -283,9 +283,6 @@ export default function ClauseDetailClient({
                   marginBottom: '16px',
                 }}
               >
-                <span style={{ fontSize: '1.4rem' }} aria-hidden="true">
-                  ⚠
-                </span>
                 <div>
                   <h4 style={{ color: 'var(--danger)', marginBottom: '2px' }}>
                     Ambiguity Detected — {signals.length} signal
@@ -309,9 +306,6 @@ export default function ClauseDetailClient({
               style={{ borderColor: 'var(--success)', background: 'var(--success-dim)' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '1.4rem' }} aria-hidden="true">
-                  ✓
-                </span>
                 <div>
                   <h4 style={{ color: 'var(--success)' }}>No Ambiguity Detected</h4>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
@@ -357,7 +351,7 @@ export default function ClauseDetailClient({
         {relevantPrecedent.length > 0 && (
           <section className="card card--gold" style={{ marginBottom: '24px' }}>
             <SectionLabel>
-              ⚖ Relevant precedent — this debate cites {relevantPrecedent.length}{' '}
+              Relevant precedent — this debate cites {relevantPrecedent.length}{' '}
               prior ruling{relevantPrecedent.length === 1 ? '' : 's'}
             </SectionLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -423,7 +417,7 @@ export default function ClauseDetailClient({
               marginBottom: '24px',
             }}
           >
-            <SectionLabel>🔨 Human ruling recorded</SectionLabel>
+            <SectionLabel>Human ruling recorded</SectionLabel>
             <p
               style={{
                 color: 'var(--text-primary)',
@@ -604,7 +598,7 @@ export default function ClauseDetailClient({
                 }}
               >
                 <p style={{ color: 'var(--danger)', fontSize: '0.85rem' }}>
-                  ⚠ {gateError}
+                  {gateError}
                 </p>
               </div>
             )}
@@ -617,7 +611,7 @@ export default function ClauseDetailClient({
                   onClick={() => runTransition(transition.to, transition.label)}
                   title={transition.description}
                 >
-                  {working ? '⟳ Working...' : transition.label}
+                  {working ? 'Working...' : transition.label}
                 </button>
               ))}
             </div>
@@ -633,7 +627,7 @@ export default function ClauseDetailClient({
             id="enter-debate-btn"
             className={`btn btn--lg ${hasRuling ? 'btn--ghost' : 'btn--primary'}`}
           >
-            {hasRuling ? '⚔ Reopen Debate' : '⚔ Enter Debate Chamber'}
+            {hasRuling ? 'Reopen Debate' : 'Enter Debate Chamber'}
           </Link>
           <Link href="/clauses" className="btn btn--ghost">
             ← Back to Clauses
@@ -685,7 +679,7 @@ function SessionCard({
 
   return (
     <section className="card" style={{ borderColor: 'var(--border-gold)', marginBottom: '24px' }} aria-label="Council deliberation">
-      <SectionLabel>🏟 Council deliberation</SectionLabel>
+      <SectionLabel>Council deliberation</SectionLabel>
       {open.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {open.map((s) => (
@@ -710,11 +704,11 @@ function SessionCard({
           </p>
           {error && (
             <p role="alert" style={{ fontSize: '0.85rem', color: 'var(--danger)', marginBottom: '10px' }}>
-              ⚠ {error}
+              {error}
             </p>
           )}
           <button className="btn btn--primary btn--sm" disabled={working} onClick={openSession}>
-            {working ? '⟳ Opening…' : '🏟 Open council session'}
+            {working ? 'Opening…' : 'Open Council Session'}
           </button>
         </>
       )}
@@ -787,7 +781,7 @@ function CaseSituation({
         marginBottom: '24px',
       }}
     >
-      <SectionLabel>📋 Current situation — judge brief</SectionLabel>
+      <SectionLabel>Current situation — judge brief</SectionLabel>
       <p
         style={{
           color: 'var(--text-primary)',
@@ -838,9 +832,6 @@ function CaseSituation({
           border: `1px solid ${action.needed ? 'var(--border-gold)' : 'rgba(16,185,129,0.25)'}`,
         }}
       >
-        <span aria-hidden="true" style={{ fontSize: '1.1rem' }}>
-          {action.needed ? '👉' : '✅'}
-        </span>
         <p style={{ fontSize: '0.87rem', color: 'var(--text-primary)', flex: '1 1 220px' }}>
           <strong>{action.needed ? 'Action needed: ' : 'No action needed — '}</strong>
           {action.detail}
@@ -878,28 +869,28 @@ const SITUATION_ACTION: Record<WorkflowState, SituationAction> = {
     needed: true,
     detail:
       'send the clause to the two advocates so they can argue its competing readings.',
-    cta: '⚔ Enter Debate Chamber',
+    cta: 'Enter Debate Chamber',
   },
   debated: {
     headline: 'Both advocates have argued — the court awaits your ruling.',
     needed: true,
     detail:
       'read the two interpretations and adopt one side or write a custom ruling. Only a human can rule.',
-    cta: '🔨 Issue Ruling',
+    cta: 'Issue Ruling',
   },
   ruled: {
     headline: 'A ruling is on record — it still needs your approval.',
     needed: true,
     detail:
       'the AI cannot resolve a case by itself. Review the ruling below and approve the resolution in the gate.',
-    cta: '✓ Review Approval Gate',
+    cta: 'Review Approval Gate',
     ctaHref: '#approval-gate',
   },
   resolved: {
     headline: 'Approved — one step left before this becomes live precedent.',
     needed: true,
     detail: 'publish the clause so the ruling goes live and future debates can cite it.',
-    cta: '✓ Review Approval Gate',
+    cta: 'Review Approval Gate',
     ctaHref: '#approval-gate',
   },
   published: {
@@ -955,7 +946,6 @@ function WorkflowStepper({ currentStatus }: { currentStatus: WorkflowState }) {
             title={WORKFLOW_STATE_META[step].description}
             aria-current={i === currentIdx ? 'step' : undefined}
           >
-            {i < currentIdx ? '✓ ' : ''}
             {WORKFLOW_STATE_META[step].label}
           </div>
           {i < WORKFLOW_STATES.length - 1 && (
@@ -970,7 +960,6 @@ function WorkflowStepper({ currentStatus }: { currentStatus: WorkflowState }) {
 }
 
 function StatusChip({ status }: { status: WorkflowState }) {
-  const meta = WORKFLOW_STATE_META[status]
   const isDanger = status === 'flagged'
   const isSuccess = status === 'resolved' || status === 'published'
 
@@ -996,7 +985,6 @@ function StatusChip({ status }: { status: WorkflowState }) {
         }`,
       }}
     >
-      <span aria-hidden="true">{meta.icon}</span>
       <span
         style={{
           fontWeight: '700',
@@ -1089,7 +1077,7 @@ function WorkflowAuditTrail({ log }: { log: WorkflowTransitionLogEntry[] }) {
         }}
       >
         <div>
-          <SectionLabel>📜 Institutional Audit Trail</SectionLabel>
+          <SectionLabel>Institutional Audit Trail</SectionLabel>
           <h3 style={{ fontSize: '1.05rem', margin: '2px 0 4px', color: 'var(--text-primary)' }}>
             Workflow Transition Log
           </h3>
@@ -1157,8 +1145,6 @@ function WorkflowAuditTrail({ log }: { log: WorkflowTransitionLogEntry[] }) {
                   ? 'system'
                   : 'human')
 
-            const actorIcon =
-              actorType === 'human' ? '👤' : actorType === 'deterministic' ? '⚙️' : '🤖'
             const actorBadgeColor =
               actorType === 'human'
                 ? 'var(--gold-400)'
@@ -1260,7 +1246,6 @@ function WorkflowAuditTrail({ log }: { log: WorkflowTransitionLogEntry[] }) {
                         border: '1px solid var(--border-subtle)',
                       }}
                     >
-                      {stateMeta?.icon ? `${stateMeta.icon} ` : ''}
                       {stateMeta?.label ?? entry.to}
                     </span>
                   </div>
@@ -1296,7 +1281,20 @@ function WorkflowAuditTrail({ log }: { log: WorkflowTransitionLogEntry[] }) {
                     flexWrap: 'wrap',
                   }}
                 >
-                  <span style={{ fontSize: '0.9rem' }}>{actorIcon}</span>
+                  <span
+                    style={{
+                      fontSize: '0.7rem',
+                      padding: '1px 6px',
+                      borderRadius: '4px',
+                      background: actorBadgeBg,
+                      color: actorBadgeColor,
+                      fontFamily: 'var(--font-mono)',
+                      textTransform: 'uppercase',
+                      fontWeight: '600',
+                    }}
+                  >
+                    {actorType}
+                  </span>
                   <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
                     {entry.actor}
                   </span>

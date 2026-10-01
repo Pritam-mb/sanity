@@ -18,9 +18,7 @@ export const deskStructure: StructureResolver = (S: StructureBuilder) => {
   const byStatus = WORKFLOW_STATES.map((state) =>
     S.listItem()
       .id(`status-${state}`)
-      .title(
-        `${WORKFLOW_STATE_META[state].icon}  ${WORKFLOW_STATE_META[state].label}`
-      )
+      .title(WORKFLOW_STATE_META[state].label)
       .child(
         S.documentList()
           .id(`list-${state}`)
@@ -61,7 +59,7 @@ export const deskStructure: StructureResolver = (S: StructureBuilder) => {
     S.divider(),
 
     S.documentTypeListItem('precedent')
-      .title('📚  Precedent Library')
+      .title('Precedent Library')
       .child(
         S.documentTypeList('precedent')
           .title('Precedent Library')
@@ -69,7 +67,7 @@ export const deskStructure: StructureResolver = (S: StructureBuilder) => {
       ),
 
     S.documentTypeListItem('ruling')
-      .title('🔨  Rulings')
+      .title('Rulings')
       .child(
         S.documentTypeList('ruling')
           .title('Rulings')
@@ -77,59 +75,59 @@ export const deskStructure: StructureResolver = (S: StructureBuilder) => {
       ),
 
     S.documentTypeListItem('debate')
-      .title('⚔  Debates')
+      .title('Debates')
       .child(S.documentTypeList('debate').title('Debates')),
 
     S.documentTypeListItem('interpretation')
-      .title('⚖  Interpretations')
+      .title('Interpretations')
       .child(S.documentTypeList('interpretation').title('Interpretations')),
 
     S.documentTypeListItem('definition')
-      .title('📖  Definitions')
+      .title('Definitions')
       .child(S.documentTypeList('definition').title('Definitions')),
 
     S.documentTypeListItem('companyStandard')
-      .title('🏛  Company Standards')
+      .title('Company Standards')
       .child(S.documentTypeList('companyStandard').title('Company Standards')),
 
     S.divider(),
 
     S.documentTypeListItem('council')
-      .title('🏛  Council')
+      .title('Council')
       .child(S.documentTypeList('council').title('Council')),
 
     S.documentTypeListItem('councilMember')
-      .title('🪑  Council Members')
+      .title('Council Members')
       .child(S.documentTypeList('councilMember').title('Council Members')),
 
     S.documentTypeListItem('session')
-      .title('🏟  Sessions')
+      .title('Sessions')
       .child(S.documentTypeList('session').title('Sessions')),
 
     S.documentTypeListItem('position')
-      .title('📍  Positions')
+      .title('Positions')
       .child(S.documentTypeList('position').title('Positions')),
 
     S.documentTypeListItem('councilOption')
-      .title('🗳  Council Options')
+      .title('Council Options')
       .child(S.documentTypeList('councilOption').title('Council Options')),
 
     S.documentTypeListItem('vote')
-      .title('✅  Votes')
+      .title('Votes')
       .child(S.documentTypeList('vote').title('Votes')),
 
     S.documentTypeListItem('approval')
-      .title('✍  Approvals')
+      .title('Approvals')
       .child(S.documentTypeList('approval').title('Approvals')),
 
     S.documentTypeListItem('comment')
-      .title('💬  Comments')
+      .title('Comments')
       .child(S.documentTypeList('comment').title('Comments')),
 
     S.divider(),
 
     S.documentTypeListItem('regulation')
-      .title('📜  Regulations & Benchmarks')
+      .title('Regulations & Benchmarks')
       .child(S.documentTypeList('regulation').title('Regulations & Benchmarks')),
   ])
 }

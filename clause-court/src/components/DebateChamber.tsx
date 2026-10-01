@@ -329,7 +329,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                   fontWeight: '600',
                 }}
               >
-                ⚠ {getSignalTypeLabel(s.type)}: &ldquo;{s.term}&rdquo;
+                {getSignalTypeLabel(s.type)}: &ldquo;{s.term}&rdquo;
               </span>
             ))}
           </div>
@@ -374,7 +374,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                 textTransform: 'uppercase',
               }}
             >
-              📚 Related Precedent Found
+              Related Precedent Found
             </div>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               {precedents.map(
@@ -448,7 +448,18 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
             padding: '0 24px',
           }}
         >
-          <div style={{ fontSize: '3rem', marginBottom: '24px' }}>⚔</div>
+          <div
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.75rem',
+              letterSpacing: '0.12em',
+              color: 'var(--gold-400)',
+              marginBottom: '12px',
+              textTransform: 'uppercase',
+            }}
+          >
+            Adversarial Hearing
+          </div>
           <h3 style={{ marginBottom: '16px', fontFamily: 'var(--font-heading)' }}>
             The Court Is Ready
           </h3>
@@ -468,7 +479,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
               }}
               role="alert"
             >
-              <p style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>⚠ {error}</p>
+              <p style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>{error}</p>
             </div>
           )}
           <button
@@ -476,7 +487,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
             className="btn btn--primary btn--lg"
             onClick={startDebate}
           >
-            ⚔ Begin Debate
+            Begin Debate
           </button>
         </div>
       )}
@@ -517,19 +528,19 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
               className={`mobile-tab ${mobileTab === 'A' ? 'mobile-tab--active-a' : ''}`}
               onClick={() => setMobileTab('A')}
             >
-              🔵 Advocate A
+              Advocate A
             </button>
             <button
               className={`mobile-tab ${mobileTab === 'B' ? 'mobile-tab--active-b' : ''}`}
               onClick={() => setMobileTab('B')}
             >
-              🟡 Advocate B
+              Advocate B
             </button>
             <button
               className={`mobile-tab ${mobileTab === 'judge' ? 'mobile-tab--active-judge' : ''}`}
               onClick={() => setMobileTab('judge')}
             >
-              ⚖ Judge
+              Judge
             </button>
           </div>
 
@@ -565,7 +576,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
               }}
               role="alert"
             >
-              <p style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>⚠ {error}</p>
+              <p style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>{error}</p>
             </div>
           )}
 
@@ -584,7 +595,6 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
           >
             {phase === 'debating' ? (
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⚖</div>
                 <h3
                   style={{
                     fontFamily: 'var(--font-heading)',
@@ -612,13 +622,12 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                   }}
                   style={{ animation: 'pulse-gold 2s infinite' }}
                 >
-                  ⚖ Issue Ruling
+                  Issue Ruling
                 </button>
               </div>
             ) : (
               <>
                 <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⚖</div>
                   <h3
                     style={{
                       fontFamily: 'var(--font-heading)',
@@ -644,7 +653,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                     role="alert"
                   >
                     <p style={{ color: 'var(--danger)', fontSize: '0.85rem' }}>
-                      ⚠ {error}
+                      {error}
                     </p>
                   </div>
                 )}
@@ -666,7 +675,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                     }}
                     style={{ flex: 1 }}
                   >
-                    🔵 Adopt Interpretation A
+                    Adopt Interpretation A
                   </button>
                   <button
                     id="adopt-interpretation-b"
@@ -677,7 +686,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                     }}
                     style={{ flex: 1 }}
                   >
-                    🟡 Adopt Interpretation B
+                    Adopt Interpretation B
                   </button>
                 </div>
 
@@ -759,7 +768,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                       letterSpacing: '0.05em',
                     }}
                   >
-                    ⚖ Prototype Notice & Legal Disclaimer (PRD §31)
+                    Prototype Notice & Legal Disclaimer (PRD §31)
                   </div>
                   This ruling establishes structured institutional precedent within Clause Court. Generated arguments and interpretations are synthetic AI reviews and do not constitute formal legal counsel or legally binding court orders.
                 </div>
@@ -770,7 +779,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                   onClick={submitRuling}
                   disabled={submittingRuling}
                 >
-                  {submittingRuling ? '⟳ Recording Ruling...' : '🔨 Judge the Case'}
+                  {submittingRuling ? 'Recording Ruling...' : 'Record Ruling'}
                 </button>
               </>
             )}
@@ -788,11 +797,6 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
             padding: '0 24px',
           }}
         >
-          <div
-            style={{ fontSize: '3rem', marginBottom: '16px', animation: 'gavel-drop 0.6s ease' }}
-          >
-            🔨
-          </div>
           <h3 style={{ fontFamily: 'var(--font-heading)', marginBottom: '8px' }}>
             Ruling Being Recorded...
           </h3>
@@ -816,15 +820,6 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
               animation: 'scale-in 0.35s ease',
             }}
           >
-            <div
-              style={{
-                fontSize: '2.5rem',
-                marginBottom: '12px',
-                animation: 'gavel-drop 0.6s ease',
-              }}
-            >
-              🔨
-            </div>
             <h3
               style={{
                 color: 'var(--success)',
@@ -896,7 +891,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                   textTransform: 'uppercase',
                 }}
               >
-                ⚡ Dissent — Advocate {ruling.dissentAdvocate} · Generated
+                Dissent — Advocate {ruling.dissentAdvocate} · Generated
                 Opinion, Not a Legal Finding
               </div>
               <p
@@ -967,7 +962,7 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
               human decision and has not been made.
             </p>
             <Link href={`/clauses/${clause._id}`} className="btn btn--primary">
-              ⚖ Complete the workflow
+              Complete the Workflow
             </Link>
           </div>
 
@@ -977,14 +972,14 @@ export default function DebateChamber({ clause, precedents, initialDebate }: Pro
                 href={`/precedents/${ruling.precedent._id}`}
                 className="btn btn--primary"
               >
-                📚 View Precedent
+                View Precedent
               </Link>
             )}
             <Link href={`/clauses/${clause._id}`} className="btn btn--ghost">
               ← Back to Clause
             </Link>
             <Link href="/graph" className="btn btn--ghost">
-              🕸 View Graph
+              View Graph
             </Link>
           </div>
         </div>
@@ -1004,7 +999,6 @@ const SIDES = {
     border: 'var(--advocate-a-border)',
     shadow: 'var(--shadow-a)',
     enter: 'slideInLeft',
-    icon: '🔵',
   },
   B: {
     label: 'ADVOCATE B — Operations-Focused',
@@ -1014,7 +1008,6 @@ const SIDES = {
     border: 'var(--advocate-b-border)',
     shadow: 'var(--shadow-b)',
     enter: 'slideInRight',
-    icon: '🟡',
   },
 } as const
 
@@ -1055,6 +1048,9 @@ function LiveTranscript({
     >
       <div
         style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
           fontFamily: 'var(--font-mono)',
           fontSize: '0.7rem',
           color: theme.color,
@@ -1063,7 +1059,8 @@ function LiveTranscript({
           marginBottom: '12px',
         }}
       >
-        {theme.icon} {theme.label}
+        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: theme.color }} />
+        {theme.label}
       </div>
 
       {waiting && !text ? (
@@ -1137,6 +1134,9 @@ function AdvocatePanel({
       <div style={{ marginBottom: '16px' }}>
         <div
           style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
             fontFamily: 'var(--font-mono)',
             fontSize: '0.7rem',
             color: theme.color,
@@ -1145,7 +1145,8 @@ function AdvocatePanel({
             marginBottom: '8px',
           }}
         >
-          {theme.icon} {theme.label}
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: theme.color }} />
+          {theme.label}
         </div>
         <h4 style={{ color: theme.light, fontFamily: 'var(--font-heading)' }}>
           {interpretation.title}
@@ -1221,7 +1222,7 @@ function AdvocatePanel({
             padding: '8px 12px',
           }}
         >
-          <span style={{ color: 'var(--gold-400)' }}>⚖ Cites: </span>
+          <span style={{ color: 'var(--gold-400)' }}>Cites: </span>
           {cites.join(', ')}
         </div>
       )}

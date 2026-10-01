@@ -39,7 +39,7 @@ function ClauseNode({ data, selected }: NodeProps<any>) {
       <Handle type="target" position={Position.Left} className="gnp-handle" />
       <div className="gnp-top">
         <span className="gnp-medallion gnp-medallion--clause" aria-hidden="true">
-          ⚖
+          C
         </span>
         <span className="gnp-eyebrow">{data.caseNumber ?? 'CLAUSE'}</span>
       </div>
@@ -58,7 +58,7 @@ function RulingNode({ data, selected }: NodeProps) {
       <Handle type="target" position={Position.Left} className="gnp-handle" />
       <div className="gnp-top">
         <span className="gnp-medallion gnp-medallion--ruling" aria-hidden="true">
-          🔨
+          R
         </span>
         <span className="gnp-eyebrow">RULING</span>
       </div>
@@ -80,7 +80,7 @@ function PrecedentNode({ data, selected }: NodeProps) {
           className="gnp-medallion gnp-medallion--precedent"
           aria-hidden="true"
         >
-          📚
+          P
         </span>
         <span className="gnp-eyebrow">PRECEDENT</span>
       </div>
@@ -248,7 +248,7 @@ function buildGraph(data: GraphData): { nodes: Node[]; edges: Edge[] } {
         animated: true,
         markerEnd: { type: MarkerType.ArrowClosed, color: '#60a5fa' },
         style: { stroke: '#3b82f6', strokeWidth: 2.5, strokeDasharray: '6 4' },
-        label: 'cites ★',
+        label: 'cites',
         labelStyle: { fill: '#93c5fd', fontSize: 10, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' },
         labelBgStyle: { fill: '#0a1226' },
       })
@@ -342,7 +342,7 @@ export default function PrecedentGraph({
 
         {error && (
           <div className="card graph-error" role="alert">
-            <p>⚠ {error}</p>
+            <p>{error}</p>
           </div>
         )}
 
@@ -360,7 +360,7 @@ export default function PrecedentGraph({
 
         {isEmpty ? (
           <div className="card graph-empty animate-scale-in">
-            <div className="graph-empty__ring" aria-hidden="true">🕸</div>
+            <div className="graph-empty__ring" aria-hidden="true" />
             <h4>The graph is empty</h4>
             <p>
               Nothing has been ruled yet. Seed the demo data and litigate a
@@ -414,7 +414,7 @@ export default function PrecedentGraph({
 
         <div className="graph-legend">
           <LegendKey color="#c9a84c" label="clause → ruling → precedent" />
-          <LegendKey color="#3b82f6" label="precedent cited by a later clause ★" dashed glow />
+          <LegendKey color="#3b82f6" label="precedent cited by a later clause" dashed glow />
           <span className="graph-legend__hint">Click any node to open it.</span>
         </div>
       </div>
@@ -437,11 +437,6 @@ function StatTile({
     <div className={`graph-stat graph-stat--${accent}`}>
       <div className="graph-stat__value">
         {value}
-        {star && value > 0 && (
-          <span className="graph-stat__star" aria-label="killer feature">
-            ★
-          </span>
-        )}
       </div>
       <div className="graph-stat__label">{label}</div>
     </div>

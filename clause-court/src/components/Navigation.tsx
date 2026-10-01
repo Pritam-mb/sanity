@@ -5,12 +5,12 @@ import { usePathname } from 'next/navigation'
 import MemberSwitcher from './MemberSwitcher'
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Dashboard', icon: '⚡' },
-  { href: '/clauses', label: 'Clauses', icon: '📋' },
-  { href: '/council', label: 'Council', icon: '🏛' },
-  { href: '/precedents', label: 'Precedents', icon: '⚖' },
-  { href: '/knowledge', label: 'Knowledge', icon: '📜' },
-  { href: '/graph', label: 'Graph', icon: '🕸' },
+  { href: '/', label: 'Dashboard' },
+  { href: '/clauses', label: 'Clauses' },
+  { href: '/council', label: 'Council' },
+  { href: '/precedents', label: 'Precedents' },
+  { href: '/knowledge', label: 'Knowledge' },
+  { href: '/graph', label: 'Graph' },
 ]
 
 export default function Navigation() {
@@ -20,7 +20,6 @@ export default function Navigation() {
     <nav className="nav">
       <div className="nav__inner">
         <Link href="/" className="nav__logo">
-          <span className="nav__logo-icon">⚖</span>
           <span className="nav__logo-text">CLAUSE COURT</span>
         </Link>
 
@@ -36,7 +35,6 @@ export default function Navigation() {
                   href={item.href}
                   className={`nav__link ${isActive ? 'nav__link--active' : ''}`}
                 >
-                  <span style={{ marginRight: '6px' }}>{item.icon}</span>
                   {item.label}
                 </Link>
               </li>

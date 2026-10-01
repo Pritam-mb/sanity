@@ -9,7 +9,6 @@ export const commentType = defineType({
   name: 'comment',
   title: 'Comment',
   type: 'document',
-  icon: () => '💬',
   fields: [
     defineField({
       name: 'session',

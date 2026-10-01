@@ -11,7 +11,6 @@ export const positionType = defineType({
   name: 'position',
   title: 'Position',
   type: 'document',
-  icon: () => '📍',
   fields: [
     defineField({
       name: 'member',

@@ -9,7 +9,6 @@ export const councilOptionType = defineType({
   name: 'councilOption',
   title: 'Council Option',
   type: 'document',
-  icon: () => '🗳',
   fields: [
     defineField({
       name: 'session',
