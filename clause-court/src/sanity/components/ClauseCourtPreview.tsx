@@ -116,7 +116,16 @@ export function ClauseCourtPreview({ documentId, document }: DocumentViewProps) 
               zIndex: 1,
             }}
           >
-            <div style={{ fontSize: '1.5rem', animation: 'spin 1s linear infinite' }}>⟳</div>
+            <div
+              style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                border: '2px solid rgba(255,255,255,0.2)',
+                borderTopColor: '#c9a84c',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
             <p style={{ fontSize: '0.85rem' }}>Loading live Clause Court preview from localhost:3000...</p>
           </div>
         )}

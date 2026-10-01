@@ -134,7 +134,7 @@ export default function PrecedentDetailPage({
               marginBottom: '12px',
             }}
           >
-            ⚖ HOLDING
+            HOLDING
           </div>
           <p
             style={{
@@ -209,7 +209,7 @@ export default function PrecedentDetailPage({
             }}
           >
             <SectionLabel>
-              ⚡ Dissent — Advocate {precedent.ruling?.dissentAdvocate}
+              Dissent — Advocate {precedent.ruling?.dissentAdvocate}
             </SectionLabel>
             <p
               style={{
@@ -410,7 +410,7 @@ export default function PrecedentDetailPage({
             </p>
             {precedent.ruling.chosenInterpretation.citedPrecedent.length > 0 && (
               <p style={{ fontSize: '0.8rem', color: 'var(--gold-400)' }}>
-                ⚖ Relied on:{' '}
+                Relied on:{' '}
                 {precedent.ruling.chosenInterpretation.citedPrecedent
                   .map((p) => p.title)
                   .join(', ')}
@@ -421,7 +421,7 @@ export default function PrecedentDetailPage({
 
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <Link href="/graph" className="btn btn--primary">
-            🕸 View Graph
+            View Graph
           </Link>
           <Link href="/precedents" className="btn btn--ghost">
             ← Back to Precedents

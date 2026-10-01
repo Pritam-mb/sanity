@@ -9,7 +9,6 @@ export const approvalType = defineType({
   name: 'approval',
   title: 'Approval',
   type: 'document',
-  icon: () => '✍',
   fields: [
     defineField({
       name: 'session',

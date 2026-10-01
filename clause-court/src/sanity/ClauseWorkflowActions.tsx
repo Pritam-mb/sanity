@@ -120,7 +120,7 @@ const FlagAction = createTransitionAction({
   from: 'draft',
   to: 'flagged',
   owner: 'deterministic',
-  label: '⚠ Mark Flagged',
+  label: 'Mark Flagged',
   description:
     'The deterministic ambiguity engine found an inspectable signal. This transition is owned by application code, not by a person.',
   requiresConfirmation: false,
@@ -130,7 +130,7 @@ const RecordDebateAction = createTransitionAction({
   from: 'flagged',
   to: 'debated',
   owner: 'deterministic',
-  label: '⚡ Record Debate',
+  label: 'Record Debate',
   description: 'Both advocates returned materially different interpretations.',
   requiresConfirmation: false,
 })
@@ -139,7 +139,7 @@ const IssueRulingAction = createTransitionAction({
   from: 'debated',
   to: 'ruled',
   owner: 'human',
-  label: '🔨 Issue Ruling',
+  label: 'Issue Ruling',
   description:
     'A human judge selected an interpretation or wrote a custom ruling. AI output alone can never reach this state.',
   requiresConfirmation: true,
@@ -149,7 +149,7 @@ const ApproveResolutionAction = createTransitionAction({
   from: 'ruled',
   to: 'resolved',
   owner: 'human',
-  label: '✓ Approve Resolution',
+  label: 'Approve Resolution',
   description:
     'Human approval gate. The reviewer accepts the ruling and closes the case. The application cannot perform this on its own.',
   requiresConfirmation: true,
@@ -159,7 +159,7 @@ const PublishClauseAction = createTransitionAction({
   from: 'resolved',
   to: 'published',
   owner: 'human',
-  label: '✓✓ Publish Clause',
+  label: 'Publish Clause',
   description: 'The clarified clause is released for publication.',
   requiresConfirmation: true,
 })

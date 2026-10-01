@@ -51,7 +51,7 @@ export default function SubmitCaseForm() {
   if (!open) {
     return (
       <button className="btn btn--primary" onClick={() => setOpen(true)}>
-        ＋ Submit a case
+        Submit a Case
       </button>
     )
   }
@@ -73,7 +73,7 @@ export default function SubmitCaseForm() {
           marginBottom: '12px',
         }}
       >
-        ＋ Put a case before the court
+        Submit a Case Before the Court
       </div>
 
       {error && (
@@ -87,7 +87,7 @@ export default function SubmitCaseForm() {
             marginBottom: '14px',
           }}
         >
-          <p style={{ color: 'var(--danger)', fontSize: '0.85rem' }}>⚠ {error}</p>
+          <p style={{ color: 'var(--danger)', fontSize: '0.85rem' }}>{error}</p>
         </div>
       )}
 
@@ -162,7 +162,7 @@ export default function SubmitCaseForm() {
 
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <button type="submit" className="btn btn--primary" disabled={working}>
-            {working ? '⟳ Scanning…' : '⚖ Submit for review'}
+            {working ? 'Scanning…' : 'Submit for Review'}
           </button>
           <button
             type="button"

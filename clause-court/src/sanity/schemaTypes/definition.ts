@@ -9,7 +9,6 @@ export const definitionType = defineType({
   name: 'definition',
   title: 'Definition',
   type: 'document',
-  icon: () => '📖',
   fields: [
     defineField({
       name: 'term',

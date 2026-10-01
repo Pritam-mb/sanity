@@ -8,7 +8,6 @@ export const councilMemberType = defineType({
   name: 'councilMember',
   title: 'Council Member',
   type: 'document',
-  icon: () => '🪑',
   fields: [
     defineField({
       name: 'name',

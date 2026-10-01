@@ -48,8 +48,7 @@ export default function MemberSwitcher() {
       style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem' }}
       title="Demo identity — who your positions, votes and approvals are recorded as"
     >
-      <span aria-hidden="true">🪪</span>
-      <span className="sr-only">View the app as</span>
+      <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Identity:</span>
       <select
         aria-label="View the app as a council member"
         value={current}

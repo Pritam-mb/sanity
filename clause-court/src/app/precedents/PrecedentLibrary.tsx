@@ -75,7 +75,7 @@ export default function PrecedentLibrary({
               marginBottom: '24px',
             }}
           >
-            <p style={{ color: 'var(--danger)' }}>⚠ {error}</p>
+            <p style={{ color: 'var(--danger)' }}>{error}</p>
           </div>
         )}
 
@@ -113,14 +113,13 @@ export default function PrecedentLibrary({
 
         {precedents.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>📚</div>
             <h4 style={{ marginBottom: '8px' }}>No precedent on record</h4>
             <p style={{ color: 'var(--text-muted)', maxWidth: '460px', margin: '0 auto 20px' }}>
               Precedent is created by a human ruling. Debate a flagged clause
               and issue a ruling, and the holding will appear here.
             </p>
             <Link href="/clauses?filter=flagged" className="btn btn--primary" style={{ display: 'inline-flex' }}>
-              ⚖ Enter a Debate
+              Enter a Debate
             </Link>
           </div>
         ) : (

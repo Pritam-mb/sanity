@@ -11,7 +11,6 @@ export const clauseType = defineType({
   name: 'clause',
   title: 'Clause',
   type: 'document',
-  icon: () => '📋',
   groups: [
     { name: 'content', title: 'Content', default: true },
     { name: 'analysis', title: 'Deterministic Analysis' },
@@ -192,7 +191,7 @@ export const clauseType = defineType({
       initialValue: 'draft',
       options: {
         list: WORKFLOW_STATES.map((state) => ({
-          title: `${WORKFLOW_STATE_META[state].icon}  ${WORKFLOW_STATE_META[state].label}`,
+          title: WORKFLOW_STATE_META[state].label,
           value: state,
         })),
       },

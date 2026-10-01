@@ -92,7 +92,7 @@ export default function ChamberClient({ initial, viewer }: Props) {
         {!viewer && (
           <div className="card" style={{ borderColor: 'var(--border-gold)', marginBottom: '20px' }}>
             <p style={{ fontSize: '0.9rem' }}>
-              🪪 <strong>Pick an identity</strong> in the navigation bar to submit positions,
+              <strong>Pick an identity</strong> in the navigation bar to submit positions,
               vote, or approve. You can read everything meanwhile.
             </p>
           </div>
@@ -100,7 +100,7 @@ export default function ChamberClient({ initial, viewer }: Props) {
 
         {error && (
           <div role="alert" className="card" style={{ borderColor: 'var(--danger)', background: 'var(--danger-dim)', marginBottom: '20px' }}>
-            <p style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>⚠ {error}</p>
+            <p style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>{error}</p>
           </div>
         )}
 
@@ -296,7 +296,7 @@ function SpectrumView({ bundle }: { bundle: ChamberBundle }) {
 function SpectrumLabel() {
   return (
     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
-      ◉ Opinion spectrum — proposed values
+      Opinion spectrum — proposed values
     </div>
   )
 }
@@ -334,13 +334,13 @@ function PositionList({
                 <span className="badge badge--debated" style={{ marginLeft: '6px' }}>{p.stance}</span>
               </div>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--gold-300)' }}>
-                {p.proposedValue} {p.unit} · {'★'.repeat(p.confidence)}{'☆'.repeat(5 - p.confidence)}
+                {p.proposedValue} {p.unit} · Confidence {p.confidence}/5
               </span>
             </div>
             {p.rationale && <p style={{ fontSize: '0.88rem', marginBottom: '6px' }}>{p.rationale}</p>}
             {p.basisNote && (
               <p style={{ fontSize: '0.76rem', color: 'var(--gold-300)', fontFamily: 'var(--font-mono)' }}>
-                ⚓ {p.basisNote}
+                Basis: {p.basisNote}
               </p>
             )}
             {replies.map((r) => (
@@ -435,7 +435,7 @@ function PositionForm({
       }}
     >
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--gold-400)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
-        {mine ? '↻ Revise your position (the original stays on record)' : '📍 Submit your position'}
+        {mine ? 'Revise your position (original stays on record)' : 'Submit your position'}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', marginBottom: '10px' }}>
         <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
@@ -488,7 +488,7 @@ function CommentFloor({
   return (
     <section className="card" aria-label="Open floor">
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
-        💬 Open floor
+        Open floor
       </div>
       {floor.length === 0 && (
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '10px' }}>No open-floor remarks yet.</p>
@@ -544,7 +544,7 @@ function ChairPanel({
   return (
     <section className="card" style={{ borderColor: 'var(--border-gold)' }} aria-label="Chair controls">
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--gold-400)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
-        🔨 Chair — procedure only
+        Chair — procedure only
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {session.status === 'briefing' && (
@@ -617,7 +617,7 @@ function OptionsPanel({
   return (
     <section className="card" aria-label="Options and vote">
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
-        🗳 Options {evaluation ? `· ${evaluation.tally ? Object.values(evaluation.tally).reduce((a, b) => a + b, 0) : 0} votes cast` : ''}
+        Options {evaluation ? `· ${evaluation.tally ? Object.values(evaluation.tally).reduce((a, b) => a + b, 0) : 0} votes cast` : ''}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: showDraft ? '12px' : '0' }}>
         {options.map((o) => (
@@ -694,7 +694,7 @@ function EvaluationView({ evaluation }: { evaluation: NonNullable<ChamberBundle[
     <div style={{ padding: '10px 12px', background: evaluation.passes ? 'var(--success-dim)' : 'var(--bg-raised)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
       {rows.map((r) => (
         <div key={r.text} style={{ fontSize: '0.8rem', color: r.ok ? 'var(--success)' : 'var(--danger)' }}>
-          {r.ok ? '✓' : '✗'} {r.text}
+          <span style={{ fontWeight: '700', marginRight: '6px' }}>{r.ok ? '[Pass]' : '[Pending]'}</span> {r.text}
         </div>
       ))}
       {evaluation.winnerId && (
@@ -741,11 +741,11 @@ function ApprovalsPanel({
   return (
     <section className="card" style={{ borderColor: 'var(--border-gold)' }} aria-label="Two-person approval">
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--gold-400)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
-        ✍ Two-person rule {remaining > 0 && session.status === 'ruled' ? `· ${remaining} signature${remaining === 1 ? '' : 's'} left` : '· complete'}
+        Two-person rule {remaining > 0 && session.status === 'ruled' ? `· ${remaining} signature${remaining === 1 ? '' : 's'} left` : '· complete'}
       </div>
       {approvals.map((a) => (
         <p key={a._id} style={{ fontSize: '0.85rem', marginBottom: '6px' }}>
-          ✓ <strong>{a.approverName}</strong>
+          <span style={{ color: 'var(--success)', fontWeight: '700', marginRight: '6px' }}>[Approved]</span> <strong>{a.approverName}</strong>
           {a.note && <span style={{ color: 'var(--text-secondary)' }}> — &ldquo;{a.note}&rdquo;</span>}
         </p>
       ))}

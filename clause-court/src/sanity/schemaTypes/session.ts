@@ -9,7 +9,6 @@ export const sessionType = defineType({
   name: 'session',
   title: 'Session',
   type: 'document',
-  icon: () => '🏟',
   fields: [
     defineField({
       name: 'clause',

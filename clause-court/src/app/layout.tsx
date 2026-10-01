@@ -78,7 +78,7 @@ export default function RootLayout({
               fontSize: '0.78rem',
             }}
           >
-            ⚖ CLAUSE COURT — AI arguments. Structural precedent. Human judgment.
+            CLAUSE COURT — AI arguments. Structural precedent. Human judgment.
           </div>
         </footer>
       </body>

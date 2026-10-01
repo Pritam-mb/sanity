@@ -9,7 +9,6 @@ export const voteType = defineType({
   name: 'vote',
   title: 'Vote',
   type: 'document',
-  icon: () => '✅',
   fields: [
     defineField({
       name: 'session',

@@ -12,7 +12,6 @@ export const rulingType = defineType({
   name: 'ruling',
   title: 'Ruling',
   type: 'document',
-  icon: () => '🔨',
   groups: [
     { name: 'holding', title: 'Holding', default: true },
     { name: 'dissent', title: 'Dissent' },

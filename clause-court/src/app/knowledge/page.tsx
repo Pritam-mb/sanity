@@ -63,7 +63,7 @@ export default async function KnowledgePage() {
           by editing data, never code.
         </p>
 
-        <h3 style={{ marginBottom: '12px' }}>📜 Regulations &amp; Benchmarks</h3>
+        <h3 style={{ marginBottom: '12px' }}>Regulations &amp; Benchmarks</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '32px' }}>
           {regulations.map((r) => (
             <div key={r._id} className="card" style={{ padding: '14px 16px' }}>
@@ -88,7 +88,7 @@ export default async function KnowledgePage() {
           )}
         </div>
 
-        <h3 style={{ marginBottom: '12px' }}>🏛 Company Standards (Rule E)</h3>
+        <h3 style={{ marginBottom: '12px' }}>Company Standards (Rule E)</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '32px' }}>
           {standards.map((s) => (
             <div key={s._id} className="card" style={{ padding: '14px 16px' }}>
@@ -104,7 +104,7 @@ export default async function KnowledgePage() {
           )}
         </div>
 
-        <h3 style={{ marginBottom: '12px' }}>📖 Definitions</h3>
+        <h3 style={{ marginBottom: '12px' }}>Definitions</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {definitions.map((d) => (
             <div key={d._id} style={{ padding: '10px 14px', background: 'var(--bg-raised)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>

@@ -12,7 +12,6 @@ export const companyStandardType = defineType({
   name: 'companyStandard',
   title: 'Company Standard',
   type: 'document',
-  icon: () => '🏛',
   fields: [
     defineField({
       name: 'title',

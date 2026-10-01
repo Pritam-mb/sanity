@@ -8,7 +8,6 @@ export const debateType = defineType({
   name: 'debate',
   title: 'Debate',
   type: 'document',
-  icon: () => '⚔',
   fields: [
     defineField({
       name: 'clause',

@@ -57,7 +57,7 @@ export default function ClauseListClient({ clauses, error }: Props) {
 
         {error && (
           <div className="card" style={{ borderColor: 'var(--danger)', background: 'var(--danger-dim)', marginBottom: '24px' }}>
-            <p style={{ color: 'var(--danger)' }}>⚠ {error}</p>
+            <p style={{ color: 'var(--danger)' }}>{error}</p>
           </div>
         )}
 
@@ -104,7 +104,6 @@ export default function ClauseListClient({ clauses, error }: Props) {
         {/* Clause Grid */}
         {filtered.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>📋</div>
             <p style={{ color: 'var(--text-muted)' }}>
               {search ? `No clauses match "${search}"` : 'No clauses found. Try seeding demo data.'}
             </p>
@@ -167,7 +166,7 @@ function SeedButton() {
         disabled={busy}
         id="seed-demo-btn"
       >
-        {busy ? '⟳ Seeding…' : 'Seed Demo Data'}
+        {busy ? 'Seeding…' : 'Seed Demo Data'}
       </button>
       {error && (
         <p
@@ -178,7 +177,7 @@ function SeedButton() {
             color: 'var(--danger)',
           }}
         >
-          ⚠ {error}
+          {error}
         </p>
       )}
     </>
@@ -242,7 +241,7 @@ function ClauseCard({ clause }: { clause: Clause }) {
                 color: 'var(--danger)',
                 fontWeight: '600',
               }}>
-                ⚠ &ldquo;{sig.term}&rdquo;
+                &ldquo;{sig.term}&rdquo;
               </span>
             ))}
           </div>
