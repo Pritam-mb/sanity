@@ -74,6 +74,7 @@ export default function RootLayout({
             <div style={{ display: 'flex', gap: '1.25rem', marginLeft: '1rem' }}>
               {[
                 { href: '/', label: 'Dashboard' },
+                { href: '/clause-tree', label: 'Clause Tree' },
                 { href: '/pages', label: 'Pages' },
                 { href: '/facts', label: 'Facts' },
                 { href: '/findings', label: 'Findings' },

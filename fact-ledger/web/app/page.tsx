@@ -2,6 +2,8 @@ import { sanityClient } from '@/lib/sanity/client'
 import Link from 'next/link'
 import { LiveDashboardCharts, type RuleStat, type ScanRunMetric } from '@/components/LiveDashboardCharts'
 import { LiveActivityStream, type AuditEventItem } from '@/components/LiveActivityStream'
+import { ClauseImpactTree } from '@/components/ClauseImpactTree'
+import { getTreeSessionsData } from '@/lib/treeData'
 import { formatTime } from '@/lib/format'
 
 export const dynamic = 'force-dynamic'
@@ -92,7 +94,10 @@ async function getDashboardData(): Promise<DashboardData> {
 }
 
 export default async function DashboardPage() {
-  const data = await getDashboardData()
+  const [data, treeSessions] = await Promise.all([
+    getDashboardData(),
+    getTreeSessionsData(),
+  ])
 
   // Group findings by Rule R1 - R5
   const ruleDefinitions: Record<string, string> = {
@@ -279,12 +284,13 @@ export default async function DashboardPage() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '1rem',
-          marginBottom: '2.5rem',
+          marginBottom: '2rem',
         }}
       >
         {[
+          { href: '/clause-tree', label: 'Clause Impact Tree', countText: 'Cascading change graph', code: 'CLAUSE TREE' },
           { href: '/findings', label: 'Open Findings', countText: `${data.driftScore} open drift`, code: 'FINDINGS' },
           { href: '/pages', label: 'Browse Pages', countText: `${data.totalPages} documents`, code: 'PAGES' },
           { href: '/facts', label: 'Manage Facts', countText: `${data.totalFacts} canonical facts`, code: 'FACTS' },
@@ -328,7 +334,10 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* ── DIRECT ON-SCREEN LIVE GRAPHS & CHARTS (Zero extra clicks required) ── */}
+      {/* DIRECT ON-SCREEN ORGANIZER MEMBER & CLAUSE IMPACT TREE (Zero extra clicks required) */}
+      <ClauseImpactTree initialSessions={treeSessions} />
+
+      {/* DIRECT ON-SCREEN LIVE GRAPHS & CHARTS (Zero extra clicks required) */}
       <LiveDashboardCharts
         ruleStats={ruleStats}
         scanHistory={scanHistory}
