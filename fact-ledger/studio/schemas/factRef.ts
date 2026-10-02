@@ -1,7 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
 /**
- * factRef — custom inline Portable Text object.
+ * factRef: custom inline Portable Text object.
  * Usage inside page.body: insert a factRef block pointing to a fact document.
  * The web renderer substitutes the live fact.value + fact.unit at render time.
  */

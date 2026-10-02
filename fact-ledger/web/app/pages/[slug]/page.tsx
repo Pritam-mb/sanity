@@ -42,7 +42,7 @@ export default async function PageDetail({ params }: { params: Promise<{ slug: s
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '2rem 1rem' }}>
       <Link href="/pages" style={{ fontSize: 14, color: '#6366f1' }}>
-        ← All Pages
+        Back to All Pages
       </Link>
       <div
         style={{

@@ -1,7 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
 /**
- * fact — the canonical source of truth for a single policy value.
+ * fact: the canonical source of truth for a single policy value.
  * Every page should reference facts via factRef instead of copying literal values.
  */
 export const factSchema = defineType({
@@ -101,7 +101,7 @@ export const factSchema = defineType({
     prepare({ title, subtitle, status }) {
       return {
         title,
-        subtitle: `${subtitle ?? '—'} · ${status ?? 'active'}`,
+        subtitle: `${subtitle ?? 'None'} · ${status ?? 'active'}`,
       }
     },
   },

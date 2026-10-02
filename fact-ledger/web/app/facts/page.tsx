@@ -27,7 +27,7 @@ export default async function FactsPage() {
 
   return (
     <main style={{ maxWidth: 1000, margin: '0 auto', padding: '2rem 1.5rem' }}>
-      <Link href="/" style={{ fontSize: 14, color: '#6366f1' }}>← Dashboard</Link>
+      <Link href="/" style={{ fontSize: 14, color: '#6366f1' }}>Back to Dashboard</Link>
       <h1 style={{ marginTop: '1rem', fontSize: '1.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>
         Facts
       </h1>
@@ -49,7 +49,7 @@ export default async function FactsPage() {
           {facts.map((f) => (
             <tr key={f._id}>
               <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{f.label}</td>
-              <td><code>{f.key?.current ?? '—'}</code></td>
+              <td><code>{f.key?.current ?? 'None'}</code></td>
               <td style={{ color: 'var(--accent-secondary)', fontWeight: 600 }}>
                 {[f.value, f.unit].filter(Boolean).join(' ')}
               </td>
@@ -83,7 +83,7 @@ export default async function FactsPage() {
           {facts.length === 0 && (
             <tr>
               <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
-                No facts yet — run <code>npm run seed</code>
+                No facts yet. Run <code>npm run seed</code>
               </td>
             </tr>
           )}

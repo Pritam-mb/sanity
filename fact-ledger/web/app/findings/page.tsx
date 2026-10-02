@@ -41,7 +41,7 @@ export default async function FindingsPage() {
 
   return (
     <main style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1.5rem' }}>
-      <Link href="/" style={{ fontSize: 14, color: '#6366f1' }}>← Dashboard</Link>
+      <Link href="/" style={{ fontSize: 14, color: '#6366f1' }}>Back to Dashboard</Link>
       <h1 style={{ marginTop: '1rem', fontSize: '1.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>
         Findings
       </h1>
@@ -79,28 +79,28 @@ export default async function FindingsPage() {
                   {f.rule}
                 </span>
               </td>
-              <td style={{ color: 'var(--text-primary)' }}>{f.page?.title ?? '—'}</td>
-              <td style={{ color: 'var(--accent-secondary)' }}>{f.fact?.label ?? '—'}</td>
+              <td style={{ color: 'var(--text-primary)' }}>{f.page?.title ?? 'None'}</td>
+              <td style={{ color: 'var(--accent-secondary)' }}>{f.fact?.label ?? 'None'}</td>
               <td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                <code style={{ fontSize: 11 }}>{f.excerpt ?? '—'}</code>
+                <code style={{ fontSize: 11 }}>{f.excerpt ?? 'None'}</code>
               </td>
               <td style={{ fontSize: 12 }}>
                 {f.foundValue && <span style={{ color: 'var(--danger)' }}>"{f.foundValue}"</span>}
-                {f.foundValue && f.expectedValue && <span style={{ color: 'var(--text-muted)', margin: '0 4px' }}>→</span>}
+                {f.foundValue && f.expectedValue && <span style={{ color: 'var(--text-muted)', margin: '0 4px' }}>to</span>}
                 {f.expectedValue && <span style={{ color: 'var(--success)' }}>"{f.expectedValue}"</span>}
               </td>
               <td>
                 <span className={`badge badge-${f.status}`}>{f.status}</span>
               </td>
-              <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                {new Date(f.detectedAt).toLocaleDateString()}
+              <td style={{ fontSize: 12, color: 'var(--text-muted)' }} suppressHydrationWarning>
+                {new Date(f.detectedAt).toISOString().split('T')[0]}
               </td>
             </tr>
           ))}
           {findings.length === 0 && (
             <tr>
               <td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
-                No findings yet — run a scan after seeding data.
+                No findings yet. Run a scan after seeding data.
               </td>
             </tr>
           )}

@@ -28,7 +28,7 @@ export default async function PagesIndex() {
 
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '2rem 1rem' }}>
-      <Link href="/" style={{ fontSize: 14, color: '#6366f1' }}>← Dashboard</Link>
+      <Link href="/" style={{ fontSize: 14, color: '#6366f1' }}>Back to Dashboard</Link>
       <h1 style={{ marginTop: '1rem', fontSize: '1.8rem', fontWeight: 700 }}>Pages</h1>
       <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>
         {pages.length} page{pages.length !== 1 ? 's' : ''} in the system
@@ -70,7 +70,7 @@ export default async function PagesIndex() {
         ))}
         {pages.length === 0 && (
           <li style={{ color: '#64748b', padding: '1rem 0' }}>
-            No pages yet — run <code>npm run seed</code> to create demo data.
+            No pages yet. Run <code>npm run seed</code> to create demo data.
           </li>
         )}
       </ul>

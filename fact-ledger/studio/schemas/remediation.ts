@@ -79,7 +79,7 @@ export const remediationSchema = defineType({
               approved: 'approved'
             },
             prepare({ title, approved }) {
-              return { title: `${approved ? '✅' : '❌'} Fix for ${title}` }
+              return { title: `${approved ? '[APPROVED]' : '[PENDING]'} Fix for ${title}` }
             }
           }
         }),
