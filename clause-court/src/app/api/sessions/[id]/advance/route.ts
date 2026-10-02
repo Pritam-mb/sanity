@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 import { sanityClient } from '@/lib/sanity/client'
 import {
   appendClauseLog,
-  getActiveMember,
+  assertSameActor,
   getSession,
   needToken,
+  requireViewer,
   ruleError,
 } from '@/lib/council/api'
 import {
@@ -42,11 +43,16 @@ export async function POST(
       optionId?: string
       note?: string
     }
-    if (!body.to || !body.actorMemberId) {
-      return NextResponse.json({ error: 'to and actorMemberId are required.' }, { status: 400 })
+    if (!body.to) {
+      return NextResponse.json({ error: 'to is required.' }, { status: 400 })
     }
 
-    const actor = await getActiveMember(body.actorMemberId)
+    // Advancing is the most privileged action in the app - it reveals blind
+    // rounds and moves the vote - and every transition below is gated on the
+    // actor being the chair. So the actor comes from the verified cookie, and a
+    // body-declared actor is only ever checked against it.
+    const actor = await requireViewer()
+    assertSameActor(body.actorMemberId, actor._id, 'actorMemberId')
     const session = await getSession(id)
     const isChair = actor._id === session.chairId
     // The chair is barred from approval steps; everyone else acts as approver

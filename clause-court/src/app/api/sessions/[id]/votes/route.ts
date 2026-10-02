@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { sanityClient } from '@/lib/sanity/client'
-import { getActiveMember, getSession, needToken, ruleError } from '@/lib/council/api'
+import { assertSameActor, getSession, needToken, requireViewer, ruleError } from '@/lib/council/api'
 import { assertVote, evaluateResult, CouncilRuleError } from '@/lib/council/tally'
 
 export const dynamic = 'force-dynamic'
@@ -16,10 +16,13 @@ export async function POST(
   const { id } = await ctx.params
   try {
     const body = (await req.json()) as { memberId?: string; optionId?: string }
-    if (!body.memberId || !body.optionId) {
-      return NextResponse.json({ error: 'memberId and optionId are required.' }, { status: 400 })
+    if (!body.optionId) {
+      return NextResponse.json({ error: 'optionId is required.' }, { status: 400 })
     }
-    const member = await getActiveMember(body.memberId)
+    const member = await requireViewer()
+    // The body may still name a member — clients send the one they think they
+    // are — but it is only ever checked, never trusted.
+    assertSameActor(body.memberId, member._id)
     const session = await getSession(id)
     if (session.status !== 'voting') {
       throw new CouncilRuleError(`Votes are taken while voting, not ${session.status}.`)
@@ -49,6 +52,7 @@ export async function POST(
       session: { _type: 'reference', _ref: id },
       member: { _type: 'reference', _ref: member._id },
       option: { _type: 'reference', _ref: body.optionId },
+      actorAuth: member.auth,
     })
 
     const after = [

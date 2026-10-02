@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { sanityClient } from '@/lib/sanity/client'
-import { getActiveMember, needToken, ruleError } from '@/lib/council/api'
+import { assertSameActor, needToken, requireViewer, ruleError } from '@/lib/council/api'
 import { CouncilRuleError } from '@/lib/council/tally'
 
 export const dynamic = 'force-dynamic'
@@ -41,14 +41,17 @@ export async function POST(req: Request) {
       councilId?: string
       chairMemberId?: string
     }
-    if (!body.clauseId || !body.chairMemberId) {
+    if (!body.clauseId) {
       return NextResponse.json(
-        { error: 'clauseId and chairMemberId are required.' },
+        { error: 'clauseId is required.' },
         { status: 400 }
       )
     }
 
-    const chair = await getActiveMember(body.chairMemberId)
+    // Opening a session is the chair's act, so the chair is who the server
+    // says you are - not who the request body says.
+    const chair = await requireViewer()
+    assertSameActor(body.chairMemberId, chair._id, 'chairMemberId')
     const clause = await sanityClient.fetch<{ _id: string; status: string } | null>(
       `*[_type == "clause" && _id == $id][0]{_id, status}`,
       { id: body.clauseId }

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { sanityClient } from '@/lib/sanity/client'
-import { getActiveMember, getSession, needToken, ruleError } from '@/lib/council/api'
+import { assertSameActor, getSession, needToken, requireViewer, ruleError } from '@/lib/council/api'
 import { CouncilRuleError } from '@/lib/council/tally'
 
 export const dynamic = 'force-dynamic'
@@ -23,10 +23,8 @@ export async function POST(
       body?: string
       targetPositionId?: string
     }
-    if (!body.memberId) {
-      return NextResponse.json({ error: 'memberId is required — pick an identity first.' }, { status: 400 })
-    }
-    const member = await getActiveMember(body.memberId)
+    const member = await requireViewer()
+    assertSameActor(body.memberId, member._id)
     const session = await getSession(id)
     if (!['deliberation', 'synthesis'].includes(session.status)) {
       throw new CouncilRuleError(`Replies are taken during deliberation, not ${session.status}.`)
@@ -56,6 +54,7 @@ export async function POST(
         : undefined,
       kind: body.kind,
       body: body.body.trim(),
+      actorAuth: member.auth,
     })
     return NextResponse.json({ id: created._id }, { status: 201 })
   } catch (e) {

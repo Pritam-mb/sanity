@@ -1,0 +1,26 @@
+{
+  "name": "fact-ledger",
+  "private": true,
+  "workspaces": [
+    "studio",
+    "web",
+    "scanner",
+    "seed",
+    "bench"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=web",
+    "dev:studio": "npm run dev --workspace=studio",
+    "dev": "npm-run-all --parallel dev:web dev:studio",
+    "build": "npm run build --workspace=web",
+    "lint": "npm run lint --workspace=web",
+    "test": "npm run test --workspace=scanner",
+    "bench": "npm run bench --workspace=bench",
+    "seed": "npm run seed --workspace=seed",
+    "demo:reset": "npm run seed --workspace=seed && npm run bench --workspace=bench",
+    "typegen": "npm run typegen --workspace=studio"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}

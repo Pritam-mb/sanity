@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { actorAuthField } from './fields/actorAuth'
 
 /**
  * A threaded reply inside a session — support, challenge or question —
@@ -45,13 +46,14 @@ export const commentType = defineType({
       },
       validation: (Rule) => Rule.required(),
     }),
-    defineField({
+defineField({
       name: 'body',
       title: 'Body',
       type: 'text',
       rows: 3,
       validation: (Rule) => Rule.required(),
     }),
+    actorAuthField(),
   ],
   preview: {
     select: { kind: 'kind', body: 'body' },
@@ -59,7 +61,7 @@ export const commentType = defineType({
       const text = typeof body === 'string' ? body : ''
       return {
         title: kind ?? 'comment',
-        subtitle: text.length > 60 ? `${text.slice(0, 60)}…` : text,
+        subtitle: text.length > 60 ? `${text.slice(0, 60)}...` : text,
       }
     },
   },

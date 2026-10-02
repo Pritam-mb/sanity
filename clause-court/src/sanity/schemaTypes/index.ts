@@ -7,7 +7,10 @@ import { councilMemberType } from './councilMember'
 import { councilOptionType } from './councilOption'
 import { debateType } from './debate'
 import { definitionType } from './definition'
+import { intakeType } from './intake'
 import { interpretationType } from './interpretation'
+import { orgPolicyRecordType } from './orgPolicyRecord'
+import { organizationType } from './organization'
 import { positionType } from './position'
 import { precedentType } from './precedent'
 import { regulationType } from './regulation'
@@ -18,6 +21,9 @@ import { voteType } from './vote'
 export const schemaTypes = [
   clauseType,
   companyStandardType,
+  organizationType,
+  orgPolicyRecordType,
+  intakeType,
   councilType,
   councilMemberType,
   sessionType,

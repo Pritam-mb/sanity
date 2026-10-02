@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { sanityClient } from '@/lib/sanity/client'
-import { getActiveMember, getSession, needToken, ruleError } from '@/lib/council/api'
+import { assertSameActor, getSession, needToken, requireViewer, ruleError } from '@/lib/council/api'
 import { approvalsNeeded } from '@/lib/council/sessionFlow'
 import { CouncilRuleError } from '@/lib/council/tally'
 
@@ -17,10 +17,10 @@ export async function POST(
   const { id } = await ctx.params
   try {
     const body = (await req.json()) as { approverId?: string; note?: string }
-    if (!body.approverId) {
-      return NextResponse.json({ error: 'approverId is required.' }, { status: 400 })
-    }
-    const approver = await getActiveMember(body.approverId)
+    const approver = await requireViewer()
+    // A signature is the strongest claim in the system - it is what makes a
+    // ruling binding - so it must never be signable by naming somebody else.
+    assertSameActor(body.approverId, approver._id, 'approverId')
     const session = await getSession(id)
     if (session.status !== 'ruled') {
       throw new CouncilRuleError(`Signatures are taken once ruled, not ${session.status}.`)
@@ -45,6 +45,7 @@ export async function POST(
       session: { _type: 'reference', _ref: id },
       approver: { _type: 'reference', _ref: approver._id },
       note: (body.note ?? '').trim() || undefined,
+      actorAuth: approver.auth,
     })
     const remaining = approvalsNeeded({
       approvals: [...existing.map((a) => ({ approverId: a.approverId })), { approverId: approver._id }],

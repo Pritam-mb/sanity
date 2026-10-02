@@ -23,6 +23,19 @@ export const councilMemberType = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'organization',
+      title: 'Organisation',
+      type: 'reference',
+      to: [{ type: 'organization' }],
+      description:
+        'The organisation whose record of past policy stands behind this member. Read by the prediction engine - never used to weight a vote.',
+    }),
+    defineField({
+      name: 'tenureSince',
+      title: 'Tenure Since',
+      type: 'date',
+    }),
+    defineField({
       name: 'active',
       title: 'Active',
       type: 'boolean',
@@ -37,11 +50,11 @@ export const councilMemberType = defineType({
     }),
   ],
   preview: {
-    select: { title: 'name', subtitle: 'seat', active: 'active' },
-    prepare({ title, subtitle, active }) {
+    select: { title: 'name', subtitle: 'seat', active: 'active', org: 'organization->name' },
+    prepare({ title, subtitle, active, org }) {
       return {
         title: title ?? 'Unnamed member',
-        subtitle: `${subtitle ?? 'no seat'}${active === false ? ' (inactive)' : ''}`,
+        subtitle: `${org ? `${org} - ` : ''}${subtitle ?? 'no seat'}${active === false ? ' (inactive)' : ''}`,
       }
     },
   },

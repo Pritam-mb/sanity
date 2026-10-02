@@ -655,8 +655,14 @@ function SessionCard({
   const open = sessions.filter((s) => s.status !== 'released')
 
   async function openSession() {
-    const match = document.cookie.match(/cc_member=([^;]+)/)
-    if (!match) {
+    // The identity cookie is httpOnly and signed, so the browser cannot read
+    // it — /api/identity is the only way to ask "am I signed in?". The server
+    // decides who the chair is regardless; this is only so the error is
+    // legible before the request is made.
+    const me = await fetch('/api/identity', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+    if (!me?.identity?.memberId) {
       setError('Pick an identity in the navigation bar first — only the chair can open a session.')
       return
     }
@@ -666,7 +672,10 @@ function SessionCard({
       const res = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clauseId, chairMemberId: decodeURIComponent(match[1]) }),
+        body: JSON.stringify({
+          clauseId,
+          chairMemberId: me.identity.memberId,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Could not open a session')

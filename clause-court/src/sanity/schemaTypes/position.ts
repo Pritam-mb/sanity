@@ -1,7 +1,8 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
+import { actorAuthField } from './fields/actorAuth'
 
 /**
- * A structured council opinion. Prose on top, numbers underneath —
+ * A structured council opinion. Prose on top, numbers underneath -
  * the numbers are what make the summary and the spectrum graph
  * deterministic. Positions are append-only: a revision points at the
  * position it supersedes via `revisionOf`, so nobody can quietly rewrite
@@ -68,7 +69,7 @@ export const positionType = defineType({
     }),
     defineField({
       name: 'confidence',
-      title: 'Confidence (1–5)',
+      title: 'Confidence (1-5)',
       type: 'number',
       initialValue: 3,
       validation: (Rule) => Rule.required().min(1).max(5).integer(),
@@ -83,7 +84,7 @@ export const positionType = defineType({
       name: 'basisNote',
       title: 'Basis Note',
       type: 'string',
-      description: 'Regulation or benchmark reference, e.g. "GDPR Art. 33 — 72h".',
+      description: 'Regulation or benchmark reference, e.g. "GDPR Art. 33 - 72h".',
     }),
     defineField({
       name: 'respondsTo',
@@ -113,12 +114,72 @@ export const positionType = defineType({
       },
       validation: (Rule) => Rule.required(),
     }),
+
+    // --- Prediction provenance ----------------------------
+    // Written when a member adopts an AI suggestion. The pair
+    // (predictedValue, adoptedValue) is what makes suggestion accuracy
+    // measurable on /council. `edited` is derived, never asserted.
+    defineField({
+      name: 'assistedBy',
+      title: 'Assisted By',
+      type: 'string',
+      description: 'Set only when a member explicitly adopted an AI suggestion.',
+      options: {
+        list: [
+          { title: 'AI suggestion (organisation record)', value: 'ai-suggested' },
+        ],
+      },
+      readOnly: true,
+    }),
+    defineField({
+      name: 'predictedValue',
+      title: 'Predicted Value',
+      type: 'number',
+      readOnly: true,
+      description: 'What the deterministic predictor proposed before the member decided.',
+    }),
+    defineField({
+      name: 'predictionBasis',
+      title: 'Prediction Basis',
+      type: 'string',
+      readOnly: true,
+      description: 'Evidence line, e.g. "Org median 24h over 5 SLA cases".',
+    }),
+    defineField({
+      name: 'predictionConfidence',
+      title: 'Prediction Confidence (1-5)',
+      type: 'number',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'edited',
+      title: 'Edited After Suggestion',
+      type: 'boolean',
+      readOnly: true,
+      description: 'Derived from predictedValue !== proposedValue. The honesty flag on /council.',
+    }),
+    defineField({
+      name: 'predictionOutcome',
+      title: 'Prediction Outcome',
+      type: 'string',
+      readOnly: true,
+      description: 'Filled in when the session rules: did this position carry?',
+      options: {
+        list: [
+          { title: 'Carried', value: 'carried' },
+          { title: 'Overtaken', value: 'overtaken' },
+          { title: 'Abandoned (revised away)', value: 'abandoned' },
+          { title: 'Undecided', value: 'undecided' },
+        ],
+      },
+    }),
+    actorAuthField(),
   ],
   preview: {
     select: { stance: 'stance', value: 'proposedValue', unit: 'unit' },
     prepare({ stance, value, unit }) {
       return {
-        title: `${stance ?? 'position'} — ${value ?? '?'} ${unit ?? ''}`,
+        title: `${stance ?? 'position'} - ${value ?? '?'} ${unit ?? ''}`,
         subtitle: 'council position',
       }
     },

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { sanityClient } from '@/lib/sanity/client'
-import { getActiveMember, getSession, needToken, ruleError } from '@/lib/council/api'
+import { assertSameActor, getSession, needToken, requireViewer, ruleError } from '@/lib/council/api'
 import { assertPositionAllowed } from '@/lib/council/sessionFlow'
 import { CouncilRuleError } from '@/lib/council/tally'
 
@@ -29,10 +29,11 @@ export async function POST(
       respondsTo?: string
       revisionOf?: string
     }
-    if (!body.memberId) {
-      return NextResponse.json({ error: 'memberId is required — pick an identity first.' }, { status: 400 })
-    }
-    const member = await getActiveMember(body.memberId)
+    const member = await requireViewer()
+    // A blind position is only blind if the server knows who filed it. Letting
+    // the body name the author would let anyone file as anyone else and then
+    // read the reveal.
+    assertSameActor(body.memberId, member._id)
     const session = await getSession(id)
     if (session.status !== 'deliberation') {
       throw new CouncilRuleError(`Positions are taken during deliberation, not ${session.status}.`)
@@ -100,6 +101,7 @@ export async function POST(
       respondsTo: body.respondsTo ? { _type: 'reference', _ref: body.respondsTo } : undefined,
       revisionOf: body.revisionOf ? { _type: 'reference', _ref: body.revisionOf } : undefined,
       round,
+      actorAuth: member.auth,
     })
     return NextResponse.json({ id: created._id, round }, { status: 201 })
   } catch (e) {

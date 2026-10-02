@@ -3,28 +3,24 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-// Must match VIEWER_COOKIE in src/lib/council/viewer.ts (kept as a literal
-// because viewer.ts imports next/headers, which cannot enter a client bundle).
-const VIEWER_COOKIE = 'cc_member'
-
 interface Member {
   _id: string
   name: string
   seat: string
 }
 
-// Demo identity switcher ("view as Priya, Arjun, Meera…"). Real sign-in
-// replaces this; every write still records the claimed member server-side.
+// Demo identity switcher ("view as Priya, Arjun, Meera...").
+//
+// The cookie is httpOnly and HMAC-signed, so it cannot be written from here the
+// way it used to be. We post the member id to /api/identity and let the server
+// mint `<id>.<hmac>`. That is the whole point: a client that can set its own
+// actor id is not an identity, it is a self-declared name.
 export default function MemberSwitcher() {
   const router = useRouter()
   const [members, setMembers] = useState<Member[]>([])
-  // Read the cookie during initial state, not in an effect — effects are for
-  // syncing with external systems, and this value is only needed once.
-  const [current, setCurrent] = useState(() => {
-    if (typeof document === 'undefined') return ''
-    const match = document.cookie.match(new RegExp(`${VIEWER_COOKIE}=([^;]+)`))
-    return match ? decodeURIComponent(match[1]) : ''
-  })
+  const [current, setCurrent] = useState('')
+  const [demo, setDemo] = useState(false)
+  const [pending, setPending] = useState(false)
 
   useEffect(() => {
     fetch('/api/members')
@@ -33,11 +29,33 @@ export default function MemberSwitcher() {
         if (data?.members) setMembers(data.members)
       })
       .catch(() => undefined)
+
+    // Ask the server who it thinks we are instead of reading the cookie: it is
+    // httpOnly, and its value is `<id>.<hmac>`, not a member id.
+    fetch('/api/identity', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data) return
+        setCurrent(data.identity?.memberId ?? '')
+        setDemo(Boolean(data.demo))
+      })
+      .catch(() => undefined)
   }, [])
 
-  function pick(id: string) {
+  async function pick(id: string) {
+    setPending(true)
     setCurrent(id)
-    document.cookie = `${VIEWER_COOKIE}=${encodeURIComponent(id)}; path=/; max-age=31536000`
+    try {
+      await fetch('/api/identity', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ memberId: id }),
+      })
+    } catch {
+      // Leave the selection as-is; the next read of /api/identity is the truth.
+    } finally {
+      setPending(false)
+    }
     router.refresh()
   }
 
@@ -46,12 +64,26 @@ export default function MemberSwitcher() {
   return (
     <label
       style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem' }}
-      title="Demo identity — who your positions, votes and approvals are recorded as"
+      title={
+        demo
+          ? 'Demo identity - CC_IDENTITY_SECRET is unset, so every actor is recorded as unverified'
+          : 'Demo identity - who your positions, votes and approvals are recorded as'
+      }
     >
-      <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Identity:</span>
+      <span
+        style={{
+          color: 'var(--text-muted)',
+          fontSize: '0.72rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+        }}
+      >
+        Identity:
+      </span>
       <select
         aria-label="View the app as a council member"
         value={current}
+        disabled={pending}
         onChange={(e) => pick(e.target.value)}
         style={{
           background: 'var(--bg-raised)',
@@ -63,7 +95,7 @@ export default function MemberSwitcher() {
           maxWidth: '190px',
         }}
       >
-        <option value="">View as…</option>
+        <option value="">View as...</option>
         {members.map((m) => (
           <option key={m._id} value={m._id}>
             {m.name} · {m.seat}

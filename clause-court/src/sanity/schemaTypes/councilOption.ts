@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { actorAuthField } from './fields/actorAuth'
 
 /**
  * One votable proposal. Source is always labelled: a member's wording or an
@@ -68,6 +69,7 @@ export const councilOptionType = defineType({
       type: 'string',
       description: 'Model + prompt version for AI drafts, e.g. "gemini-2.5-flash / opts-v1".',
     }),
+    actorAuthField(),
   ],
   preview: {
     select: { title: 'title', source: 'source' },

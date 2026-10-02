@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { actorAuthField } from './fields/actorAuth'
 
 /**
  * One member's vote for one option in one session.
@@ -31,6 +32,7 @@ export const voteType = defineType({
       to: [{ type: 'councilOption' }],
       validation: (Rule) => Rule.required(),
     }),
+    actorAuthField(),
   ],
   preview: {
     select: { title: 'member.name' },

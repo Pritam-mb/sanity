@@ -1,0 +1,300 @@
+{
+  "generated": "2026-10-02T14:19:42.648Z",
+  "summary": {
+    "dev": {
+      "pages": 15,
+      "planted": 21
+    },
+    "holdout": {
+      "pages": 8,
+      "planted": 9
+    },
+    "total": 31,
+    "byRule": {
+      "R1": 23,
+      "R2": 5,
+      "R3": 2,
+      "R4": 1
+    }
+  },
+  "entries": [
+    {
+      "dataset": "dev",
+      "pageId": "page-returns-policy",
+      "blockKey": "b3",
+      "factId": "fact-refund-window-days",
+      "rule": "R1",
+      "plantedText": "30 days",
+      "note": "plain \"30 days\" outside factRef"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-faq-refunds",
+      "blockKey": "b2",
+      "factId": "fact-refund-window-days",
+      "rule": "R1",
+      "plantedText": "thirty (30) days",
+      "note": "number-word alias"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-faq-refunds",
+      "blockKey": "b3",
+      "factId": "fact-refund-window-days",
+      "rule": "R2",
+      "plantedText": "60-day refund window",
+      "note": "contradicting value near label \"refund\""
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-pricing",
+      "blockKey": "b3",
+      "factId": "fact-sla-uptime-pct",
+      "rule": "R1",
+      "plantedText": "99.9%",
+      "note": "SLA value copied as plain text"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-help-uploads",
+      "blockKey": "b2",
+      "factId": "fact-max-file-size-mb",
+      "rule": "R1",
+      "plantedText": "100 MB",
+      "note": "file size limit copied as plain text"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-trial-terms",
+      "blockKey": "b2",
+      "factId": "fact-free-trial-days",
+      "rule": "R1",
+      "plantedText": "14 days",
+      "note": "trial period copied as plain text"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-late-payment",
+      "blockKey": "b2",
+      "factId": "fact-late-fee-pct",
+      "rule": "R1",
+      "plantedText": "1.5%",
+      "note": "late fee rate copied as plain text"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-late-payment",
+      "blockKey": "b3",
+      "factId": "fact-late-fee-pct",
+      "rule": "R2",
+      "plantedText": "2% monthly",
+      "note": "contradicting late fee value"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-support-sla",
+      "blockKey": "b2",
+      "factId": "fact-support-response-hours",
+      "rule": "R1",
+      "plantedText": "24 hours",
+      "note": "support response time copied as plain text"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-support-sla",
+      "blockKey": "b4",
+      "factId": "fact-old-refund-window",
+      "rule": "R3",
+      "plantedText": "factRef to deprecated fact-old-refund-window",
+      "note": "deprecated factRef"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-faq-upload-limit",
+      "blockKey": "b2",
+      "factId": "fact-max-file-size-mb",
+      "rule": "R1",
+      "plantedText": "one hundred megabytes",
+      "note": "word-form alias for file size"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-onboarding",
+      "blockKey": "b2",
+      "factId": "fact-free-trial-days",
+      "rule": "R1",
+      "plantedText": "two weeks",
+      "note": "word-form alias for trial period"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-onboarding",
+      "blockKey": "b3",
+      "factId": "fact-support-response-hours",
+      "rule": "R1",
+      "plantedText": "twenty-four hours",
+      "note": "word-form alias for support hours"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-billing-faq",
+      "blockKey": "b2",
+      "factId": "fact-late-fee-pct",
+      "rule": "R1",
+      "plantedText": "one point five percent",
+      "note": "word-form alias for late fee"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-uptime-commitment",
+      "blockKey": "b2",
+      "factId": "fact-sla-uptime-pct",
+      "rule": "R1",
+      "plantedText": "99.9 percent",
+      "note": "SLA alias with word \"percent\""
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-uptime-commitment",
+      "blockKey": "b3",
+      "factId": "fact-sla-uptime-pct",
+      "rule": "R2",
+      "plantedText": "99.5%",
+      "note": "contradicting SLA value near \"uptime\""
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-getting-started",
+      "blockKey": "b2",
+      "factId": "fact-refund-window-days",
+      "rule": "R1",
+      "plantedText": "30 days",
+      "note": "refund window copied as plain text"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-enterprise-agreement",
+      "blockKey": "b2",
+      "factId": "fact-refund-window-days",
+      "rule": "R1",
+      "plantedText": "one month",
+      "note": "\"one month\" alias for refund window"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-enterprise-agreement",
+      "blockKey": "b3",
+      "factId": "fact-free-trial-days",
+      "rule": "R1",
+      "plantedText": "14 days",
+      "note": "trial period copied as plain text"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-terms-of-service",
+      "blockKey": "b3",
+      "factId": "fact-refund-window-days",
+      "rule": "R1",
+      "plantedText": "30 days",
+      "note": "same doc has correct factRef + plain copy"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "page-product-limits",
+      "blockKey": "b3",
+      "factId": "fact-max-file-size-mb",
+      "rule": "R1",
+      "plantedText": "100 MB",
+      "note": "file size in pipe-separated table prose"
+    },
+    {
+      "dataset": "holdout",
+      "pageId": "page-ho-vendor-terms",
+      "blockKey": "b2",
+      "factId": "fact-refund-window-days",
+      "rule": "R1",
+      "plantedText": "thirty days",
+      "note": "word-form alias, different doc style"
+    },
+    {
+      "dataset": "holdout",
+      "pageId": "page-ho-partner-faq",
+      "blockKey": "b2",
+      "factId": "fact-sla-uptime-pct",
+      "rule": "R1",
+      "plantedText": "ninety-nine point nine percent",
+      "note": "hyphenated word form in partner doc"
+    },
+    {
+      "dataset": "holdout",
+      "pageId": "page-ho-reseller",
+      "blockKey": "b2",
+      "factId": "fact-free-trial-days",
+      "rule": "R1",
+      "plantedText": "14 days",
+      "note": "trial period in reseller doc"
+    },
+    {
+      "dataset": "holdout",
+      "pageId": "page-ho-reseller",
+      "blockKey": "b3",
+      "factId": "fact-refund-window-days",
+      "rule": "R2",
+      "plantedText": "45 days",
+      "note": "old refund window value near \"refund\""
+    },
+    {
+      "dataset": "holdout",
+      "pageId": "page-ho-data-policy",
+      "blockKey": "b2",
+      "factId": "fact-max-file-size-mb",
+      "rule": "R1",
+      "plantedText": "100 megabytes",
+      "note": "alternative unit spelling in data policy"
+    },
+    {
+      "dataset": "holdout",
+      "pageId": "page-ho-security",
+      "blockKey": "b2",
+      "factId": "fact-support-response-hours",
+      "rule": "R1",
+      "plantedText": "24-hour",
+      "note": "hyphenated alias in security policy"
+    },
+    {
+      "dataset": "holdout",
+      "pageId": "page-ho-cancellation",
+      "blockKey": "b2",
+      "factId": "fact-refund-window-days",
+      "rule": "R1",
+      "plantedText": "one month",
+      "note": "\"one month\" alias in cancellation doc"
+    },
+    {
+      "dataset": "holdout",
+      "pageId": "page-ho-cancellation",
+      "blockKey": "b3",
+      "factId": "fact-refund-window-days",
+      "rule": "R2",
+      "plantedText": "60 days refund",
+      "note": "wrong value near \"refund\" label"
+    },
+    {
+      "dataset": "holdout",
+      "pageId": "page-ho-compliance",
+      "blockKey": "b2",
+      "factId": "fact-old-refund-window",
+      "rule": "R3",
+      "plantedText": "factRef to deprecated fact-old-refund-window",
+      "note": "deprecated factRef in compliance doc"
+    },
+    {
+      "dataset": "dev",
+      "pageId": "none",
+      "blockKey": "none",
+      "factId": "fact-data-retention-years",
+      "rule": "R4",
+      "plantedText": "zero page references"
+    }
+  ]
+}

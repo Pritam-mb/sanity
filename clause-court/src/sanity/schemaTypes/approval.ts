@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { actorAuthField } from './fields/actorAuth'
 
 /**
  * One signature under the two-person rule: two different approvers,
@@ -30,6 +31,7 @@ export const approvalType = defineType({
       type: 'text',
       rows: 2,
     }),
+    actorAuthField(),
   ],
   preview: {
     select: { title: 'approver.name' },

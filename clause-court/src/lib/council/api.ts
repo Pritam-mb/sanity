@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { sanityClient } from '@/lib/sanity/client'
 import { CouncilRuleError } from '@/lib/council/tally'
+import { getViewerIdentity } from '@/lib/council/viewer'
+import { checkActorClaim } from '@/lib/council/identity'
+import type { AuthStrength } from '@/lib/council/identity'
 
 export function needToken(): NextResponse | null {
   if (!process.env.SANITY_API_TOKEN) {
@@ -27,6 +30,48 @@ export async function getActiveMember(memberId: string): Promise<ActiveMember> {
     throw new CouncilRuleError('Unknown or inactive council member — a vote from someone without a seat is refused.')
   }
   return member
+}
+
+/**
+ * The member the server has decided is acting.
+ *
+ * Before v3 every write route took `memberId` from the request body and looked
+ * it up. That is not an identity, it is a claim: anyone who knew a member's id
+ * could POST their vote, their position or their signature as that member, and
+ * every rule in `tally.ts` would pass because the rules trust the actor id they
+ * are handed. Signing the cookie changes nothing until the write path reads the
+ * cookie, so this is the function that closes it.
+ *
+ * `auth` rides along so the caller can record how the identity was established.
+ */
+export interface ActingMember extends ActiveMember {
+  auth: AuthStrength
+}
+
+export async function requireViewer(): Promise<ActingMember> {
+  const identity = await getViewerIdentity()
+  if (!identity) {
+    throw new CouncilRuleError(
+      'Sign in as a council member before acting — this request carries no verified identity.'
+    )
+  }
+  const member = await getActiveMember(identity.memberId)
+  return { ...member, auth: identity.auth }
+}
+
+/**
+ * Reconcile a client-declared actor against the verified one, as a refusal.
+ *
+ * The decision itself is pure and lives in `identity.ts` so it can be tested
+ * without a request; this is the throwing wrapper the routes use.
+ */
+export function assertSameActor(
+  claimed: string | undefined | null,
+  verifiedId: string,
+  field = 'memberId'
+): void {
+  const claim = checkActorClaim(claimed, verifiedId, field)
+  if (!claim.ok) throw new CouncilRuleError(claim.message)
 }
 
 export interface SessionDoc {
