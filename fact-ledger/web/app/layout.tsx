@@ -5,7 +5,7 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Fact Ledger — Drift Dashboard',
+  title: 'Fact Ledger: Drift Dashboard',
   description: 'Change one fact, find every stale copy, fix them in one reviewed release, and verify drift is zero.',
 }
 
@@ -45,13 +45,30 @@ export default function RootLayout({
             <Link href="/" style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
+              gap: '0.6rem',
               color: '#f1f5f9',
               fontWeight: 800,
               fontSize: '1rem',
               letterSpacing: '-0.02em',
             }}>
-              <span style={{ fontSize: '1.2rem' }}>📋</span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 24,
+                  height: 24,
+                  borderRadius: 6,
+                  background: 'rgba(99, 102, 241, 0.2)',
+                  border: '1px solid rgba(99, 102, 241, 0.5)',
+                  color: '#a5b4fc',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  fontFamily: 'monospace',
+                }}
+              >
+                FL
+              </span>
               Fact Ledger
             </Link>
             <div style={{ display: 'flex', gap: '1.25rem', marginLeft: '1rem' }}>

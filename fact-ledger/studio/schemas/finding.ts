@@ -1,8 +1,8 @@
 import { defineField, defineType } from 'sanity'
 
 /**
- * finding — a persisted scan result.
- * One finding per (page × fact × rule × blockKey × offset).
+ * finding: a persisted scan result.
+ * One finding per (page * fact * rule * blockKey * offset).
  * Status 'open' means unresolved; 'fixed' or 'dismissed' means resolved.
  */
 export const findingSchema = defineType({
@@ -30,10 +30,10 @@ export const findingSchema = defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'R1 – Unlinked match', value: 'R1' },
-          { title: 'R2 – Contradiction', value: 'R2' },
-          { title: 'R3 – Deprecated reference', value: 'R3' },
-          { title: 'R4 – Orphan fact', value: 'R4' },
+          { title: 'R1: Unlinked match', value: 'R1' },
+          { title: 'R2: Contradiction', value: 'R2' },
+          { title: 'R3: Deprecated reference', value: 'R3' },
+          { title: 'R4: Orphan fact', value: 'R4' },
         ],
       },
       validation: (r) => r.required(),
@@ -127,7 +127,7 @@ export const findingSchema = defineType({
     },
     prepare({ pageTitle, factLabel, rule, status }) {
       return {
-        title: `${rule} — ${factLabel ?? '?'}`,
+        title: `${rule}: ${factLabel ?? '?'}`,
         subtitle: `${pageTitle ?? '?'} · ${status}`,
       }
     },

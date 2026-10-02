@@ -1,7 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
 /**
- * person — minimal document for fact ownership.
+ * person: minimal document for fact ownership.
  */
 export const personSchema = defineType({
   name: 'person',

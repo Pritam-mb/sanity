@@ -11,7 +11,7 @@ const client = createClient({
   token: process.env.SANITY_API_TOKEN,
 })
 
-console.log('📡 Starting Local Webhook Proxy...')
+console.log('[PROXY] Starting Local Webhook Proxy...')
 console.log(`Listening for document changes on project ${client.config().projectId}...`)
 
 const query = '*[_type in ["page", "fact"]]'
@@ -19,7 +19,7 @@ const query = '*[_type in ["page", "fact"]]'
 client.listen(query, {}, { includeResult: true }).subscribe(async (update: any) => {
   if (update.transition === 'update' || update.transition === 'appear') {
     const doc = update.result
-    console.log(`\n🔔 Detected change on ${doc._type} (id: ${doc._id}). Forwarding to localhost webhook...`)
+    console.log(`\n[CHANGE] Detected change on ${doc._type} (id: ${doc._id}). Forwarding to localhost webhook...`)
     
     try {
       const response = await fetch('http://localhost:3000/api/webhook/sanity', {
@@ -31,9 +31,9 @@ client.listen(query, {}, { includeResult: true }).subscribe(async (update: any) 
       })
       
       const json = await response.json()
-      console.log(`✅ Webhook processed! HTTP ${response.status}`, json)
+      console.log(`[SUCCESS] Webhook processed! HTTP ${response.status}`, json)
     } catch (err: any) {
-      console.error(`❌ Webhook forward failed:`, err.message)
+      console.error(`[ERROR] Webhook forward failed:`, err.message)
     }
   }
 })

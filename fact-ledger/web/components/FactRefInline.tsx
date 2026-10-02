@@ -2,7 +2,7 @@
  * factRef inline renderer for @portabletext/react.
  * Replaces a factRef block with the live canonical value from the fact document.
  *
- * The resolver is async at the page level — the page Server Component fetches
+ * The resolver is async at the page level: the page Server Component fetches
  * facts upfront and passes them as a lookup map here. This keeps rendering
  * pure and avoids waterfalls.
  */

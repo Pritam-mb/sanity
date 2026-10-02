@@ -1,7 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
 /**
- * benchmarkResult — written by bench/run.ts, read by the dashboard P4/P5 panels.
+ * benchmarkResult: written by bench/run.ts, read by the dashboard P4/P5 panels.
  * Every number shown in the UI comes from these documents; no hard-coded demo output.
  */
 export const benchmarkResultSchema = defineType({
@@ -72,7 +72,7 @@ export const benchmarkResultSchema = defineType({
     prepare({ dataset, ranAt }) {
       const ts = ranAt ? new Date(ranAt).toLocaleString() : '?'
       return {
-        title: `Benchmark — ${dataset ?? '?'}`,
+        title: `Benchmark: ${dataset ?? '?'}`,
         subtitle: ts,
       }
     },

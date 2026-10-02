@@ -1,7 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
 /**
- * scanRun — audit record of one scan execution.
+ * scanRun: audit record of one scan execution.
  * Stores a metrics snapshot so the dashboard doesn't recompute history.
  */
 export const scanRunSchema = defineType({
@@ -124,7 +124,7 @@ export const scanRunSchema = defineType({
     prepare({ trigger, startedAt, open }) {
       const ts = startedAt ? new Date(startedAt).toLocaleString() : '?'
       return {
-        title: `${trigger ?? 'scan'} — ${ts}`,
+        title: `${trigger ?? 'scan'}: ${ts}`,
         subtitle: `${open ?? '?'} open findings`,
       }
     },

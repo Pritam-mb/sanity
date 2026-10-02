@@ -1,7 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
 /**
- * changeEvent — immutable audit log entry.
+ * changeEvent: immutable audit log entry.
  * Written by every action in the system: scan, fact edit, approve, dismiss, publish.
  */
 export const changeEventSchema = defineType({

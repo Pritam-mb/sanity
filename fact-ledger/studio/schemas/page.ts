@@ -1,7 +1,7 @@
 import { defineField, defineType } from 'sanity'
 
 /**
- * page — a content page whose body uses Portable Text.
+ * page: a content page whose body uses Portable Text.
  * Fact values should be inserted as factRef inline objects, never as literal text.
  */
 export const pageSchema = defineType({
