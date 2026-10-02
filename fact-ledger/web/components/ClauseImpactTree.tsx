@@ -55,13 +55,13 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
       >
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366f1', display: 'inline-block' }} />
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff', display: 'inline-block' }} />
             <span
               style={{
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
-                color: 'var(--accent-secondary)',
+                color: '#fff',
                 textTransform: 'uppercase',
               }}
             >
@@ -279,9 +279,9 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                       fontWeight: 700,
                       padding: '2px 6px',
                       borderRadius: 4,
-                      background: 'rgba(56, 189, 248, 0.15)',
-                      color: '#38bdf8',
-                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      color: '#fff',
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
                     }}
                   >
                     SOURCE DOCUMENT
@@ -336,13 +336,13 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                       gap: '0.4rem',
                       fontSize: '0.75rem',
                       padding: '4px 8px',
-                      background: 'rgba(239, 68, 68, 0.1)',
-                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
                       borderRadius: 6,
                     }}
                   >
                     <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>BEFORE:</span>
-                    <span style={{ color: '#ef4444', fontWeight: 700, textDecoration: 'line-through' }}>
+                    <span style={{ color: '#a1a1aa', fontWeight: 700, textDecoration: 'line-through' }}>
                       {currentSession.clause.beforeValue}
                     </span>
                   </div>
@@ -356,13 +356,13 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                       gap: '0.4rem',
                       fontSize: '0.75rem',
                       padding: '4px 8px',
-                      background: 'rgba(16, 185, 129, 0.1)',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      background: 'rgba(255, 255, 255, 0.07)',
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
                       borderRadius: 6,
                     }}
                   >
                     <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>AFTER:</span>
-                    <span style={{ color: '#10b981', fontWeight: 700 }}>
+                    <span style={{ color: '#fff', fontWeight: 700 }}>
                       {currentSession.clause.afterValue}
                     </span>
                   </div>
@@ -436,17 +436,17 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                 const isDrafted = item.status === 'drafted'
                 const isOpen = item.status === 'open'
 
-                const statusColor = isFixed ? '#10b981' : isDrafted ? '#f59e0b' : '#ef4444'
+                const statusColor = isFixed ? '#000000' : isDrafted ? '#ffffff' : '#d4d4d8'
                 const statusBg = isFixed
-                  ? 'rgba(16, 185, 129, 0.1)'
+                  ? '#ffffff'
                   : isDrafted
-                  ? 'rgba(245, 158, 11, 0.1)'
-                  : 'rgba(239, 68, 68, 0.1)'
+                  ? 'rgba(255, 255, 255, 0.1)'
+                  : 'rgba(255, 255, 255, 0.04)'
                 const statusBorder = isFixed
-                  ? 'rgba(16, 185, 129, 0.3)'
+                  ? '#ffffff'
                   : isDrafted
-                  ? 'rgba(245, 158, 11, 0.3)'
-                  : 'rgba(239, 68, 68, 0.3)'
+                  ? 'rgba(255, 255, 255, 0.3)'
+                  : 'rgba(255, 255, 255, 0.2)'
                 const statusLabel = isFixed ? 'RESOLVED' : isDrafted ? 'DRAFTED' : 'DRIFT OPEN'
 
                 return (
@@ -454,8 +454,8 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                     key={item.id}
                     onClick={() => setSelectedAffectedItem(item)}
                     style={{
-                      background: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-card)',
-                      border: isSelected ? '1px solid var(--accent-primary)' : '1px solid var(--border)',
+                      background: isSelected ? 'rgba(255, 255, 255, 0.06)' : 'var(--bg-card)',
+                      border: isSelected ? '1px solid #fff' : '1px solid var(--border)',
                       borderRadius: 10,
                       padding: '1.1rem',
                       cursor: 'pointer',
@@ -463,7 +463,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      boxShadow: isSelected ? '0 4px 15px rgba(99, 102, 241, 0.15)' : 'none',
+                      boxShadow: isSelected ? '0 4px 15px rgba(255, 255, 255, 0.12)' : 'none',
                     }}
                   >
                     <div>
@@ -475,9 +475,9 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                             fontWeight: 700,
                             padding: '2px 6px',
                             borderRadius: 4,
-                            background: 'rgba(99, 102, 241, 0.15)',
-                            color: 'var(--accent-secondary)',
-                            border: '1px solid rgba(99, 102, 241, 0.3)',
+                            background: 'rgba(255, 255, 255, 0.08)',
+                            color: '#fff',
+                            border: '1px solid rgba(255, 255, 255, 0.25)',
                           }}
                         >
                           RULE {item.rule}: {item.ruleName.toUpperCase()}
@@ -558,7 +558,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366f1', display: 'inline-block' }} />
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff', display: 'inline-block' }} />
                   <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     Inspector: {selectedAffectedItem.pageTitle}
                   </span>
@@ -601,7 +601,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: 10, marginBottom: 2 }}>
                     Rule Evaluation
                   </div>
-                  <div style={{ color: '#ef4444' }}>
+                  <div style={{ color: '#fff' }}>
                     Rule {selectedAffectedItem.rule}: {selectedAffectedItem.ruleName}
                   </div>
                 </div>
@@ -614,11 +614,11 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                     </div>
                     <div
                       style={{
-                        background: 'rgba(239, 68, 68, 0.08)',
-                        border: '1px solid rgba(239, 68, 68, 0.25)',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
                         padding: '6px 10px',
                         borderRadius: 6,
-                        color: '#f87171',
+                        color: '#a1a1aa',
                         fontSize: '0.75rem',
                         marginBottom: 6,
                       }}
@@ -628,11 +628,11 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                     </div>
                     <div
                       style={{
-                        background: 'rgba(16, 185, 129, 0.08)',
-                        border: '1px solid rgba(16, 185, 129, 0.25)',
+                        background: 'rgba(255, 255, 255, 0.07)',
+                        border: '1px solid rgba(255, 255, 255, 0.25)',
                         padding: '6px 10px',
                         borderRadius: 6,
-                        color: '#34d399',
+                        color: '#fff',
                         fontSize: '0.75rem',
                       }}
                     >
@@ -660,12 +660,12 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
               const isCompleted = point.status === 'completed'
               const isInProgress = point.status === 'in_progress'
 
-              const dotColor = isCompleted ? '#10b981' : isInProgress ? '#f59e0b' : '#64748b'
+              const dotColor = isCompleted ? '#ffffff' : isInProgress ? '#d4d4d8' : '#52525b'
               const badgeBg = isCompleted
-                ? 'rgba(16, 185, 129, 0.1)'
+                ? '#ffffff'
                 : isInProgress
-                ? 'rgba(245, 158, 11, 0.1)'
-                : 'rgba(100, 116, 139, 0.1)'
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(255, 255, 255, 0.04)'
 
               return (
                 <div
@@ -686,7 +686,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                       height: 28,
                       borderRadius: '50%',
                       background: dotColor,
-                      color: '#ffffff',
+                      color: '#000000',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -712,8 +712,8 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                             padding: '1px 6px',
                             borderRadius: 4,
                             background: badgeBg,
-                            color: dotColor,
-                            border: `1px solid ${dotColor}40`,
+                            color: isCompleted ? '#000000' : dotColor,
+                            border: `1px solid rgba(255,255,255,0.25)`,
                           }}
                         >
                           {point.badge}

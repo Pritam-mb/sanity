@@ -46,7 +46,7 @@ export interface LiveDashboardChartsProps {
   }
 }
 
-const PIE_COLORS = ['#10b981', '#ef4444']
+const PIE_COLORS = ['#ffffff', '#52525b']
 
 export function LiveDashboardCharts({
   ruleStats,
@@ -71,7 +71,7 @@ export function LiveDashboardCharts({
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff', display: 'inline-block' }} />
           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
             REPORT GENERATED FROM LIVE GROQ
           </span>
@@ -107,11 +107,11 @@ export function LiveDashboardCharts({
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.75rem' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#10b981' }}>
-                <span style={{ width: 8, height: 8, borderRadius: 2, background: '#10b981' }} /> Fixed
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#fff' }}>
+                <span style={{ width: 8, height: 8, borderRadius: 2, background: '#fff' }} /> Fixed
               </span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#ef4444' }}>
-                <span style={{ width: 8, height: 8, borderRadius: 2, background: '#ef4444' }} /> Open Drift
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#a1a1aa' }}>
+                <span style={{ width: 8, height: 8, borderRadius: 2, background: '#52525b' }} /> Open Drift
               </span>
             </div>
           </div>
@@ -151,8 +151,8 @@ export function LiveDashboardCharts({
                           <div style={{ fontWeight: 700, color: '#f1f5f9', marginBottom: 4 }}>
                             {item.rule}: {item.name}
                           </div>
-                          <div style={{ color: '#ef4444' }}>Open Drift: {item.open}</div>
-                          <div style={{ color: '#10b981' }}>Resolved: {item.fixed}</div>
+                          <div style={{ color: '#a1a1aa' }}>Open Drift: {item.open}</div>
+                          <div style={{ color: '#fff' }}>Resolved: {item.fixed}</div>
                           <div style={{ color: '#94a3b8', borderTop: '1px solid #1e293b', marginTop: 4, paddingTop: 4 }}>
                             Total Monitored: {item.total}
                           </div>
@@ -162,8 +162,8 @@ export function LiveDashboardCharts({
                     return null
                   }}
                 />
-                <Bar dataKey="fixed" name="Fixed" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="open" name="Open Drift" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="fixed" name="Fixed" stackId="a" fill="#ffffff" radius={[0, 0, 0, 0]} />
+                <Bar dataKey="open" name="Open Drift" stackId="a" fill="#52525b" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -199,8 +199,8 @@ export function LiveDashboardCharts({
               <AreaChart data={scanHistory} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                 <defs>
                   <linearGradient id="durationGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#ffffff" stopOpacity={0.45} />
+                    <stop offset="95%" stopColor="#ffffff" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -235,7 +235,7 @@ export function LiveDashboardCharts({
                           <div style={{ fontWeight: 700, color: '#f1f5f9', marginBottom: 2 }}>
                             Duration: {item.durationMs} ms
                           </div>
-                          <div style={{ color: '#a5b4fc' }}>Trigger: {item.trigger}</div>
+                          <div style={{ color: '#fff' }}>Trigger: {item.trigger}</div>
                           <div style={{ color: '#94a3b8' }}>
                             Scope: {item.pagesScanned} pages · {item.factsScanned} facts
                           </div>
@@ -251,7 +251,7 @@ export function LiveDashboardCharts({
                 <Area
                   type="monotone"
                   dataKey="durationMs"
-                  stroke="#6366f1"
+                  stroke="#ffffff"
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#durationGrad)"
@@ -286,7 +286,7 @@ export function LiveDashboardCharts({
             <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Resolution Efficiency
             </div>
-            <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981', marginTop: '0.25rem' }}>
+            <div style={{ fontSize: '2rem', fontWeight: 800, color: '#fff', marginTop: '0.25rem' }}>
               {resolutionHealth.ratePct.toFixed(1)}%
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>

@@ -113,6 +113,66 @@ export const structure = (S: StructureBuilder) =>
 
       S.divider(),
 
+      // ── Employee Voice ─────────────────────────────
+      S.listItem()
+        .title('Policy Updates')
+        .id('policy-updates')
+        .child(
+          S.documentTypeList('policyUpdate').title('Policy Updates')
+        ),
+
+      S.listItem()
+        .title('Complaints')
+        .id('complaints')
+        .child(
+          S.list()
+            .title('Complaints')
+            .items([
+              S.listItem()
+                .title('Open')
+                .child(
+                  S.documentList()
+                    .title('Open Complaints')
+                    .filter('_type == "complaint" && status == "open"')
+                    .defaultOrdering([{ field: 'raisedAt', direction: 'desc' }])
+                ),
+              S.listItem()
+                .title('In Review')
+                .child(
+                  S.documentList()
+                    .title('Complaints In Review')
+                    .filter('_type == "complaint" && status == "in-review"')
+                    .defaultOrdering([{ field: 'raisedAt', direction: 'desc' }])
+                ),
+              S.listItem()
+                .title('All Complaints')
+                .child(S.documentTypeList('complaint').title('All Complaints')),
+            ])
+        ),
+
+      S.listItem()
+        .title('Policy Questions')
+        .id('policy-questions')
+        .child(
+          S.list()
+            .title('Policy Questions')
+            .items([
+              S.listItem()
+                .title('Open')
+                .child(
+                  S.documentList()
+                    .title('Open Questions')
+                    .filter('_type == "policyQuestion" && status == "open"')
+                    .defaultOrdering([{ field: 'askedAt', direction: 'desc' }])
+                ),
+              S.listItem()
+                .title('All Questions')
+                .child(S.documentTypeList('policyQuestion').title('All Questions')),
+            ])
+        ),
+
+      S.divider(),
+
       // ── Scan Runs ──────────────────────────────────
       S.listItem()
         .title('Scan Runs')

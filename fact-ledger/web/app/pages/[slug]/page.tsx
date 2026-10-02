@@ -3,6 +3,7 @@ import { PortableText } from '@portabletext/react'
 import { buildPtComponents, type FactLookup } from '@/components/FactRefInline'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 interface PageDoc {
   _id: string
@@ -21,8 +22,7 @@ async function getPage(slug: string): Promise<PageDoc | null> {
   )
 }
 
-async function getFactsForPage(pageId: string): Promise<FactLookup[]> {
-  // Fetch all facts referenced in this page's body via factRef
+async function getFactsForPage(): Promise<FactLookup[]> {
   return sanityClient.fetch(
     `*[_type == "fact"]{
       _id, label, value, unit
@@ -35,40 +35,30 @@ export default async function PageDetail({ params }: { params: Promise<{ slug: s
   const page = await getPage(slug)
   if (!page) notFound()
 
-  const facts = await getFactsForPage(page._id)
+  const facts = await getFactsForPage()
   const factMap = new Map<string, FactLookup>(facts.map((f) => [f._id, f]))
   const ptComponents = buildPtComponents(factMap)
 
   return (
-    <main style={{ maxWidth: 760, margin: '0 auto', padding: '2rem 1rem' }}>
-      <Link href="/pages" style={{ fontSize: 14, color: '#6366f1' }}>
-        Back to All Pages
-      </Link>
-      <div
-        style={{
-          display: 'inline-block',
-          marginLeft: '1rem',
-          padding: '2px 8px',
-          borderRadius: 4,
-          background: '#1e1b4b',
-          color: '#a5b4fc',
-          fontSize: 12,
-        }}
-      >
-        {page.kind}
+    <div className="page-shell" style={{ maxWidth: 860 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14, flexWrap: 'wrap' }}>
+        <Link href="/pages" className="back-link" style={{ marginBottom: 0 }}>
+          <ArrowLeft size={14} /> All Pages
+        </Link>
+        <span className="kind-chip">{page.kind}</span>
       </div>
-      <h1 style={{ marginTop: '1rem', fontSize: '1.8rem', fontWeight: 700 }}>
-        {page.title}
-      </h1>
-      <hr style={{ margin: '1.5rem 0', borderColor: '#334155' }} />
-      <div className="prose">
-        {page.body ? (
-          <PortableText value={page.body as any} components={ptComponents as any} />
-        ) : (
-          <p style={{ color: '#64748b' }}>This page has no content yet.</p>
-        )}
+      <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Live fact-linked document</div>
+      <h1 className="page-title">{page.title}</h1>
+      <div className="page-card page-card-pad" style={{ marginTop: 18 }}>
+        <div className="prose">
+          {page.body ? (
+            <PortableText value={page.body as any} components={ptComponents as any} />
+          ) : (
+            <p style={{ color: '#8b8b93' }}>This page has no content yet.</p>
+          )}
+        </div>
       </div>
-    </main>
+    </div>
   )
 }
 

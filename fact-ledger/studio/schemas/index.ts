@@ -7,6 +7,9 @@ import { scanRunSchema } from './scanRun'
 import { changeEventSchema } from './changeEvent'
 import { benchmarkResultSchema } from './benchmarkResult'
 import { remediationSchema } from './remediation'
+import { policyUpdateSchema } from './policyUpdate'
+import { complaintSchema } from './complaint'
+import { policyQuestionSchema } from './policyQuestion'
 
 export const schemaTypes = [
   // Core data model
@@ -20,4 +23,8 @@ export const schemaTypes = [
   changeEventSchema,
   benchmarkResultSchema,
   remediationSchema,
+  // Employee voice: updates, complaints, questions
+  policyUpdateSchema,
+  complaintSchema,
+  policyQuestionSchema,
 ]

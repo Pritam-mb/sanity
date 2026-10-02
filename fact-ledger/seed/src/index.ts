@@ -786,6 +786,234 @@ doc({
   // No ground truth entries — clean page, all findings here are false positives
 }
 
+// ─── Employee voice: policy updates ────────────────────────────────────────
+// Officials post news / policy changes; employees upvote / downvote.
+doc({
+  _id: 'update-refund-60', _type: 'policyUpdate',
+  title: 'Refund window extended to 60 days for annual plans',
+  kind: 'policy-change',
+  summary: 'Starting next quarter, annual-plan customers get a 60-day refund window instead of 30 days. Help pages and terms will be reconciled in one release.',
+  author: 'Policy Office',
+  linkedFact: { _type: 'reference', _ref: F.refund },
+  linkedPage: { _type: 'reference', _ref: 'page-returns-policy' },
+  status: 'published',
+  upvotes: 42, downvotes: 3,
+  publishedAt: '2026-09-18T09:00:00Z',
+})
+doc({
+  _id: 'update-sla-9995', _type: 'policyUpdate',
+  title: 'Enterprise SLA raised to 99.95% uptime',
+  kind: 'policy-change',
+  summary: 'Enterprise contracts now guarantee 99.95% monthly uptime, up from 99.9%. Sales collateral and status-page wording are being updated.',
+  author: 'Policy Office',
+  linkedFact: { _type: 'reference', _ref: F.sla },
+  status: 'published',
+  upvotes: 35, downvotes: 6,
+  publishedAt: '2026-09-10T09:00:00Z',
+})
+doc({
+  _id: 'update-soc2-audit', _type: 'policyUpdate',
+  title: 'SOC2 Type II audit scheduled for November',
+  kind: 'news',
+  summary: 'External auditors will sample retention and access-control clauses. Please report any stale numbers you spot before October 30.',
+  author: 'Security Team',
+  linkedFact: { _type: 'reference', _ref: F.retention },
+  status: 'published',
+  upvotes: 28, downvotes: 1,
+  publishedAt: '2026-09-02T09:00:00Z',
+})
+doc({
+  _id: 'update-trial-faq', _type: 'policyUpdate',
+  title: 'Free trial FAQ rewritten for clarity',
+  kind: 'notice',
+  summary: 'The trial FAQ confused "14 days" with "two weeks" in three places. The wording is now canonical and linked to the fact ledger.',
+  author: 'Docs Team',
+  linkedFact: { _type: 'reference', _ref: F.trial },
+  status: 'published',
+  upvotes: 19, downvotes: 2,
+  publishedAt: '2026-08-24T09:00:00Z',
+})
+doc({
+  _id: 'update-support-24h', _type: 'policyUpdate',
+  title: 'Priority support response stays at 24 hours',
+  kind: 'notice',
+  summary: 'We evaluated a 4-hour priority window and decided to keep 24 hours. The proposal is parked; share your view with a vote.',
+  author: 'Support Lead',
+  linkedFact: { _type: 'reference', _ref: F.support },
+  status: 'published',
+  upvotes: 11, downvotes: 14,
+  publishedAt: '2026-08-15T09:00:00Z',
+})
+doc({
+  _id: 'update-late-fee', _type: 'policyUpdate',
+  title: 'Late fee disclosure: draft open for comment',
+  kind: 'news',
+  summary: 'Finance proposes keeping the 1.5% monthly late fee but disclosing it earlier in checkout. Draft language is open for employee comment.',
+  author: 'Finance Team',
+  linkedFact: { _type: 'reference', _ref: F.lateFee },
+  status: 'published',
+  upvotes: 9, downvotes: 5,
+  publishedAt: '2026-08-05T09:00:00Z',
+})
+
+// ─── Employee voice: complaints ──────────────────────────────────────────
+// Employees raise issues against specific facts / pages.
+doc({
+  _id: 'complaint-refund-conflict', _type: 'complaint',
+  title: 'Refund page still says 30 days, checkout says 60',
+  category: 'contradiction',
+  description: 'The pricing FAQ promises a 60-day refund but the help center article still says 30 days. A customer quoted the old number on a call today.',
+  targetFact: { _type: 'reference', _ref: F.refund },
+  raisedBy: 'Priya Nair',
+  status: 'open',
+  raisedAt: '2026-09-20T10:15:00Z',
+})
+doc({
+  _id: 'complaint-warranty-confusion', _type: 'complaint',
+  title: 'Warranty text confused with refund window',
+  category: 'unclear',
+  description: 'The getting-started guide mentions a 30-day warranty right next to the refund paragraph. New hires keep mixing them up.',
+  targetFact: { _type: 'reference', _ref: F.refund },
+  raisedBy: 'Tunde Ade',
+  status: 'in-review',
+  response: 'Good catch — we are splitting the paragraphs and linking the refund value to the ledger.',
+  raisedAt: '2026-09-17T14:40:00Z',
+})
+doc({
+  _id: 'complaint-sla-outdated', _type: 'complaint',
+  title: 'Status page shows outdated 99.9% SLA',
+  category: 'outdated',
+  description: 'Enterprise SLA moved to 99.95% but the status page footer still shows 99.9%. This is a compliance risk.',
+  targetFact: { _type: 'reference', _ref: F.sla },
+  raisedBy: 'Maria Santos',
+  status: 'open',
+  raisedAt: '2026-09-15T08:05:00Z',
+})
+doc({
+  _id: 'complaint-trial-unclear', _type: 'complaint',
+  title: 'Trial length wording is ambiguous',
+  category: 'unclear',
+  description: '"Two weeks" vs "14 days" — do weekends count? Support gets this question weekly. Please pin one canonical phrasing.',
+  targetFact: { _type: 'reference', _ref: F.trial },
+  raisedBy: 'Jonas Weber',
+  status: 'resolved',
+  response: 'Resolved: FAQ now uses the canonical 14-day fact reference everywhere.',
+  raisedAt: '2026-09-08T11:20:00Z',
+  resolvedAt: '2026-09-12T16:00:00Z',
+})
+doc({
+  _id: 'complaint-latefee-unfair', _type: 'complaint',
+  title: 'Late fee disclosed too late in checkout',
+  category: 'unfair',
+  description: 'The 1.5% fee only appears on the final screen. Customers feel ambushed. Disclose it on the first billing screen.',
+  targetFact: { _type: 'reference', _ref: F.lateFee },
+  raisedBy: 'Aisha Khan',
+  status: 'open',
+  raisedAt: '2026-09-05T09:30:00Z',
+})
+doc({
+  _id: 'complaint-support-hours', _type: 'complaint',
+  title: 'Support hours contradict across regions',
+  category: 'contradiction',
+  description: 'EU help pages say 24-hour response, APAC pages say one business day. These differ on weekends — pick one definition.',
+  targetFact: { _type: 'reference', _ref: F.support },
+  raisedBy: 'Liam Murphy',
+  status: 'in-review',
+  response: 'Confirmed. Standardizing on 24 hours and aliasing one business day to it.',
+  raisedAt: '2026-08-28T13:55:00Z',
+})
+doc({
+  _id: 'complaint-filesize-table', _type: 'complaint',
+  title: 'File size limits table hard to read',
+  category: 'unclear',
+  description: 'The limits table on the product page mixes MB and GB. New users upload oversized files and get errors.',
+  targetFact: { _type: 'reference', _ref: F.fileSize },
+  raisedBy: 'Sofia Rossi',
+  status: 'resolved',
+  response: 'Resolved: table now uses one unit column sourced from the fact ledger.',
+  raisedAt: '2026-08-20T10:00:00Z',
+  resolvedAt: '2026-08-27T15:30:00Z',
+})
+doc({
+  _id: 'complaint-retention-years', _type: 'complaint',
+  title: 'Nobody can find the retention period',
+  category: 'other',
+  description: 'The 7-year retention rule lives in one PDF. No help page references it, so teams guess. Can we publish it properly?',
+  targetFact: { _type: 'reference', _ref: F.retention },
+  raisedBy: 'David Okafor',
+  status: 'open',
+  raisedAt: '2026-08-12T09:10:00Z',
+})
+
+// ─── Employee voice: questions ─────────────────────────────────────────
+// Employees ask about policies; officials answer.
+doc({
+  _id: 'question-refund-annual', _type: 'policyQuestion',
+  question: 'Does the 60-day refund apply to monthly plans or only annual plans?',
+  askedBy: 'Priya Nair',
+  linkedFact: { _type: 'reference', _ref: F.refund },
+  status: 'answered',
+  answer: 'Only annual plans. Monthly plans keep the 30-day window. The pricing FAQ now states this explicitly.',
+  answeredBy: 'Policy Office',
+  helpful: 24,
+  askedAt: '2026-09-19T09:00:00Z',
+  answeredAt: '2026-09-19T15:30:00Z',
+})
+doc({
+  _id: 'question-sla-credits', _type: 'policyQuestion',
+  question: 'If uptime drops below the SLA, do customers get automatic credits?',
+  askedBy: 'Tunde Ade',
+  linkedFact: { _type: 'reference', _ref: F.sla },
+  status: 'answered',
+  answer: 'Yes — 10% service credit for every 0.1% below the SLA in a month, claimed via support within 30 days.',
+  answeredBy: 'Policy Office',
+  helpful: 18,
+  askedAt: '2026-09-14T12:00:00Z',
+  answeredAt: '2026-09-15T10:00:00Z',
+})
+doc({
+  _id: 'question-trial-weekends', _type: 'policyQuestion',
+  question: 'Does the 14-day trial count calendar days including weekends?',
+  askedBy: 'Jonas Weber',
+  linkedFact: { _type: 'reference', _ref: F.trial },
+  status: 'answered',
+  answer: 'Calendar days, including weekends and holidays. Day 1 is the signup day.',
+  answeredBy: 'Docs Team',
+  helpful: 15,
+  askedAt: '2026-09-06T08:30:00Z',
+  answeredAt: '2026-09-06T13:00:00Z',
+})
+doc({
+  _id: 'question-latefee-when', _type: 'policyQuestion',
+  question: 'When exactly is the 1.5% late fee applied — after the due date or after a grace period?',
+  askedBy: 'Aisha Khan',
+  linkedFact: { _type: 'reference', _ref: F.lateFee },
+  status: 'open',
+  helpful: 7,
+  askedAt: '2026-09-21T10:45:00Z',
+})
+doc({
+  _id: 'question-support-weekend', _type: 'policyQuestion',
+  question: 'Is the 24-hour support response measured 24/7 or business hours only?',
+  askedBy: 'Liam Murphy',
+  linkedFact: { _type: 'reference', _ref: F.support },
+  status: 'open',
+  helpful: 5,
+  askedAt: '2026-09-20T16:20:00Z',
+})
+doc({
+  _id: 'question-filesize-video', _type: 'policyQuestion',
+  question: 'Does the 100 MB file limit apply to video uploads too?',
+  askedBy: 'Sofia Rossi',
+  linkedFact: { _type: 'reference', _ref: F.fileSize },
+  status: 'answered',
+  answer: 'Yes, all file types share the 100 MB per-file limit. Enterprise plans can request higher caps.',
+  answeredBy: 'Support Lead',
+  helpful: 9,
+  askedAt: '2026-08-29T11:00:00Z',
+  answeredAt: '2026-08-30T09:15:00Z',
+})
+
 // ─── Seed function ──────────────────────────────────────────────────────────
 
 async function seed() {

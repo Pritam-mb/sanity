@@ -143,8 +143,8 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
               width: 10,
               height: 10,
               borderRadius: '50%',
-              background: isConnected ? '#22c55e' : '#ef4444',
-              boxShadow: isConnected ? '0 0 10px rgba(34, 197, 94, 0.6)' : 'none',
+              background: isConnected ? '#fff' : '#52525b',
+              boxShadow: 'none',
             }}
           />
           <div>
@@ -153,7 +153,7 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
               Project: <code style={{ fontSize: '0.75rem' }}>tmics7hc</code> · Dataset: <code style={{ fontSize: '0.75rem' }}>fact-ledger</code> · Status:{' '}
-              <span style={{ color: isConnected ? '#22c55e' : '#ef4444', fontWeight: 600 }}>
+              <span style={{ color: '#fff', fontWeight: 600 }}>
                 {isConnected ? 'STREAMING ACTIVE' : 'DISCONNECTED'}
               </span>
               {liveEventCount > 0 && (
@@ -173,9 +173,9 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
             style={{
               padding: '6px 14px',
               borderRadius: 6,
-              background: 'rgba(99, 102, 241, 0.15)',
-              border: '1px solid rgba(99, 102, 241, 0.4)',
-              color: 'var(--accent-secondary)',
+              background: '#fff',
+              border: '1px solid #fff',
+              color: '#000',
               fontSize: '0.8rem',
               fontWeight: 600,
               cursor: isScanning ? 'wait' : 'pointer',
@@ -191,9 +191,9 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
             style={{
               padding: '6px 14px',
               borderRadius: 6,
-              background: 'rgba(16, 185, 129, 0.15)',
-              border: '1px solid rgba(16, 185, 129, 0.4)',
-              color: '#34d399',
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              color: '#fff',
               fontSize: '0.8rem',
               fontWeight: 600,
               cursor: isRemediating ? 'wait' : 'pointer',
@@ -229,8 +229,8 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
           style={{
             padding: '8px 14px',
             marginBottom: '1rem',
-            background: 'rgba(99, 102, 241, 0.1)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
             borderRadius: 6,
             fontSize: '0.8rem',
             color: 'var(--accent-secondary)',
@@ -252,8 +252,8 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
             const isHuman = item.actor?.toLowerCase().includes('editor') || item.actor?.toLowerCase().includes('human')
             const isScan = item.action?.includes('scan')
 
-            const actorBadgeColor = isAI ? '#38bdf8' : isHuman ? '#f59e0b' : '#a855f7'
-            const actorBg = isAI ? 'rgba(56, 189, 248, 0.1)' : isHuman ? 'rgba(245, 158, 11, 0.1)' : 'rgba(168, 85, 247, 0.1)'
+            const actorBadgeColor = isAI ? '#ffffff' : isHuman ? '#d4d4d8' : '#a1a1aa'
+            const actorBg = 'rgba(255, 255, 255, 0.06)'
 
             return (
               <div
@@ -263,8 +263,8 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '10px 14px',
-                  background: item.isLive ? 'rgba(99, 102, 241, 0.06)' : 'var(--bg-card)',
-                  border: item.isLive ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid var(--border)',
+                  background: item.isLive ? 'rgba(255, 255, 255, 0.05)' : 'var(--bg-card)',
+                  border: item.isLive ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid var(--border)',
                   borderRadius: 8,
                   fontSize: '0.85rem',
                 }}

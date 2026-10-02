@@ -1,5 +1,6 @@
 import { sanityClient } from '@/lib/sanity/client'
 import Link from 'next/link'
+import { ArrowLeft, FileText } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,64 +17,46 @@ async function getPages(): Promise<PageListItem[]> {
   )
 }
 
-const kindColors: Record<string, string> = {
-  policy: '#7c3aed',
-  help: '#0284c7',
-  pricing: '#059669',
-  faq: '#b45309',
-}
-
 export default async function PagesIndex() {
   const pages = await getPages()
 
   return (
-    <main style={{ maxWidth: 760, margin: '0 auto', padding: '2rem 1rem' }}>
-      <Link href="/" style={{ fontSize: 14, color: '#6366f1' }}>Back to Dashboard</Link>
-      <h1 style={{ marginTop: '1rem', fontSize: '1.8rem', fontWeight: 700 }}>Pages</h1>
-      <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>
-        {pages.length} page{pages.length !== 1 ? 's' : ''} in the system
+    <div className="page-shell" style={{ maxWidth: 900 }}>
+      <Link href="/dashboard" className="back-link">
+        <ArrowLeft size={14} /> Back to Dashboard
+      </Link>
+      <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Content corpus</div>
+      <h1 className="page-title">Pages</h1>
+      <p className="page-sub">
+        <strong style={{ color: '#fff' }}>{pages.length} page{pages.length !== 1 ? 's' : ''}</strong> actively monitored for drift
       </p>
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
         {pages.map((p) => (
           <li key={p._id}>
-            <Link
-              href={`/pages/${p.slug?.current}`}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.75rem 1rem',
-                border: '1px solid #1e293b',
-                borderRadius: 8,
-                background: '#0f172a',
-                color: '#e2e8f0',
-                textDecoration: 'none',
-              }}
-            >
-              <span
-                style={{
-                  padding: '2px 8px',
-                  borderRadius: 4,
-                  background: kindColors[p.kind] ?? '#334155',
-                  color: '#fff',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                {p.kind}
+            <Link href={`/pages/${p.slug?.current}`} style={{ textDecoration: 'none' }}>
+              <span className="list-row-card">
+                <span style={{
+                  width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                  background: '#fff', border: '1px solid #fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000',
+                }}>
+                  <FileText size={15} />
+                </span>
+                <span className="kind-chip kind-chip-white">
+                  {p.kind}
+                </span>
+                <span style={{ fontWeight: 600, fontSize: '0.92rem' }}>{p.title}</span>
+                <span style={{ marginLeft: 'auto', color: '#fff', fontWeight: 800 }}>→</span>
               </span>
-              <span style={{ fontWeight: 500 }}>{p.title}</span>
             </Link>
           </li>
         ))}
         {pages.length === 0 && (
-          <li style={{ color: '#64748b', padding: '1rem 0' }}>
+          <li className="page-card page-card-pad" style={{ color: '#8b8b93' }}>
             No pages yet. Run <code>npm run seed</code> to create demo data.
           </li>
         )}
       </ul>
-    </main>
+    </div>
   )
 }
