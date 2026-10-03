@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { BackLink } from '@/components/BackLink'
 import { getQuestions, getFactOptions, getPageOptions } from '@/lib/voice'
 import { QuestionForm } from '@/components/QuestionForm'
 import { RoleAnswerBox } from '@/components/RoleAnswerBox'
@@ -17,9 +16,7 @@ export default async function AskPage() {
 
   return (
     <div className="page-shell">
-      <Link href="/portal" className="back-link">
-        <ArrowLeft size={14} /> Back to Portal
-      </Link>
+      <BackLink />
       <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Know your policy</div>
       <h1 className="page-title">Ask a Policy</h1>
       <p className="page-sub">

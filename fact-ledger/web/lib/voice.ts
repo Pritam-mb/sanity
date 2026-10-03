@@ -11,7 +11,7 @@ export interface PolicyUpdateDoc {
   downvotes: number
   publishedAt: string
   linkedFact?: { _id: string; label: string }
-  linkedPage?: { _id: string; title: string }
+  linkedPage?: { _id: string; title: string; slug?: string }
 }
 
 export interface ComplaintDoc {
@@ -49,7 +49,7 @@ export async function getUpdates(): Promise<PolicyUpdateDoc[]> {
       "downvotes": coalesce(downvotes, 0),
       publishedAt,
       "linkedFact": linkedFact->{ _id, label },
-      "linkedPage": linkedPage->{ _id, title }
+      "linkedPage": linkedPage->{ _id, title, "slug": slug.current }
     }`
   )
 }

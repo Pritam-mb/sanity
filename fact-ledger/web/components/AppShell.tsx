@@ -1,8 +1,8 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   LayoutDashboard,
   GitBranch,
@@ -12,34 +12,14 @@ import {
   Megaphone,
   MessageSquareWarning,
   CircleHelp,
-  PencilLine,
   Home,
   Globe,
+  ChevronDown,
+  LogOut,
+  Building2,
 } from 'lucide-react'
 
 export type Role = 'official' | 'employee'
-
-const OFFICIAL_LINKS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/portal', label: 'Employee View', icon: Home },
-  { href: '/updates', label: 'Updates', icon: Megaphone },
-  { href: '/complaints', label: 'Complaints', icon: MessageSquareWarning },
-  { href: '/ask', label: 'Questions', icon: CircleHelp },
-  { href: '/policies', label: 'Edit Policy', icon: PencilLine },
-  { href: '/clause-tree', label: 'Clause Tree', icon: GitBranch },
-  { href: '/pages', label: 'Pages', icon: FileText },
-  { href: '/facts', label: 'Facts', icon: Database },
-  { href: '/findings', label: 'Findings', icon: AlertTriangle },
-]
-
-const EMPLOYEE_LINKS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/portal', label: 'Employee View', icon: Home },
-  { href: '/updates', label: 'Updates & News', icon: Megaphone },
-  { href: '/ask', label: 'Ask a Policy', icon: CircleHelp },
-  { href: '/complaints', label: 'My Complaints', icon: MessageSquareWarning },
-  { href: '/pages', label: 'Policy Library', icon: FileText },
-]
 
 export function useRole(): [Role, (r: Role) => void] {
   const [role, setRoleState] = useState<Role>('official')
@@ -78,8 +58,13 @@ export function RoleSwitcher({ role, setRole }: { role: Role; setRole: (r: Role)
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [orgName, setOrgName] = useState('Acme Technologies')
   const [role, setRole] = useRole()
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
+  const navRef = useRef<HTMLDivElement>(null)
+  const accountRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     try {
@@ -93,22 +78,84 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setActiveDropdown(null)
+      }
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setAccountMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Close dropdowns on route changes
+  useEffect(() => {
+    setActiveDropdown(null)
+    setAccountMenuOpen(false)
+  }, [pathname])
+
+  const handleSignOut = () => {
+    try {
+      sessionStorage.removeItem('pg_org')
+    } catch {
+      // ignore
+    }
+    router.push('/')
+  }
+
   // Hide on landing page and login page
   if (pathname === '/' || pathname === '/login') {
     return <>{children}</>
   }
 
-  const NAV_LINKS = role === 'official' ? OFFICIAL_LINKS : EMPLOYEE_LINKS
+  // Governance routes
+  const governanceItems = [
+    { href: '/findings', label: 'Findings', icon: AlertTriangle, desc: 'Scanner drift output' },
+    { href: '/facts', label: 'Facts Registry', icon: Database, desc: 'Canonical truth & editor' },
+    { href: '/pages', label: 'Monitored Pages', icon: FileText, desc: 'Scanned corpus docs' },
+  ]
+  const isGovernanceActive =
+    pathname.startsWith('/findings') ||
+    pathname.startsWith('/facts') ||
+    pathname.startsWith('/policies') ||
+    pathname.startsWith('/pages')
+
+  // Voice routes
+  const voiceItems = [
+    { href: '/updates', label: 'Updates', icon: Megaphone, desc: 'Policy changes & announcements' },
+    { href: '/complaints', label: 'Complaints', icon: MessageSquareWarning, desc: 'Employee complaints triage' },
+    { href: '/ask', label: 'Questions & Answers', icon: CircleHelp, desc: 'Q&A verified policy sources' },
+  ]
+  const isVoiceActive =
+    pathname.startsWith('/updates') ||
+    pathname.startsWith('/complaints') ||
+    pathname.startsWith('/ask') ||
+    pathname.startsWith('/questions')
+
+  // Employee links (clean and dedicated)
+  const employeeLinks = [
+    { href: '/portal', label: 'Home', icon: Home },
+    { href: '/pages', label: 'Policy Library', icon: FileText },
+    { href: '/updates', label: 'Updates', icon: Megaphone },
+    { href: '/ask', label: 'Ask a Policy', icon: CircleHelp },
+    { href: '/complaints', label: 'My Complaints', icon: MessageSquareWarning },
+  ]
+
+  const logoHref = role === 'official' ? '/dashboard' : '/portal'
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col selection:bg-white selection:text-black">
       {/* Fixed Top Bar */}
       <header className="fixed top-0 inset-x-0 z-40 h-14 border-b border-white/10 bg-black/95 backdrop-blur-xl px-4 flex items-center justify-between gap-3">
-        {/* Brand logo redirects to dashboard */}
+        {/* Brand logo redirects role-appropriately */}
         <Link
-          href="/dashboard"
+          href={logoHref}
           className="flex items-center gap-2 font-bold text-sm tracking-tight text-white shrink-0 hover:opacity-90 transition-opacity"
-          title="Fact Ledger Dashboard"
+          title={`Fact Ledger ${role === 'official' ? 'Control Center' : 'Portal'}`}
         >
           <span className="flex items-center justify-center w-6 h-6 rounded-md bg-white text-black text-xs font-mono font-black">
             FL
@@ -120,52 +167,205 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </span>
         </Link>
 
-        {/* Workspace Navigation Links in topbar (natural flex, never overlaps left or right) */}
-        <div className="flex-1 flex justify-center min-w-0 px-2 overflow-hidden">
-          <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-0.5 shadow-inner overflow-x-auto no-scrollbar max-w-full">
-            {NAV_LINKS.map((item) => {
-              const isActive =
-                pathname === item.href ||
-                (item.href !== '/dashboard' &&
-                  item.href !== '/portal' &&
-                  pathname.startsWith(item.href))
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-full transition-all duration-150 whitespace-nowrap shrink-0 ${
-                    isActive
+        {/* Workspace Navigation Links in topbar */}
+        <div ref={navRef} className="flex-1 flex justify-center min-w-0 px-2">
+          {role === 'official' ? (
+            <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-0.5 shadow-inner">
+              {/* Dashboard */}
+              <Link
+                href="/dashboard"
+                className={`px-3 py-1 text-xs font-semibold rounded-full transition-all duration-150 whitespace-nowrap shrink-0 ${
+                  pathname === '/dashboard'
+                    ? 'bg-white !text-black shadow-sm font-bold'
+                    : 'text-neutral-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Dashboard
+              </Link>
+
+              {/* Clause Tree */}
+              <Link
+                href="/clause-tree"
+                className={`px-3 py-1 text-xs font-semibold rounded-full transition-all duration-150 whitespace-nowrap shrink-0 ${
+                  pathname === '/clause-tree'
+                    ? 'bg-white !text-black shadow-sm font-bold'
+                    : 'text-neutral-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Clause Tree
+              </Link>
+
+              {/* Governance Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setActiveDropdown(activeDropdown === 'governance' ? null : 'governance')}
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full transition-all duration-150 whitespace-nowrap ${
+                    isGovernanceActive
                       ? 'bg-white !text-black shadow-sm font-bold'
                       : 'text-neutral-400 hover:text-white hover:bg-white/10'
                   }`}
+                  aria-expanded={activeDropdown === 'governance'}
                 >
-                  {item.label}
-                </Link>
-              )
-            })}
-          </div>
+                  Governance
+                  <ChevronDown size={12} className={`transition-transform duration-150 ${activeDropdown === 'governance' ? 'rotate-180' : ''}`} />
+                </button>
+                {activeDropdown === 'governance' && (
+                  <div className="nav-dropdown-menu">
+                    <div className="nav-dropdown-header">Governance &amp; Truth</div>
+                    {governanceItems.map((item) => {
+                      const Icon = item.icon
+                      const active =
+                        pathname === item.href ||
+                        (item.href === '/facts' && pathname.startsWith('/policies')) ||
+                        pathname.startsWith(item.href)
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`nav-dropdown-item ${active ? 'active' : ''}`}
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          <div className="nav-dropdown-item-icon">
+                            <Icon size={14} />
+                          </div>
+                          <div>
+                            <div className="nav-dropdown-item-title">{item.label}</div>
+                            <div className="nav-dropdown-item-desc">{item.desc}</div>
+                          </div>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Voice Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setActiveDropdown(activeDropdown === 'voice' ? null : 'voice')}
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full transition-all duration-150 whitespace-nowrap ${
+                    isVoiceActive
+                      ? 'bg-white !text-black shadow-sm font-bold'
+                      : 'text-neutral-400 hover:text-white hover:bg-white/10'
+                  }`}
+                  aria-expanded={activeDropdown === 'voice'}
+                >
+                  Voice
+                  <ChevronDown size={12} className={`transition-transform duration-150 ${activeDropdown === 'voice' ? 'rotate-180' : ''}`} />
+                </button>
+                {activeDropdown === 'voice' && (
+                  <div className="nav-dropdown-menu">
+                    <div className="nav-dropdown-header">Employee Voice &amp; Q&amp;A</div>
+                    {voiceItems.map((item) => {
+                      const Icon = item.icon
+                      const active = pathname.startsWith(item.href) || (item.href === '/ask' && pathname.startsWith('/questions'))
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`nav-dropdown-item ${active ? 'active' : ''}`}
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          <div className="nav-dropdown-item-icon">
+                            <Icon size={14} />
+                          </div>
+                          <div>
+                            <div className="nav-dropdown-item-title">{item.label}</div>
+                            <div className="nav-dropdown-item-desc">{item.desc}</div>
+                          </div>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Employee Mode: Dedicated Clean Links */
+            <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-0.5 shadow-inner overflow-x-auto no-scrollbar max-w-full">
+              {employeeLinks.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== '/portal' && pathname.startsWith(item.href))
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`px-3 py-1 text-xs font-semibold rounded-full transition-all duration-150 whitespace-nowrap shrink-0 ${
+                      isActive
+                        ? 'bg-white !text-black shadow-sm font-bold'
+                        : 'text-neutral-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Right Actions: Role switcher + Main Website section */}
+        {/* Right Actions: Role switcher + Account Session Dropdown */}
         <div className="flex items-center gap-2 shrink-0 z-10">
-          <div className="hidden 2xl:flex items-center gap-1.5 text-[10px] font-mono font-bold tracking-wider text-white bg-white/5 border border-white/15 px-2.5 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            {role === 'official' ? 'OFFICIAL' : 'EMPLOYEE'}
-          </div>
           <RoleSwitcher role={role} setRole={setRole} />
 
           <div className="h-4 w-px bg-white/15 mx-0.5" />
 
-          {/* Dedicated separate section for the website home path */}
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 text-xs text-neutral-300 hover:text-white transition-colors px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 font-semibold shrink-0"
-            title="Go to main website (home)"
-          >
-            <Globe size={13} className="text-neutral-400" />
-            <span className="hidden sm:inline">Main Website</span>
-            <span className="sm:hidden">Site</span>
-          </Link>
+          {/* Account & Session Pill */}
+          <div ref={accountRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+              className="flex items-center gap-1.5 text-xs text-neutral-300 hover:text-white transition-colors px-2.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 font-semibold shrink-0"
+              title="Workspace account &amp; navigation"
+              aria-expanded={accountMenuOpen}
+            >
+              <div className="w-4 h-4 rounded-full bg-white text-black text-[9px] font-bold flex items-center justify-center">
+                {orgName.charAt(0).toUpperCase()}
+              </div>
+              <span className="hidden md:inline max-w-[100px] truncate">{orgName}</span>
+              <ChevronDown size={11} className={`text-neutral-400 transition-transform ${accountMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {accountMenuOpen && (
+              <div className="account-dropdown-menu">
+                <div className="account-dropdown-header">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-white">
+                      <Building2 size={14} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white leading-tight">{orgName}</div>
+                      <div className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">
+                        {role === 'official' ? 'Official Access' : 'Employee Access'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="account-dropdown-body">
+                  <Link
+                    href="/"
+                    className="account-dropdown-link"
+                    onClick={() => setAccountMenuOpen(false)}
+                  >
+                    <Globe size={14} className="text-neutral-400" />
+                    <span>Main Website (Landing)</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="account-dropdown-link text-neutral-300 hover:text-white hover:bg-red-500/10 hover:border-red-500/30"
+                  >
+                    <LogOut size={14} className="text-neutral-400" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -174,6 +374,38 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 min-w-0 bg-black">
           {children}
         </main>
+
+        {/* ── Persistent Workspace Footer Status Bar ── */}
+        <footer className="workspace-footer">
+          <div className="workspace-footer-inner">
+            <div className="workspace-footer-left">
+              <span className="workspace-footer-dot" />
+              <span>Sanity Content Lake · dataset: <code>fact-ledger</code> · Live Audit Stream Active</span>
+            </div>
+            <div className="workspace-footer-right">
+              <span>
+                Fact Ledger made with love by{' '}
+                <a
+                  href="https://github.com/t-rexbytes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline text-white font-medium"
+                >
+                  T-RexBytes
+                </a>{' '}
+                &amp;{' '}
+                <a
+                  href="https://github.com/pritam-mb"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline text-white font-medium"
+                >
+                  Pritam-mb
+                </a>
+              </span>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   )
