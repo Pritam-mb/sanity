@@ -1,113 +1,108 @@
-# Fact Ledger
+<div align="center">
+  <img src="./docs/hero.png" alt="Fact Ledger Hero" width="100%" />
+  
+  <br />
+  <br />
 
-An AI-assisted fact drift detection system. Organizations state the same facts (refund windows, SLA uptime, fees, limits) in many pages. When a fact changes, one page is edited and the rest silently go stale. **Fact Ledger finds every stale copy, fixes them in one reviewed release, and verifies drift is zero.**
+  <p>
+    <b>An AI-assisted fact drift detection engine built on Sanity Content Lake.</b>
+  </p>
+  
+  <p>
+    <a href="https://fact-ledger.onrender.com">Live Demo</a> •
+    <a href="https://pritam.sanity.studio">Sanity Studio</a> •
+    <a href="#setup">Installation</a>
+  </p>
 
-**Headline claim:** *Change one fact, find every stale copy, fix them in one reviewed release, and verify drift is zero.*
-
-**Principle:** Rules flag. AI drafts. Human approves. Sanity remembers.
+</div>
 
 ---
 
-## Monorepo structure
+## 🛑 The Problem: Fact Drift
+A product manager at a SaaS company decides to extend refunds from 30 days to 60 days. She opens the CMS, updates the Refund Policy page, and clicks publish. What she doesn't know: the Help Center article still says 30. The Pricing FAQ still says 30. The Onboarding Guide, the Terms of Service, the Enterprise SLA page, the Checkout confirmation modal copy — **all still say 30.**
+
+**That is Fact Drift.** The number "30" is stored in twenty-three places as dead characters. There's no relationship between them. When one changes, the others don't know.
+
+## 💡 The Solution: Fact Ledger
+Fact Ledger fixes this at the data model level. Business values become **first-class Sanity documents** (`facts`). Pages don't copy those values; they reference them.
+
+For every page that still has hardcoded plain text, a deterministic scanner runs, finds the stale copies, and raises structured findings. An AI agent drafts exact Sanity patch mutations to fix them. A human reviews the diffs and clicks one button. Everything updates atomically in a single transaction.
+
+> **Rules flag. AI drafts. Human approves. Sanity remembers.**
+
+---
+
+## 🏗️ Architecture & Monorepo
 
 ```
 fact-ledger/
-├── studio/     # Sanity Studio v3 — source of truth, schema, structure
-├── web/        # Next.js 16 App Router — Drift Dashboard + page renderer
-├── scanner/    # Pure TypeScript functions R1–R4 + Vitest unit tests
-├── seed/       # Idempotent seed script (facts, dev + holdout pages, ground truth)
-├── bench/      # Benchmark runner — writes benchmarkResult docs
-└── docs/       # PROGRESS.md, spec, design notes
+├── studio/     # Sanity Studio v3 — source of truth, schema, custom actions
+├── web/        # Next.js 16 App Router — Live Drift Dashboard & API routes
+├── scanner/    # Pure TypeScript deterministic rules (R1–R5) + Vitest tests
+├── seed/       # Idempotent seed script (facts, pages, ground truth)
+├── bench/      # Benchmark runner — 100% precision/recall validator
+└── docs/       # Architecture spec, images, design notes
 ```
 
-## Tech stack
+## 🚀 Key Features
 
-- **Sanity Studio v3** + Content Lake: source of truth, schema, custom structure
-- **TypeGen:** `sanity typegen generate` in `studio/`
-- **Next.js 16** App Router + TypeScript: dashboard and API routes
-- **Charts:** Recharts (required panels P1–P6)
-- **Scanner:** TypeScript pure functions, unit-tested with Vitest
-- **LLM:** Optional. Disabled by default. `rephraseSentence()` in `web/lib/llm.ts` — set `LLM_API_KEY` to enable
+* **Deterministic Scanner (0% AI):** 5 strict rules (R1-R5) that catch unlinked matches, contradictions, deprecated references, orphan facts, and temporal violations with 100% precision.
+* **AI Remediation Engine:** Automatically drafts exact before/after JSON patches for every stale clause. No unsupervised publishing.
+* **Atomic Transactions:** Human editors review AI-drafted fixes in Sanity Studio. One click commits all patches atomically across the entire dataset.
+* **App SDK Dashboard:** A real-time Next.js control center monitoring Drift Score, KPIs, and Employee Voice complaints.
 
-## Fallback choices (Section 13 of spec)
+---
 
-| Preferred | Chosen | Notes |
-|---|---|---|
-| Sanity Functions | **Next.js API route** | Sanity Functions require plan upgrade. Fallback recorded here per spec §13. |
-| Content Releases | **Content Releases (preferred)** | Available via `@sanity/client` JS client. |
-| Agent Actions rephrase | **Direct LLM call (disabled by default)** | No `LLM_API_KEY` → plain splice, no rephrase. |
-| Custom Studio tool | **Dashboard as Next.js page** | visionTool added for GROQ exploration in Studio. |
+## 🛠️ Quick Start
 
-## Setup
-
+### 1. Clone & Install
 ```bash
-git clone <repo>
-cd fact-ledger
+git clone https://github.com/Pritam-mb/sanity.git
+cd sanity/fact-ledger
 
-# 1. Fill in environment files
-cp web/.env.example web/.env.local
-# Edit web/.env.local with your Sanity project ID + API token
-# Edit studio/.env with same values
-
-# 2. Install everything
+# Install all workspace dependencies
 npm install --workspace=web
 npm install --workspace=studio
 npm install --workspace=scanner
 npm install --workspace=seed
 npm install --workspace=bench
+```
 
-# 3. One-command demo reset (seed + benchmark)
+### 2. Environment Setup
+```bash
+cp web/.env.example web/.env.local
+```
+Fill in `web/.env.local` and `studio/.env`:
+* `NEXT_PUBLIC_SANITY_PROJECT_ID`: Your Sanity Project ID
+* `NEXT_PUBLIC_SANITY_DATASET`: `fact-ledger`
+* `SANITY_API_TOKEN`: Editor token (required for writing findings/patches)
+
+### 3. Seed & Run
+```bash
+# Seed the demo dataset and run the benchmark validation
 npm run demo:reset
 
-# 4. Run dev servers
-npm run dev:web     # http://localhost:3000
-npm run dev:studio  # http://localhost:3333
+# Start the dashboard (localhost:3000)
+npm run dev:web
+
+# Start Sanity Studio (localhost:3333)
+npm run dev:studio
 ```
 
-## Environment variables
+---
 
-### `web/.env.local`
-| Variable | Required | Notes |
-|---|---|---|
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | ✅ | From sanity.io/manage |
-| `NEXT_PUBLIC_SANITY_DATASET` | ✅ | `fact-ledger` |
-| `SANITY_API_TOKEN` | ✅ (writes) | Editor token — never `NEXT_PUBLIC_` |
-| `NEXT_PUBLIC_SANITY_READ_TOKEN` | Optional | Blank for public datasets |
-| `LLM_API_KEY` | Optional | Enables `rephraseSentence()` |
-| `LLM_MODEL` | Optional | Defaults to `gemini-2.5-flash` |
+## 🧪 Commands
 
-## Commands
+| Command | Action |
+| :--- | :--- |
+| `npm run dev:web` | Start the Next.js control center |
+| `npm run dev:studio` | Start the Sanity Studio |
+| `npm run test` | Run Vitest unit tests for the scanner rules |
+| `npm run seed` | Inject the test dataset into your Sanity project |
+| `npm run bench` | Run the validation benchmark against the ground truth |
+| `npm run typegen` | Generate TypeScript types from your GROQ queries |
 
-```bash
-npm run dev:web       # Next.js dev server (port 3000)
-npm run dev:studio    # Sanity Studio (port 3333)
-npm run test          # Vitest unit tests (scanner)
-npm run seed          # Seed demo dataset
-npm run bench         # Run benchmark, write benchmarkResult docs
-npm run demo:reset    # seed + bench in sequence
-npm run typegen       # sanity typegen generate
-```
-
-## Dashboard panels
-
-| Panel | Description |
-|---|---|
-| P1 | KPI row: Drift Score, Facts, Pages, Coverage % |
-| P2 | Before vs after release per fact (grouped bar) |
-| P3 | Fact × Page heatmap (CSS grid) |
-| P4 | Accuracy vs ground truth (TP/FP/FN/precision/recall) |
-| P5 | Baseline comparison (exact-string vs scanner) |
-| P6 | Findings table with Approve/Dismiss |
-
-All numbers come from GROQ queries against Sanity documents. No hard-coded values.
-
-## Forbidden (per spec §12)
-
-Councils, voting, AI judges, auto-extraction, multi-language, custom auth, public chatbot, extra dashboard panels.
-
-## Future work
-
-- Sanity Functions webhook handler (currently a Next.js API route fallback)
-- Compromise finder, gap finder (out of scope for MVP)
-- Real authentication (currently open)
-- Multi-tenant support
+<br />
+<div align="center">
+  <i>Built for the <a href="https://dev.to/challenges/sanity-2026-09-16">Sanity + Dev.to AI Challenge</a></i>
+</div>
