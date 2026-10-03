@@ -30,7 +30,7 @@ export default async function PoliciesPage() {
       <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Canonical registry</div>
       <h1 className="page-title">Edit Policy</h1>
       <p className="page-sub">
-        <strong style={{ color: '#fff' }}>{active} active values</strong> · officials edit canonical numbers here — every save is audit-logged, and the next scan flags stale copies.
+        <strong style={{ color: '#fff' }}>{active} active values</strong> · officials edit canonical numbers here: every save is audit-logged, and the next scan flags stale copies.
       </p>
 
       <OfficialOnly>

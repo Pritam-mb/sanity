@@ -25,7 +25,7 @@ export default async function UpdatesPage() {
       <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Official announcements</div>
       <h1 className="page-title">Updates &amp; News</h1>
       <p className="page-sub">
-        What officials changed or announced — <strong style={{ color: '#fff' }}>{updates.length} published</strong>. Employees upvote what looks right, downvote concerns.
+        What officials changed or announced: <strong style={{ color: '#fff' }}>{updates.length} published</strong>. Employees upvote what looks right, downvote concerns.
       </p>
 
       <OfficialOnly>

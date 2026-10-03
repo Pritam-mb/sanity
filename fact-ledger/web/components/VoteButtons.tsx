@@ -50,7 +50,7 @@ export function VoteButtons({
     <button
       onClick={() => vote(dir)}
       disabled={!!voted || busy}
-      title={voted ? `You voted ${voted === 'up' ? 'up' : 'down'}` : dir === 'up' ? 'Upvote — this looks right' : 'Downvote — I have a concern'}
+      title={voted ? `You voted ${voted === 'up' ? 'up' : 'down'}` : dir === 'up' ? 'Upvote: this looks right' : 'Downvote: I have a concern'}
       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer disabled:cursor-default ${
         active
           ? 'bg-white text-black border-white'

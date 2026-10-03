@@ -76,7 +76,7 @@ export function ComplaintForm({
           {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
       </div>
-      <input className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Short title — e.g. Refund page still says 30 days" required />
+      <input className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Short title: e.g. Refund page still says 30 days" required />
       <div className="flex gap-2">
         {(['fact', 'page'] as const).map((t) => (
           <button
@@ -94,7 +94,7 @@ export function ComplaintForm({
       {targetType === 'fact' ? (
         <select className={inputCls} value={targetId} onChange={(e) => setTargetId(e.target.value)} required>
           <option value="">Select policy…</option>
-          {facts.map((f) => <option key={f._id} value={f._id}>{f.label} — {[f.value, f.unit].filter(Boolean).join(' ')}</option>)}
+          {facts.map((f) => <option key={f._id} value={f._id}>{f.label} : {[f.value, f.unit].filter(Boolean).join(' ')}</option>)}
         </select>
       ) : (
         <select className={inputCls} value={targetId} onChange={(e) => setTargetId(e.target.value)} required>

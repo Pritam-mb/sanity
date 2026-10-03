@@ -104,7 +104,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col selection:bg-white selection:text-black">
-      {/* ── Fixed Top Bar (no routing links — sidebar owns navigation) ── */}
+      {/* Fixed Top Bar */}
       <header className="fixed top-0 inset-x-0 z-40 h-14 border-b border-white/10 bg-black/95 backdrop-blur-xl px-4 flex items-center justify-between gap-3">
         <Link href={role === 'official' ? '/dashboard' : '/portal'} className="flex items-center gap-2 font-bold text-sm tracking-tight text-white shrink-0">
           <span className="flex items-center justify-center w-6 h-6 rounded-md bg-white text-black text-xs font-mono font-black">
@@ -118,7 +118,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Link>
 
         {/* Centered Topbar Routing Options */}
-        <div className="hidden md:flex items-center gap-1 space-x-1 bg-white/5 border border-white/10 rounded-full px-1.5 py-0.5 absolute left-1/2 -translate-x-1/2 shadow-inner">
+        <div className="hidden xl:flex nav-pill-center bg-white/5 border border-white/10 rounded-full px-2 py-0.5 shadow-inner max-w-[calc(100vw-420px)] overflow-x-auto">
           {NAV_LINKS.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -131,7 +131,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`px-3 py-1 text-xs font-semibold rounded-full transition-all duration-150 whitespace-nowrap ${
                   isActive
-                    ? 'bg-white text-black shadow-sm font-bold'
+                    ? 'bg-white !text-black shadow-sm font-bold'
                     : 'text-neutral-400 hover:text-white hover:bg-white/10'
                 }`}
               >
@@ -195,7 +195,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   aria-current={isActive ? 'page' : undefined}
                   className={`flex items-center h-10 px-3 text-[13px] font-semibold rounded-lg transition-colors border ${
                     isActive
-                      ? 'bg-white text-black font-bold border-white'
+                      ? 'bg-white !text-black font-bold border-white hover:bg-neutral-100 hover:!text-black'
                       : 'text-neutral-400 hover:text-white hover:bg-white/5 border-transparent hover:border-white/10'
                   } ${collapsed ? 'justify-center gap-0' : 'gap-3'}`}
                 >

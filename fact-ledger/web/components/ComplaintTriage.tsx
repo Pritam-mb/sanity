@@ -60,7 +60,7 @@ export function ComplaintTriage({
           disabled={busy}
           className="px-4 py-2 bg-white text-black text-xs font-bold rounded-lg hover:bg-neutral-200 cursor-pointer disabled:opacity-50"
         >
-          {saved ? 'Saved ✓' : busy ? 'Saving…' : 'Save response'}
+          {saved ? 'Saved' : busy ? 'Saving…' : 'Save response'}
         </button>
       </div>
     </div>

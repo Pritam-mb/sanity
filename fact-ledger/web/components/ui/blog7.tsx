@@ -89,25 +89,25 @@ export const Blog7 = ({
   ],
 }: Blog7Props) => {
   return (
-    <section id="feedback" className="py-24 border-t border-white/10 bg-black overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+    <section id="feedback" className="case-studies-section">
+      <div className="case-studies-inner">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium text-neutral-300 bg-white/5 border border-white/10 mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            <span className="font-mono text-[11px] uppercase tracking-wider font-semibold">
+        <div className="case-studies-header">
+          <div className="case-studies-badge">
+            <span className="case-studies-badge-dot" />
+            <span className="case-studies-badge-text">
               {tagline}
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-5 leading-[1.12]">
+          <h2 className="case-studies-title">
             {heading}
           </h2>
-          <p className="text-neutral-400 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl mx-auto">
+          <p className="case-studies-desc">
             {description}
           </p>
           <Link
             href={buttonUrl}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-neutral-300 transition-colors group"
+            className="case-studies-link group"
           >
             <span>{buttonText}</span>
             <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
@@ -115,81 +115,68 @@ export const Blog7 = ({
         </div>
 
         {/* 3 Case Study Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
+        <div className="case-studies-grid">
           {posts.map((post) => {
             const Icon = ICONS[post.icon];
             return (
-              <Card
-                key={post.id}
-                className="flex flex-col border border-white/10 bg-neutral-950/80 rounded-2xl overflow-hidden hover:border-white/30 transition-all duration-200 group hover:shadow-[0_0_30px_rgba(255,255,255,0.03)]"
-              >
+              <div key={post.id} className="case-study-card group">
                 {/* Visual Header Banner */}
-                <div className="h-44 w-full bg-gradient-to-br from-neutral-900 to-black p-5 flex flex-col justify-between border-b border-white/10 relative overflow-hidden">
-                  {/* Subtle background grid pattern */}
-                  <div
-                    className="absolute inset-0 opacity-20 pointer-events-none"
-                    style={{
-                      backgroundImage: "radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px)",
-                      backgroundSize: "16px 16px",
-                    }}
-                  />
+                <div className="case-study-banner">
+                  <div className="case-study-banner-pattern" />
 
                   {/* Top row: Icon + Category Badge */}
-                  <div className="flex items-center justify-between relative z-10">
-                    <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center font-bold shadow-md shadow-white/10">
+                  <div className="case-study-banner-top">
+                    <div className="case-study-icon-wrap">
                       <Icon size={20} strokeWidth={2.2} />
                     </div>
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-300 bg-white/10 border border-white/15 px-2.5 py-1 rounded-full">
+                    <span className="case-study-category-badge">
                       {post.label}
                     </span>
                   </div>
 
-                  {/* Bottom row: High-contrast metric pill */}
-                  <div className="flex items-baseline justify-between relative z-10 pt-2 border-t border-white/5">
+                  {/* Bottom row: High-contrast metric */}
+                  <div className="case-study-banner-bottom">
                     <div>
-                      <div className="text-2xl font-black tracking-tight text-white font-mono">
+                      <div className="case-study-metric-val">
                         {post.metric}
                       </div>
-                      <div className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+                      <div className="case-study-metric-label">
                         {post.metricLabel}
                       </div>
                     </div>
-                    <div className="text-[11px] font-mono text-neutral-400">
+                    <div className="case-study-pub-date">
                       {post.published}
                     </div>
                   </div>
                 </div>
 
-                {/* Card Content */}
-                <CardHeader className="p-6 pb-3">
-                  <h3 className="text-lg font-bold text-white group-hover:text-neutral-200 leading-snug tracking-tight">
-                    <Link href={post.url} className="hover:underline underline-offset-4">
+                {/* Card Body */}
+                <div className="case-study-body">
+                  <h3 className="case-study-card-title">
+                    <Link href={post.url}>
                       {post.title}
                     </Link>
                   </h3>
-                </CardHeader>
-
-                <CardContent className="px-6 py-2 flex-1">
-                  <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                  <p className="case-study-card-desc">
                     {post.summary}
                   </p>
-                </CardContent>
+                </div>
 
                 {/* Card Footer: Author + Link */}
-                <CardFooter className="p-6 pt-4 flex items-center justify-between border-t border-white/10 mt-4 text-xs">
+                <div className="case-study-footer">
                   <div>
-                    <div className="font-semibold text-white">{post.author}</div>
-                    <div className="text-[11px] text-neutral-500">{post.role}</div>
+                    <div className="case-study-author-name">{post.author}</div>
+                    <div className="case-study-author-role">{post.role}</div>
                   </div>
                   <Link
                     href={post.url}
-                    className="inline-flex items-center gap-1.5 font-bold text-white group-hover:text-white group-hover:underline underline-offset-4"
+                    className="case-study-action-btn"
                   >
                     <span>Read review</span>
-                    <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight size={13} />
                   </Link>
-                </CardFooter>
-              </Card>
+                </div>
+              </div>
             );
           })}
         </div>

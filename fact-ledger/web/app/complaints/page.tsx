@@ -45,7 +45,7 @@ export default async function ComplaintsPage() {
       <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Employee voice</div>
       <h1 className="page-title">Policy Complaints</h1>
       <p className="page-sub">
-        <strong style={{ color: '#fff' }}>{open} open</strong> · {inReview} in review · {resolved} resolved — every complaint names the exact policy or page.
+        <strong style={{ color: '#fff' }}>{open} open</strong> · {inReview} in review · {resolved} resolved: every complaint names the exact policy or page.
       </p>
 
       <OfficialOnly>
@@ -69,7 +69,7 @@ export default async function ComplaintsPage() {
               <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', marginBottom: '0.3rem' }}>{c.title}</h2>
               <p style={{ fontSize: '0.87rem', color: '#d4d4d8', lineHeight: 1.6, marginBottom: '0.5rem' }}>{c.description}</p>
               <div style={{ fontSize: '0.75rem', color: '#8b8b93' }}>
-                Against: <strong style={{ color: '#fff' }}>{c.targetFact?.label ?? c.targetPage?.title ?? '—'}</strong>
+                Against: <strong style={{ color: '#fff' }}>{c.targetFact?.label ?? c.targetPage?.title ?? '-'}</strong>
                 {' · '}by {c.raisedBy}
               </div>
               {c.response && (
@@ -87,7 +87,7 @@ export default async function ComplaintsPage() {
           ))}
           {complaints.length === 0 && (
             <div className="page-card page-card-pad" style={{ textAlign: 'center', color: '#8b8b93' }}>
-              No complaints yet — be the first to raise one.
+              No complaints yet: be the first to raise one.
             </div>
           )}
         </div>
