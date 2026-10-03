@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { BackLink } from '@/components/BackLink'
 import { getComplaints, getFactOptions, getPageOptions } from '@/lib/voice'
 import { ComplaintForm } from '@/components/ComplaintForm'
 import { ComplaintTriage } from '@/components/ComplaintTriage'
@@ -39,9 +38,7 @@ export default async function ComplaintsPage() {
 
   return (
     <div className="page-shell">
-      <Link href="/portal" className="back-link">
-        <ArrowLeft size={14} /> Back to Portal
-      </Link>
+      <BackLink />
       <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Employee voice</div>
       <h1 className="page-title">Policy Complaints</h1>
       <p className="page-sub">

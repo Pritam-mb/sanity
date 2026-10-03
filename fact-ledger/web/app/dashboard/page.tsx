@@ -6,6 +6,7 @@ import { ClauseImpactTree } from '@/components/ClauseImpactTree'
 import { VoiceAnalytics, type VoiceStats } from '@/components/VoiceAnalytics'
 import { getTreeSessionsData } from '@/lib/treeData'
 import { formatTime } from '@/lib/format'
+import { OfficialGate } from '@/components/OfficialGate'
 
 export const dynamic = 'force-dynamic'
 
@@ -213,6 +214,7 @@ export default async function DashboardPage() {
       valueColor: '#ffffff',
       description: 'Open anomalies requiring review',
       tag: 'ACTIVE DRIFT',
+      href: '/findings',
     },
     {
       label: 'Active Facts',
@@ -221,6 +223,7 @@ export default async function DashboardPage() {
       valueColor: '#ffffff',
       description: 'Canonical business parameters',
       tag: 'ENTITIES',
+      href: '/facts',
     },
     {
       label: 'Monitored Pages',
@@ -229,6 +232,7 @@ export default async function DashboardPage() {
       valueColor: '#ffffff',
       description: 'Content pages actively scanned',
       tag: 'CORPUS',
+      href: '/pages',
     },
     {
       label: 'Resolved Issues',
@@ -237,6 +241,7 @@ export default async function DashboardPage() {
       valueColor: '#ffffff',
       description: 'Healed across releases',
       tag: 'RESOLVED',
+      href: '/findings',
     },
     {
       label: 'Reference Coverage',
@@ -245,10 +250,12 @@ export default async function DashboardPage() {
       valueColor: '#ffffff',
       description: 'Linked vs plain-text mentions',
       tag: 'HEALTH',
+      href: undefined as string | undefined,
     },
   ]
 
   return (
+    <OfficialGate>
     <div style={{ maxWidth: 1280, margin: '0 auto', padding: '2rem 1.5rem' }}>
       {/* ── Header ── */}
       <div style={{ marginBottom: '2rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
@@ -298,8 +305,9 @@ export default async function DashboardPage() {
           marginBottom: '1.5rem',
         }}
       >
-        {kpis.map(kpi => (
-          <div key={kpi.label} className="kpi-card">
+        {kpis.map(kpi => {
+          const body = (
+            <>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span className="kpi-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: kpi.dotColor, display: 'inline-block' }} />
@@ -324,8 +332,16 @@ export default async function DashboardPage() {
               {kpi.value}
             </span>
             <span className="kpi-delta">{kpi.description}</span>
-          </div>
-        ))}
+            </>
+          )
+          return kpi.href ? (
+            <Link key={kpi.label} href={kpi.href} className="kpi-card kpi-card-link" aria-label={`${kpi.label}: open details`}>
+              {body}
+            </Link>
+          ) : (
+            <div key={kpi.label} className="kpi-card">{body}</div>
+          )
+        })}
       </div>
 
       {/* Quick Navigation Strip */}
@@ -414,7 +430,7 @@ export default async function DashboardPage() {
           { href: '/complaints', label: 'Triage Complaints', countText: `${openComplaints} waiting on officials`, code: 'COMPLAINTS' },
           { href: '/ask', label: 'Answer Questions', countText: `${openQuestions} need answers`, code: 'Q&A' },
           { href: '/updates', label: 'Post Update', countText: 'Announce policy news', code: 'UPDATES' },
-          { href: '/policies', label: 'Edit Policy', countText: 'Change canonical values', code: 'POLICIES' },
+          { href: '/policies', label: 'Edit Facts', countText: 'Change canonical values', code: 'FACTS' },
         ].map(item => (
           <Link
             key={item.href}
@@ -459,26 +475,7 @@ export default async function DashboardPage() {
         initialEvents={initialAuditEvents}
         initialScans={data.recentScans || []}
       />
-
-      {/* Source Verification Note */}
-      <p
-        style={{
-          marginTop: '3rem',
-          color: 'var(--text-muted)',
-          fontSize: '0.75rem',
-          borderTop: '1px solid var(--border)',
-          paddingTop: '1.25rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <span>
-          All report figures, graphs, and audit items are derived from live GROQ queries against{' '}
-          <code>finding</code>, <code>fact</code>, <code>page</code>, <code>scanRun</code>, and <code>changeEvent</code> documents.
-        </span>
-        <span style={{ fontFamily: 'monospace' }}>SANITY CONTENT LAKE ENGINE</span>
-      </p>
     </div>
+    </OfficialGate>
   )
 }

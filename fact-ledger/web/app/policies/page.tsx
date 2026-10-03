@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { Table2 } from 'lucide-react'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { sanityClient } from '@/lib/sanity/client'
 import { PolicyEditor } from '@/components/PolicyEditor'
 import { OfficialOnly, EmployeeOnly } from '@/components/RoleView'
@@ -24,14 +25,19 @@ export default async function PoliciesPage() {
 
   return (
     <div className="page-shell">
-      <Link href="/dashboard" className="back-link">
-        <ArrowLeft size={14} /> Back to Dashboard
-      </Link>
-      <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Canonical registry</div>
-      <h1 className="page-title">Edit Policy</h1>
-      <p className="page-sub">
-        <strong style={{ color: '#fff' }}>{active} active values</strong> · officials edit canonical numbers here: every save is audit-logged, and the next scan flags stale copies.
-      </p>
+      <Breadcrumbs items={[{ label: 'Governance' }, { label: 'Facts', href: '/facts' }, { label: 'Edit' }]} />
+      <div className="page-header-row">
+        <div>
+          <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Canonical registry</div>
+          <h1 className="page-title">Edit Canonical Facts</h1>
+          <p className="page-sub">
+            <strong style={{ color: '#fff' }}>{active} active values</strong> · officials edit canonical numbers here: every save is audit-logged, and the next scan flags stale copies.
+          </p>
+        </div>
+        <Link href="/facts" className="btn-action btn-action-ghost">
+          <Table2 size={14} /> View Table
+        </Link>
+      </div>
 
       <OfficialOnly>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.25rem', alignItems: 'start' }}>

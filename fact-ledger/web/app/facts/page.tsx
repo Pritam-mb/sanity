@@ -1,6 +1,8 @@
 import { sanityClient } from '@/lib/sanity/client'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { PencilLine } from 'lucide-react'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { OfficialOnly } from '@/components/RoleView'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,11 +17,15 @@ interface FactDoc {
   effectiveFrom?: string
   effectiveUntil?: string
   highStakes?: boolean
+  usage: number
 }
 
 async function getFacts(): Promise<FactDoc[]> {
   return sanityClient.fetch(
-    `*[_type == "fact"] | order(label asc){ _id, label, value, unit, status, key, aliases, effectiveFrom, effectiveUntil, highStakes }`
+    `*[_type == "fact"] | order(label asc){
+      _id, label, value, unit, status, key, aliases, effectiveFrom, effectiveUntil, highStakes,
+      "usage": count(*[_type == "page" && references(^._id)])
+    }`
   )
 }
 
@@ -30,14 +36,21 @@ export default async function FactsPage() {
 
   return (
     <div className="page-shell">
-      <Link href="/dashboard" className="back-link">
-        <ArrowLeft size={14} /> Back to Dashboard
-      </Link>
-      <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Canonical registry</div>
-      <h1 className="page-title">Facts</h1>
-      <p className="page-sub">
-        <strong style={{ color: '#fff' }}>{active} active</strong> · {deprecated} deprecated · single source of truth for every policy value
-      </p>
+      <Breadcrumbs items={[{ label: 'Governance' }, { label: 'Facts' }]} />
+      <div className="page-header-row">
+        <div>
+          <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Canonical registry</div>
+          <h1 className="page-title">Facts</h1>
+          <p className="page-sub">
+            <strong style={{ color: '#fff' }}>{active} active</strong> · {deprecated} deprecated · single source of truth for every policy value
+          </p>
+        </div>
+        <OfficialOnly>
+          <Link href="/policies" className="btn-action">
+            <PencilLine size={14} /> Edit Canonical Values
+          </Link>
+        </OfficialOnly>
+      </div>
 
       <div className="data-table-wrap">
         <table className="data-table">
@@ -47,6 +60,7 @@ export default async function FactsPage() {
               <th>Key</th>
               <th>Value</th>
               <th>Aliases</th>
+              <th>Used In</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -83,6 +97,13 @@ export default async function FactsPage() {
                     </span>
                   )}
                 </td>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  {f.usage > 0 ? (
+                    <span className="usage-pill">{f.usage} page{f.usage !== 1 ? 's' : ''}</span>
+                  ) : (
+                    <span className="orphan-chip" title="Rule R4: no page references this fact">Orphan Risk (R4)</span>
+                  )}
+                </td>
                 <td>
                   <span className={`badge badge-${f.status === 'active' ? 'fixed' : 'dismissed'}`}>
                     {f.status}
@@ -92,7 +113,7 @@ export default async function FactsPage() {
             ))}
             {facts.length === 0 && (
               <tr>
-                <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
+                <td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
                   No facts yet. Run <code>npm run seed</code>
                 </td>
               </tr>

@@ -44,7 +44,9 @@ export default function LoginPage() {
     }
 
     setTimeout(() => {
-      router.push('/dashboard')
+      let role: string | null = null
+      try { role = localStorage.getItem('fl_role') } catch { /* ignore */ }
+      router.push(role === 'employee' ? '/portal' : '/dashboard')
     }, 600)
   }
 

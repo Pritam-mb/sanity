@@ -1,6 +1,5 @@
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
 import { ClauseImpactTree } from '@/components/ClauseImpactTree'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { getTreeSessionsData } from '@/lib/treeData'
 
 export const dynamic = 'force-dynamic'
@@ -10,17 +9,14 @@ export default async function ClauseTreePage() {
 
   return (
     <div className="page-shell">
-      <Link href="/dashboard" className="back-link">
-        <ArrowLeft size={14} /> Back to Dashboard
-      </Link>
-
+      <Breadcrumbs items={[{ label: 'Governance' }, { label: 'Clause Tree' }]} />
       <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Organization clause explorer</div>
       <h1 className="page-title">Document &amp; Clause Change Impact Tree</h1>
       <p className="page-sub">
-        Full-screen workspace mapping how a single fact change cascades across dependent policies, contracts and help guides.
+        Trace who changed what, which clause moved, and every downstream policy, contract and help guide affected.
       </p>
 
-      <ClauseImpactTree initialSessions={sessions} />
+      <ClauseImpactTree initialSessions={sessions} hideHeader />
     </div>
   )
 }

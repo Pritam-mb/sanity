@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { ArrowLeft, Megaphone } from 'lucide-react'
+import { Megaphone } from 'lucide-react'
+import { BackLink } from '@/components/BackLink'
 import { getUpdates, getFactOptions, getPageOptions } from '@/lib/voice'
 import { VoteButtons } from '@/components/VoteButtons'
 import { UpdateComposer } from '@/components/UpdateComposer'
@@ -18,10 +19,8 @@ export default async function UpdatesPage() {
   const [updates, facts, pages] = await Promise.all([getUpdates(), getFactOptions(), getPageOptions()])
 
   return (
-    <div className="page-shell">
-      <Link href="/portal" className="back-link">
-        <ArrowLeft size={14} /> Back to Portal
-      </Link>
+    <div className="page-shell" style={{ maxWidth: 860 }}>
+      <BackLink />
       <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Official announcements</div>
       <h1 className="page-title">Updates &amp; News</h1>
       <p className="page-sub">
@@ -29,12 +28,12 @@ export default async function UpdatesPage() {
       </p>
 
       <OfficialOnly>
-        <div style={{ marginBottom: '1.5rem', maxWidth: 720 }}>
+        <div style={{ marginBottom: '1.5rem', width: '100%' }}>
           <UpdateComposer facts={facts} pages={pages} />
         </div>
       </OfficialOnly>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', maxWidth: 860 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', width: '100%' }}>
         {updates.map((u) => (
           <article key={u._id} className="page-card page-card-pad">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
@@ -53,7 +52,7 @@ export default async function UpdatesPage() {
                   </span>
                 )}
                 {u.linkedPage && (
-                  <Link href={`/pages`} style={{ fontSize: '11px', color: '#fff', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', padding: '2px 9px', borderRadius: 100 }}>
+                  <Link href={u.linkedPage.slug ? `/pages/${u.linkedPage.slug}` : '/pages'} style={{ fontSize: '11px', color: '#fff', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', padding: '2px 9px', borderRadius: 100 }}>
                     Page: {u.linkedPage.title}
                   </Link>
                 )}

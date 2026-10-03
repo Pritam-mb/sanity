@@ -27,6 +27,22 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
   const [isRemediating, setIsRemediating] = useState(false)
   const [actionMessage, setActionMessage] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(true)
+  const [cooldown, setCooldown] = useState(0)
+  const [toast, setToast] = useState<{ text: string; ok: boolean } | null>(null)
+
+  // Cooldown ticker: counts down once per second after a scan finishes
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [cooldown])
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(() => setToast(null), 5000)
+    return () => clearTimeout(t)
+  }, [toast])
 
   // Subscribe to real-time Sanity document changes
   useEffect(() => {
@@ -82,22 +98,28 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
 
   // Quick Action: Execute Immediate Scan
   const handleTriggerScan = async () => {
+    if (isScanning || cooldown > 0) return
     setIsScanning(true)
     setActionMessage('Executing deterministic scanner across all pages and facts...')
     try {
       const res = await fetch('/api/scan', { method: 'POST' })
       const data = await res.json()
       if (data.success) {
-        setActionMessage(
-          `Scan completed in ${data.durationMs}ms: ${data.scanned.pages} pages, ${data.findings.total} findings (${data.findings.created} new)`
-        )
+        const text = `Scan completed in ${data.durationMs}ms: ${data.scanned.pages} pages, ${data.findings.total} findings (${data.findings.created} new)`
+        setActionMessage(text)
+        setToast({ text, ok: true })
       } else {
-        setActionMessage(`Scan failed: ${data.error || 'Unknown error'}`)
+        const text = `Scan failed: ${data.error || 'Unknown error'}`
+        setActionMessage(text)
+        setToast({ text, ok: false })
       }
     } catch (err: any) {
-      setActionMessage(`Scan request failed: ${err.message}`)
+      const text = `Scan request failed: ${err.message}`
+      setActionMessage(text)
+      setToast({ text, ok: false })
     } finally {
       setIsScanning(false)
+      setCooldown(10)
       setTimeout(() => setActionMessage(null), 5000)
     }
   }
@@ -124,6 +146,15 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
 
   return (
     <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.5rem', marginBottom: '2.5rem' }}>
+      {toast && (
+        <div className={`app-toast ${toast.ok ? '' : 'app-toast-error'}`} role="status" aria-live="polite">
+          <span className="app-toast-dot" />
+          <span style={{ flex: 1 }}>{toast.text}</span>
+          <button type="button" className="app-toast-close" onClick={() => setToast(null)} aria-label="Dismiss">
+            &times;
+          </button>
+        </div>
+      )}
       {/* Top Bar: Connection & Action Triggers */}
       <div
         style={{
@@ -168,21 +199,23 @@ export function LiveActivityStream({ initialEvents, initialScans }: LiveActivity
         {/* Action Buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <button
+            id="run-scan-btn"
             onClick={handleTriggerScan}
-            disabled={isScanning}
+            disabled={isScanning || cooldown > 0}
             style={{
               padding: '6px 14px',
               borderRadius: 6,
-              background: '#fff',
+              background: cooldown > 0 ? 'rgba(255,255,255,0.12)' : '#fff',
               border: '1px solid #fff',
-              color: '#000',
+              color: cooldown > 0 ? '#d4d4d8' : '#000',
               fontSize: '0.8rem',
               fontWeight: 600,
-              cursor: isScanning ? 'wait' : 'pointer',
-              transition: 'background 0.15s, border-color 0.15s',
+              minWidth: 168,
+              cursor: isScanning ? 'wait' : cooldown > 0 ? 'not-allowed' : 'pointer',
+              transition: 'background 0.15s, border-color 0.15s, color 0.15s',
             }}
           >
-            {isScanning ? 'RUNNING SCAN...' : 'RUN IMMEDIATE SCAN'}
+            {isScanning ? 'RUNNING SCAN...' : cooldown > 0 ? `SCAN AGAIN IN ${cooldown}s` : 'RUN IMMEDIATE SCAN'}
           </button>
 
           <button

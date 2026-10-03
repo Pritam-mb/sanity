@@ -6,9 +6,11 @@ import { formatTime, formatDate } from '@/lib/format'
 
 interface ClauseImpactTreeProps {
   initialSessions: ChangeTreeNode[]
+  /** Suppress the internal title block when the host page already provides a header. */
+  hideHeader?: boolean
 }
 
-export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
+export function ClauseImpactTree({ initialSessions, hideHeader = false }: ClauseImpactTreeProps) {
   const [sessions] = useState<ChangeTreeNode[]>(initialSessions)
   const [selectedSessionId, setSelectedSessionId] = useState<string>(
     initialSessions[0]?.sessionId || 'session-sarah-refund'
@@ -46,13 +48,14 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
           display: 'flex',
           flexWrap: 'wrap',
           alignItems: 'flex-start',
-          justifyContent: 'space-between',
+          justifyContent: hideHeader ? 'flex-end' : 'space-between',
           gap: '1rem',
           paddingBottom: '1.25rem',
           borderBottom: '1px solid var(--border)',
           marginBottom: '1.5rem',
         }}
       >
+        {!hideHeader && (
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff', display: 'inline-block' }} />
@@ -75,6 +78,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
             Trace who changed what document, which clause was modified, and all downstream pages and policies affected across Sanity.
           </p>
         </div>
+        )}
 
         {/* View Mode Toggle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
