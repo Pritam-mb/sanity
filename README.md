@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./docs/hero.png" alt="Fact Ledger Hero" width="100%" />
+  
   
   <br />
   <br />
