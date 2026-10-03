@@ -13,6 +13,7 @@
     "dev:studio": "npm run dev --workspace=studio",
     "dev": "npm-run-all --parallel dev:web dev:studio",
     "build": "npm run build --workspace=web",
+    "start": "npm run start --workspace=web",
     "lint": "npm run lint --workspace=web",
     "test": "npm run test --workspace=scanner",
     "bench": "npm run bench --workspace=bench",
