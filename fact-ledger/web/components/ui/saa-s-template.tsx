@@ -31,14 +31,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizes = {
-      default: "h-10 px-4 py-2 text-sm",
+      default: "h-10 px-5 py-2 text-sm",
       sm: "h-9 px-4 text-xs font-bold uppercase tracking-wider",
-      lg: "h-12 px-8 text-[15px] font-bold"
+      lg: "h-12 px-7 text-[15px] font-bold"
     };
 
     return (
       <button
         ref={ref}
+        style={{ paddingLeft: size === 'lg' ? 28 : undefined, paddingRight: size === 'lg' ? 28 : undefined, ...props.style }}
         className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
         {...props}
       >
@@ -84,7 +85,7 @@ export const Navigation = React.memo(() => {
         </Link>
 
         {/* Center: Perfectly aligned & centered routing options */}
-        <div className="hidden md:flex items-center gap-1 space-x-1 bg-white/5 border border-white/10 rounded-full px-2 py-1 absolute left-1/2 -translate-x-1/2 shadow-inner">
+        <div className="hidden md:flex nav-pill-center bg-white/5 border border-white/10 rounded-full px-2 py-1 shadow-inner">
           {[
             { href: "#features", label: "Capabilities" },
             { href: "#how-it-works", label: "How It Works" },
@@ -188,7 +189,7 @@ function LedgerPreviewCard() {
           <span style={{ background: "#3f3f46" }} />
           <span style={{ background: "#fff" }} />
         </div>
-        <div className="hero-preview-url">fact-ledger / control-center — live</div>
+        <div className="hero-preview-url">fact-ledger / control-center / live</div>
         <div className="preview-live-pill">
           <span className="preview-live-dot" />
           ZERO DRIFT
@@ -266,22 +267,18 @@ export const Hero = React.memo(() => {
       </h1>
 
       <p className="hero-sub">
-        Change one canonical fact — automatically detect every stale clause across
+        Change one canonical fact: automatically detect every stale clause across
         contracts and policies, fix them in one reviewed release, and verify drift is zero.
       </p>
 
       <div className="hero-cta-row">
-        <Link href="/login">
-          <Button type="button" variant="gradient" size="lg" aria-label="Get started with the platform">
-            Create Company Workspace
-            <ArrowRight size={16} />
-          </Button>
+        <Link href="/login" className="hero-btn-gradient" aria-label="Get started with the platform">
+          <span>Create Company Workspace</span>
+          <ArrowRight size={16} />
         </Link>
-        <Link href="/dashboard">
-          <Button type="button" variant="secondary" size="lg" aria-label="Explore live dashboard">
-            <ScanLine size={16} />
-            Live Demo Dashboard
-          </Button>
+        <Link href="/dashboard" className="hero-btn-secondary" aria-label="Explore live dashboard">
+          <ScanLine size={16} />
+          <span>Live Demo Dashboard</span>
         </Link>
       </div>
 
@@ -297,7 +294,7 @@ export const Hero = React.memo(() => {
       <LedgerPreviewCard />
 
       <div className="hero-trust-row">
-        {["R1–R5 deterministic scanner", "Human-gated releases", "Immutable audit ledger"].map((t) => (
+        {["R1-R5 deterministic scanner", "Human-gated releases", "Immutable audit ledger"].map((t) => (
           <span key={t} className="hero-trust-chip">
             <CheckCircle2 size={13} /> {t}
           </span>
@@ -325,7 +322,7 @@ export function HowItWorksSection() {
     {
       num: "03",
       title: "Real-time Verification",
-      desc: "Rules R1–R5 flag drift instantly with file, block and character offsets.",
+      desc: "Rules R1-R5 flag drift instantly with file, block and character offsets.",
     },
     {
       num: "04",
@@ -361,7 +358,7 @@ export function HowItWorksSection() {
           <ArrowRight size={13} />
           <span>WEBHOOK</span>
           <ArrowRight size={13} />
-          <span>SCANNER R1–R5</span>
+          <span>SCANNER R1-R5</span>
           <ArrowRight size={13} />
           <span className="pipeline-strip-hl">DRAFT RELEASE</span>
           <ArrowRight size={13} />
@@ -448,14 +445,33 @@ export function Footer() {
         </div>
       </div>
       <div className="footer-bottom">
-        <span>Fact Ledger — monochrome edition</span>
+        <span>
+          Fact Ledger made with ♥ by{' '}
+          <a
+            href="https://github.com/t-rexbytes"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline text-white font-medium"
+          >
+            T-RexBytes
+          </a>{' '}
+          &amp;{' '}
+          <a
+            href="https://github.com/pritam-mb"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline text-white font-medium"
+          >
+            Pritam-mb
+          </a>
+        </span>
         <span className="font-mono">SANITY CONTENT LAKE · 100% BENCHMARK PRECISION</span>
       </div>
     </footer>
   );
 }
 
-// ── Page — Blog7 is the features section (imageless) ──────────────
+// -- Page: Blog7 is the features section (imageless) --------------
 export default function Component() {
   return (
     <main className="landing-root">

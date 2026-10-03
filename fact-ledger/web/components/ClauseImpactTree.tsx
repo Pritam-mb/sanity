@@ -147,8 +147,8 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                   alignItems: 'center',
                   gap: '0.75rem',
                   padding: '10px 12px',
-                  background: isSelected ? 'rgba(99, 102, 241, 0.12)' : 'var(--bg-card)',
-                  border: isSelected ? '1px solid var(--accent-primary)' : '1px solid var(--border)',
+                  background: isSelected ? 'rgba(255, 255, 255, 0.08)' : 'var(--bg-card)',
+                  border: isSelected ? '1px solid rgba(255, 255, 255, 0.5)' : '1px solid var(--border)',
                   borderRadius: 8,
                   cursor: 'pointer',
                   textAlign: 'left',
@@ -160,12 +160,12 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                     width: 36,
                     height: 36,
                     borderRadius: 8,
-                    background: isSelected ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                    color: '#ffffff',
+                    background: isSelected ? '#ffffff' : 'var(--bg-elevated)',
+                    color: isSelected ? '#000000' : '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontWeight: 800,
+                    fontWeight: 900,
                     fontSize: '0.85rem',
                     flexShrink: 0,
                     fontFamily: 'monospace',
@@ -180,7 +180,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                     {s.document.title}
                   </div>
-                  <div style={{ fontSize: '0.65rem', color: isSelected ? 'var(--accent-secondary)' : 'var(--text-muted)', marginTop: 2 }}>
+                  <div style={{ fontSize: '0.65rem', color: isSelected ? '#ffffff' : 'var(--text-muted)', marginTop: 2 }}>
                     {s.metrics.totalAffected} Affected · {s.metrics.openDrift} Open Drift
                   </div>
                 </div>
@@ -202,9 +202,9 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                 gap: '1rem',
                 padding: '12px 20px',
                 background: 'var(--bg-card)',
-                border: '1px solid var(--accent-primary)',
+                border: '1px solid rgba(255, 255, 255, 0.35)',
                 borderRadius: 12,
-                boxShadow: '0 4px 15px rgba(99, 102, 241, 0.15)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.6)',
               }}
             >
               <div
@@ -212,12 +212,12 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                   width: 42,
                   height: 42,
                   borderRadius: 10,
-                  background: 'var(--accent-primary)',
-                  color: '#ffffff',
+                  background: '#ffffff',
+                  color: '#000000',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontWeight: 800,
+                  fontWeight: 900,
                   fontSize: '1rem',
                   fontFamily: 'monospace',
                 }}
@@ -236,9 +236,9 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                       fontWeight: 700,
                       padding: '2px 6px',
                       borderRadius: 4,
-                      background: 'rgba(99, 102, 241, 0.15)',
-                      color: 'var(--accent-secondary)',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      color: '#ffffff',
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
                     }}
                   >
                     ORGANIZER MEMBER
@@ -254,7 +254,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
             </div>
 
             {/* Vertical Connector Line */}
-            <div style={{ width: 2, height: 28, background: 'var(--accent-primary)', opacity: 0.6 }} />
+            <div style={{ width: 2, height: 28, background: 'rgba(255, 255, 255, 0.35)' }} />
           </div>
 
           {/* Level 2: Primary Document & Clause Change Node */}
@@ -371,7 +371,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
             </div>
 
             {/* Vertical Connector Line to Branches */}
-            <div style={{ width: 2, height: 28, background: 'var(--accent-primary)', opacity: 0.6 }} />
+            <div style={{ width: 2, height: 28, background: 'rgba(255, 255, 255, 0.35)' }} />
           </div>
 
           {/* Level 3: Downstream Impact Branches (Affected Surface) */}
@@ -405,15 +405,16 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                     key={st}
                     onClick={() => setStatusFilter(st)}
                     style={{
-                      padding: '3px 8px',
-                      borderRadius: 4,
-                      border: statusFilter === st ? '1px solid var(--accent-primary)' : '1px solid var(--border)',
-                      background: statusFilter === st ? 'rgba(99, 102, 241, 0.15)' : 'var(--bg-card)',
-                      color: statusFilter === st ? 'var(--accent-secondary)' : 'var(--text-muted)',
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      border: statusFilter === st ? '1px solid #ffffff' : '1px solid var(--border)',
+                      background: statusFilter === st ? '#ffffff' : 'rgba(255, 255, 255, 0.04)',
+                      color: statusFilter === st ? '#000000' : 'var(--text-muted)',
                       fontSize: '0.7rem',
-                      fontWeight: 600,
+                      fontWeight: 700,
                       cursor: 'pointer',
                       textTransform: 'uppercase',
+                      transition: 'background 0.15s, color 0.15s, border-color 0.15s',
                     }}
                   >
                     {st}
@@ -550,7 +551,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
               style={{
                 marginTop: '1.5rem',
                 background: 'var(--bg-card)',
-                border: '1px solid var(--accent-primary)',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
                 borderRadius: 12,
                 padding: '1.25rem 1.5rem',
                 boxShadow: '0 6px 20px rgba(0, 0, 0, 0.3)',
@@ -675,7 +676,7 @@ export function ClauseImpactTree({ initialSessions }: ClauseImpactTreeProps) {
                     alignItems: 'flex-start',
                     gap: '1rem',
                     background: 'var(--bg-card)',
-                    border: isInProgress ? '1px solid var(--accent-primary)' : '1px solid var(--border)',
+                    border: isInProgress ? '1px solid rgba(255, 255, 255, 0.5)' : '1px solid var(--border)',
                     borderRadius: 10,
                     padding: '1rem 1.25rem',
                   }}

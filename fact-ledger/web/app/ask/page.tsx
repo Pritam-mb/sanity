@@ -23,7 +23,7 @@ export default async function AskPage() {
       <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Know your policy</div>
       <h1 className="page-title">Ask a Policy</h1>
       <p className="page-sub">
-        <strong style={{ color: '#fff' }}>{open} open</strong> · {answered} answered — ask about any rule, officials answer with the canonical source.
+        <strong style={{ color: '#fff' }}>{open} open</strong> · {answered} answered: ask about any rule, officials answer with the canonical source.
       </p>
 
       <OfficialOnly>
@@ -62,7 +62,7 @@ export default async function AskPage() {
           ))}
           {questions.length === 0 && (
             <div className="page-card page-card-pad" style={{ textAlign: 'center', color: '#8b8b93' }}>
-              No questions yet — ask the first one.
+              No questions yet: ask the first one.
             </div>
           )}
         </div>

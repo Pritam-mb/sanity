@@ -39,7 +39,7 @@ export function PolicyEditor({
       })
       const data = await res.json()
       if (data.success) {
-        setMsg('Saved — re-run a scan to propagate drift findings.')
+        setMsg('Saved. Re-run a scan to propagate drift findings.')
         setTimeout(() => window.location.reload(), 900)
       } else setMsg(data.error || 'Save failed')
     } catch (err: any) {
@@ -72,7 +72,7 @@ export function PolicyEditor({
         </label>
       </div>
       <label className="flex flex-col gap-1 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
-        Aliases (comma separated — the scanner watches these)
+        Aliases (comma separated: the scanner watches these)
         <input className={inputCls} value={aliases} onChange={(e) => setAliases(e.target.value)} />
       </label>
       {msg && <div className="text-xs text-neutral-300 bg-white/5 border border-white/15 rounded-lg px-3 py-2">{msg}</div>}

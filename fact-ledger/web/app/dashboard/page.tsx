@@ -145,7 +145,7 @@ export default async function DashboardPage() {
     ratePct: totalAnomalies > 0 ? (data.fixedFindings / totalAnomalies) * 100 : 100,
   }
 
-  // Employee voice: complaints, updates, questions — the official's full picture
+  // Employee voice: complaints, updates, questions: the official's full picture
   const [complaintsRaw, updatesRaw, questionsRaw] = await Promise.all([
     sanityClient.fetch<{ status: string; targetFact?: { label: string }; targetPage?: { title: string } }[]>(
       `*[_type=="complaint"]{ status, "targetFact": targetFact->{label}, "targetPage": targetPage->{title} }`
@@ -187,7 +187,7 @@ export default async function DashboardPage() {
       const label = c.targetFact?.label ?? c.targetPage?.title ?? 'General'
       m.set(label, (m.get(label) ?? 0) + 1)
     })
-    let top = '—'
+    let top = '-'
     let topN = 0
     m.forEach((n, k) => { if (n > topN) { topN = n; top = k } })
     return topN > 0 ? `${top} (${topN})` : 'None yet'

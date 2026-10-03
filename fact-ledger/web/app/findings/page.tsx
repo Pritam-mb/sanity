@@ -45,7 +45,7 @@ export default async function FindingsPage() {
       <Link href="/dashboard" className="back-link">
         <ArrowLeft size={14} /> Back to Dashboard
       </Link>
-      <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Scanner output · R1–R5</div>
+      <div className="page-eyebrow"><span className="page-eyebrow-dot" /> Scanner output · R1-R5</div>
       <h1 className="page-title">Findings</h1>
       <div style={{ display: 'flex', gap: '0.6rem', margin: '12px 0 20px', flexWrap: 'wrap' }}>
         <span className="badge badge-open">{open.length} open</span>
@@ -85,13 +85,13 @@ export default async function FindingsPage() {
                     {f.foundValue && <span style={{ color: '#fff', fontWeight: 600, textDecoration: 'line-through' }}>&ldquo;{f.foundValue}&rdquo;</span>}
                     {f.foundValue && f.expectedValue && <span style={{ color: '#71717a', margin: '0 4px' }}>→</span>}
                     {f.expectedValue && <span style={{ color: '#fff', fontWeight: 600 }}>&ldquo;{f.expectedValue}&rdquo;</span>}
-                    {!f.foundValue && !f.expectedValue && <span style={{ color: '#71717a' }}>—</span>}
+                    {!f.foundValue && !f.expectedValue && <span style={{ color: '#71717a' }}>-</span>}
                   </td>
                   <td>
                     <span className={`badge badge-${f.status}`}>{f.status}</span>
                   </td>
                   <td style={{ fontSize: 12, color: '#8b8b93', whiteSpace: 'nowrap' }} suppressHydrationWarning>
-                    {f.detectedAt ? new Date(f.detectedAt).toISOString().split('T')[0] : '—'}
+                    {f.detectedAt ? new Date(f.detectedAt).toISOString().split('T')[0] : '-'}
                   </td>
                 </tr>
               )
