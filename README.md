@@ -1,218 +1,108 @@
-﻿# The Debate Chamber — Clause Court
+<div align="center">
+  <img src="./docs/hero.png" alt="Fact Ledger Hero" width="100%" />
+  
+  <br />
+  <br />
 
-A Next.js / Sanity powered "AI courtroom" where ambiguous clauses are debated by two AI advocates, and human rulings become reusable legal precedent.
+  <p>
+    <b>An AI-assisted fact drift detection engine built on Sanity Content Lake.</b>
+  </p>
+  
+  <p>
+    <a href="https://fact-ledger.onrender.com">Live Demo</a> •
+    <a href="https://pritam.sanity.studio">Sanity Studio</a> •
+    <a href="#setup">Installation</a>
+  </p>
 
-## 🎯 What This Is
-
-Clause Court turns ambiguous policy / contract text into a **reviewable, precedent-backed process**.
-
-Instead of a static document, the system creates:
-
-1. **Ambiguity signals** (detects vague terms).
-2. **Two AI advocates** arguing opposing interpretations.
-3. **A human judge** who rules and issues precedent.
-4. **A persistent precedent database** that informs future debates.
-
-It transforms "vague clause" into a **collaborative, structured, precedent-based review flow**.
-
-## 🚀 The Pitch (30–60 second elevator version)
-
-> “Ambiguous terms cause legal disputes because there’s no easy way to stress-test them. Clause Court fixes this by turning ambiguity into a debate. It flags vague clauses, has two AIs argue both sides, lets a human decide the outcome, and stores that ruling as reusable precedent.
->
-> That way, when future clauses are similar, the AI can cite the past case and say, ‘This was argued before and here’s what the human decided.’ It turns vague language into a structured, precedent-based review system that gets smarter over time.”
+</div>
 
 ---
 
-## ⚖️ Core Mechanics
+## 🛑 The Problem: Fact Drift
+A product manager at a SaaS company decides to extend refunds from 30 days to 60 days. She opens the CMS, updates the Refund Policy page, and clicks publish. What she doesn't know: the Help Center article still says 30. The Pricing FAQ still says 30. The Onboarding Guide, the Terms of Service, the Enterprise SLA page, the Checkout confirmation modal copy — **all still say 30.**
 
-### 1. Ambiguity Detection (The Prompt Engine)
+**That is Fact Drift.** The number "30" is stored in twenty-three places as dead characters. There's no relationship between them. When one changes, the others don't know.
 
-Uses explicit signals instead of letting the LLM decide what’s ambiguous. The prompt engine scans for patterns like:
+## 💡 The Solution: Fact Ledger
+Fact Ledger fixes this at the data model level. Business values become **first-class Sanity documents** (`facts`). Pages don't copy those values; they reference them.
 
-- vagueness markers
-- undefined scope
-- unclear timelines
-- undefined obligations
-- undefined remedies
-- undefined exceptions
-- "reasonable" / "timely" / "appropriate" without metrics
-- open-ended obligations without metrics
-- undefined scope
-- exceptions without clear boundaries
+For every page that still has hardcoded plain text, a deterministic scanner runs, finds the stale copies, and raises structured findings. An AI agent drafts exact Sanity patch mutations to fix them. A human reviews the diffs and clicks one button. Everything updates atomically in a single transaction.
 
-### 2. The Courtroom
-
-A streaming interface where:
-
-- Advocate A presents one reading of the clause.
-- Advocate B presents an opposing reading.
-- Both use the *same* source text and signals.
-- The human judge selects or writes the ruling.
-- The system stores both arguments and the final precedent.
-
-### 3. The Precedent Graph
-
-Each ruling becomes a **structured precedent document** in Sanity, with:
-
-- clause text
-- chosen interpretation
-- judicial reasoning
-- citations to earlier precedent
-- future-use citations to earlier precedent
-
-## ✨ Key Features (MVP Focus)
-
-- **Sanity-first schema**: Clauses, interpretations, rulings, and precedents are all first-class Sanity documents with relationships.
-- **Streaming debate**: Real-time tokens for both advocates using Google Gemini streaming.
-- **Judge interface**: Simple form for selecting or typing a ruling, plus optionally suggesting a revised clause.
-- **Precedent citation**: Later debates automatically find and surface relevant earlier precedents.
-- **Persistence**: Finished debates are not discarded. They remain readable, linkable, and citable.
-- **Sanity Workflows**: Draft -> Review -> Approved flow on clauses and rulings.
-- **App SDK integration**: Custom UI elements for the judicial interface and precedent browser.
-- **Relevance ranking**: Precedents are ranked by how semantically similar their terms are to the new clause under review.
-- **Citation preview**: In the judge interface, users can see exactly how precedent applies to the current clause.
-- **Mobile-first design**: Full mobile support with a three-tab debate view.
-
-## 🧪 What’s NOT included (scope control)
-
-- Real legal advice (this is a **reasoning prototype**, not a legal tool).
-- Enforceability decisions.
-- Automated clause publishing (human approval required).
-- Multi-language support.
-- Advanced case management features.
-- Full document editing (users can suggest revisions but cannot edit official documents).
+> **Rules flag. AI drafts. Human approves. Sanity remembers.**
 
 ---
 
-## 🎯 Goals (MVP)
+## 🏗️ Architecture & Monorepo
 
-1. Detect structurally ambiguous clauses using explicit signals.
-2. Generate two distinct, defensible interpretations.
-3. Make human judgment the final authority.
-4. Store rulings as first-class precedent in Sanity.
-5. Reuse precedent in future debates so the system learns.
-6. Make Sanity essential (removing it breaks the precedent graph).
-7. Deliver a compelling 2–3 minute demo showing the full cycle.
+```
+fact-ledger/
+├── studio/     # Sanity Studio v3 — source of truth, schema, custom actions
+├── web/        # Next.js 16 App Router — Live Drift Dashboard & API routes
+├── scanner/    # Pure TypeScript deterministic rules (R1–R5) + Vitest tests
+├── seed/       # Idempotent seed script (facts, pages, ground truth)
+├── bench/      # Benchmark runner — 100% precision/recall validator
+└── docs/       # Architecture spec, images, design notes
+```
 
-## 👥 Users
+## 🚀 Key Features
 
-- **Primary**: Policy/content reviewers who need to approve ambiguous terms.
-- **Secondary**: Authors who want to ensure their clauses are clear.
-- **Tertiary**: Legal researchers looking for structured reasoning patterns.
+* **Deterministic Scanner (0% AI):** 5 strict rules (R1-R5) that catch unlinked matches, contradictions, deprecated references, orphan facts, and temporal violations with 100% precision.
+* **AI Remediation Engine:** Automatically drafts exact before/after JSON patches for every stale clause. No unsupervised publishing.
+* **Atomic Transactions:** Human editors review AI-drafted fixes in Sanity Studio. One click commits all patches atomically across the entire dataset.
+* **App SDK Dashboard:** A real-time Next.js control center monitoring Drift Score, KPIs, and Employee Voice complaints.
 
 ---
 
-## 🔌 Data Model (Sanity Document Types)
+## 🛠️ Quick Start
 
-### `ambiguitySignal`
+### 1. Clone & Install
+```bash
+git clone https://github.com/Pritam-mb/sanity.git
+cd sanity/fact-ledger
 
-```ts
-{
-  _id: string,
-  type: " vagueness" | "undefined_scope" | ...,
-  description: string,
-  example: string,
-  severity: number
-}
+# Install all workspace dependencies
+npm install --workspace=web
+npm install --workspace=studio
+npm install --workspace=scanner
+npm install --workspace=seed
+npm install --workspace=bench
 ```
 
-### `policyClause`
-
-```ts
-{
-  _id: string,
-  title: string,
-  text: string,
-  ambiguitySignals: AmbiguitySignal[]
-}
+### 2. Environment Setup
+```bash
+cp web/.env.example web/.env.local
 ```
+Fill in `web/.env.local` and `studio/.env`:
+* `NEXT_PUBLIC_SANITY_PROJECT_ID`: Your Sanity Project ID
+* `NEXT_PUBLIC_SANITY_DATASET`: `fact-ledger`
+* `SANITY_API_TOKEN`: Editor token (required for writing findings/patches)
 
-### `advocateInterpretation`
+### 3. Seed & Run
+```bash
+# Seed the demo dataset and run the benchmark validation
+npm run demo:reset
 
-```ts
-{
-  _id: string,
-  side: 'A' | 'B',
-  title: string,
-  summary: string,
-  argument: string,
-  textualEvidence: string[],
-  precedentUsed: string[]
-}
-```
+# Start the dashboard (localhost:3000)
+npm run dev:web
 
-### `judgeRuling`
-
-```ts
-{
-  _id: string,
-  judgeName: string,
-  chosenInterpretation: { _id, title, side } | null,
-  customRuling: string | null,
-  reasoning: string | null,
-  dissent: string | null,
-  dissentAdvocate: 'A' | 'B' | null,
-  suggestedRevision: string | null,
-  precedent: PrecedentDocument | null
-}
-```
-
-### `precedent`
-
-```ts
-{
-  _id: string,
-  title: string,
-  holding: string,
-  applicableTerms: string[]
-}
+# Start Sanity Studio (localhost:3333)
+npm run dev:studio
 ```
 
 ---
 
-## ⚙️ Technical Stack
+## 🧪 Commands
 
-- **Frontend**: Next.js (App Router)
-- **Backend**: Vercel / Next.js API routes (streaming + Gemini API)
-- **Sanity**: Studio + GROQ + Client SDK
-- **Streaming**: `stream: true` Gemini API + SSE parsing
-- **Language**: TypeScript
+| Command | Action |
+| :--- | :--- |
+| `npm run dev:web` | Start the Next.js control center |
+| `npm run dev:studio` | Start the Sanity Studio |
+| `npm run test` | Run Vitest unit tests for the scanner rules |
+| `npm run seed` | Inject the test dataset into your Sanity project |
+| `npm run bench` | Run the validation benchmark against the ground truth |
+| `npm run typegen` | Generate TypeScript types from your GROQ queries |
 
----
-
-## 🎯 MVP Roadmap
-
-### Phase 1 — Foundation
-
-- [ ] Create Sanity studio + documents.
-- [ ] Build ambiguity detection prompt engine.
-- [ ] Build the streaming advocate argumentation flow.
-- [ ] Implement the human judge interface.
-- [ ] Implement basic precedent storage and retrieval.
-- [ ] Ensure Sanity references are correctly wired.
-
-### Phase 2 — Polish & Demo Prep
-
-- [ ] Add relevance ranking for precedent.
-- [ ] Add citation preview in judge UI.
-- [ ] Polish mobile UI (three-tab view).
-- [ ] Implement Sanity Workflows for both clauses and rulings.
-- [ ] Create final demo script + demo data.
-
-### Phase 3 — Submit
-
-- [ ] Write build-process writeup.
-- [ ] Create final demo video.
-- [ ] Prepare GitHub repository + README.
-- [ ] Submit before deadline.
-
----
-
-## 📚 Additional Details
-
-For complete system context, reference the following documents:
-
-- [Clause Court Product Requirements (Full PRD)](Clause_Court_Full_PRD.md) — The complete product requirements document.
-- [Clause Court System Context](Clause_Court_System_Context.md) — High-level technical overview and architectural choices.
-
-These two documents provide the full scope for building the product.
+<br />
+<div align="center">
+  <i>Built for the <a href="https://dev.to/challenges/sanity-2026-09-16">Sanity + Dev.to AI Challenge</a></i>
+</div>
