@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { AppShell } from '@/components/AppShell'
+import { SmoothScroll } from '@/components/SmoothScroll'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,9 +26,11 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-black text-white antialiased">
-        <AppShell>
-          {children}
-        </AppShell>
+        <SmoothScroll>
+          <AppShell>
+            {children}
+          </AppShell>
+        </SmoothScroll>
       </body>
     </html>
   )

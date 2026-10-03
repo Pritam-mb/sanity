@@ -17,6 +17,7 @@ import {
   Legend,
 } from 'recharts'
 import { formatTime } from '@/lib/format'
+import { useChartCursor } from '@/lib/useChartCursor'
 
 export interface RuleStat {
   rule: string
@@ -53,6 +54,17 @@ export function LiveDashboardCharts({
   scanHistory,
   resolutionHealth,
 }: LiveDashboardChartsProps) {
+  const ruleCursor = useChartCursor({ tooltipWidth: 185, tooltipHeight: 90 })
+  const velocityCursor = useChartCursor({ tooltipWidth: 210, tooltipHeight: 95 })
+  const efficiencyCursor = useChartCursor({ tooltipWidth: 180, tooltipHeight: 85, alwaysFlipX: true })
+
+  const formattedScans = React.useMemo(() => {
+    return scanHistory.map((s, idx) => ({
+      ...s,
+      runLabel: idx === scanHistory.length - 1 ? 'Latest' : `#${idx + 1}`,
+    }))
+  }, [scanHistory])
+
   const pieData = [
     { name: 'Resolved Anomalies', value: resolutionHealth.fixed },
     { name: 'Active Drift', value: resolutionHealth.open },
@@ -103,10 +115,10 @@ export function LiveDashboardCharts({
                 Findings Breakdown by Rule
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                R1 (Unlinked) · R2 (Contradiction) · R3 (Deprecated) · R4 (Orphan) · R5 (Temporal)
+                Drift detection across heuristic rules R1 to R5
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.75rem' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#fff' }}>
                 <span style={{ width: 8, height: 8, borderRadius: 2, background: '#fff' }} /> Fixed
               </span>
@@ -116,14 +128,28 @@ export function LiveDashboardCharts({
             </div>
           </div>
 
-          <div style={{ width: '100%', height: 260 }}>
+          <div
+            style={{ width: '100%', height: 260, position: 'relative' }}
+            onMouseMove={ruleCursor.onMouseMove}
+            onMouseLeave={ruleCursor.onMouseLeave}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ruleStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                 <XAxis
                   dataKey="rule"
+                  tickFormatter={(r: string) => {
+                    const map: Record<string, string> = {
+                      R1: 'R1 Unlinked',
+                      R2: 'R2 Contradict',
+                      R3: 'R3 Deprecated',
+                      R4: 'R4 Orphan',
+                      R5: 'R5 Temporal',
+                    }
+                    return map[r] || r
+                  }}
                   stroke="#64748b"
-                  fontSize={11}
+                  fontSize={10}
                   tickLine={false}
                   axisLine={{ stroke: '#334155' }}
                 />
@@ -135,7 +161,12 @@ export function LiveDashboardCharts({
                   allowDecimals={false}
                 />
                 <Tooltip
-                  content={({ active, payload, label }) => {
+                  cursor={false}
+                  position={ruleCursor.pos || undefined}
+                  isAnimationActive={false}
+                  allowEscapeViewBox={{ x: true, y: true }}
+                  wrapperStyle={{ pointerEvents: 'none', zIndex: 1000 }}
+                  content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const item = payload[0].payload as RuleStat
                       return (
@@ -146,6 +177,9 @@ export function LiveDashboardCharts({
                             padding: '8px 12px',
                             borderRadius: 8,
                             fontSize: 12,
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+                            pointerEvents: 'none',
+                            whiteSpace: 'nowrap',
                           }}
                         >
                           <div style={{ fontWeight: 700, color: '#f1f5f9', marginBottom: 4 }}>
@@ -162,8 +196,8 @@ export function LiveDashboardCharts({
                     return null
                   }}
                 />
-                <Bar dataKey="fixed" name="Fixed" stackId="a" fill="#ffffff" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="open" name="Open Drift" stackId="a" fill="#52525b" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="fixed" name="Fixed" stackId="a" fill="#ffffff" radius={[0, 0, 0, 0]} isAnimationActive={false} />
+                <Bar dataKey="open" name="Open Drift" stackId="a" fill="#52525b" radius={[4, 4, 0, 0]} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -194,9 +228,13 @@ export function LiveDashboardCharts({
             </div>
           </div>
 
-          <div style={{ width: '100%', height: 260 }}>
+          <div
+            style={{ width: '100%', height: 260, position: 'relative' }}
+            onMouseMove={velocityCursor.onMouseMove}
+            onMouseLeave={velocityCursor.onMouseLeave}
+          >
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={scanHistory} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+              <AreaChart data={formattedScans} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                 <defs>
                   <linearGradient id="durationGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#ffffff" stopOpacity={0.45} />
@@ -205,7 +243,7 @@ export function LiveDashboardCharts({
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                 <XAxis
-                  dataKey="timeLabel"
+                  dataKey="runLabel"
                   stroke="#64748b"
                   fontSize={10}
                   tickLine={false}
@@ -219,6 +257,10 @@ export function LiveDashboardCharts({
                   unit="ms"
                 />
                 <Tooltip
+                  position={velocityCursor.pos || undefined}
+                  isAnimationActive={false}
+                  allowEscapeViewBox={{ x: true, y: true }}
+                  wrapperStyle={{ pointerEvents: 'none', zIndex: 1000 }}
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const item = payload[0].payload as ScanRunMetric
@@ -230,6 +272,9 @@ export function LiveDashboardCharts({
                             padding: '8px 12px',
                             borderRadius: 8,
                             fontSize: 12,
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+                            pointerEvents: 'none',
+                            whiteSpace: 'nowrap',
                           }}
                         >
                           <div style={{ fontWeight: 700, color: '#f1f5f9', marginBottom: 2 }}>
@@ -293,22 +338,78 @@ export function LiveDashboardCharts({
               {resolutionHealth.fixed} fixed of {resolutionHealth.fixed + resolutionHealth.open} total anomalies
             </div>
           </div>
-          <div style={{ width: 90, height: 90 }}>
+          <div
+            style={{ width: 100, height: 100, position: 'relative' }}
+            onMouseMove={efficiencyCursor.onMouseMove}
+            onMouseLeave={efficiencyCursor.onMouseLeave}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={pieData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={28}
-                  outerRadius={40}
+                  innerRadius={30}
+                  outerRadius={44}
                   paddingAngle={4}
                   dataKey="value"
+                  isAnimationActive={false}
                 >
                   {pieData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+                      style={{ cursor: 'pointer' }}
+                    />
                   ))}
                 </Pie>
+                <Tooltip
+                  position={efficiencyCursor.pos || undefined}
+                  isAnimationActive={false}
+                  allowEscapeViewBox={{ x: true, y: true }}
+                  wrapperStyle={{ pointerEvents: 'none', zIndex: 1000 }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0]
+                      const total = resolutionHealth.fixed + resolutionHealth.open
+                      const val = Number(data.value) || 0
+                      const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0'
+                      return (
+                        <div
+                          style={{
+                            background: '#090d16',
+                            border: '1px solid #334155',
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            fontSize: 12,
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+                            pointerEvents: 'none',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <div style={{ fontWeight: 700, color: '#f1f5f9', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span
+                              style={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                background: data.name === 'Resolved Anomalies' ? '#fff' : '#52525b',
+                              }}
+                            />
+                            {data.name}
+                          </div>
+                          <div style={{ color: '#cbd5e1', marginTop: 4 }}>
+                            Count: <strong style={{ color: '#fff' }}>{val}</strong> ({pct}%)
+                          </div>
+                          <div style={{ color: '#64748b', fontSize: 10, marginTop: 2 }}>
+                            {data.name === 'Resolved Anomalies' ? 'Zero drift reconciled' : 'Active drift flagged'}
+                          </div>
+                        </div>
+                      )
+                    }
+                    return null
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
