@@ -90,6 +90,48 @@ body {
   font-size: 16px;
   line-height: 1.6;
   min-height: 100vh;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari, Edge and WebKit browsers */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+html.lenis::-webkit-scrollbar,
+html.lenis body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+html.lenis,
+html.lenis body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* ── Recharts Tooltip Cursor Glitch Fix & Smooth Follower ─── */
+.recharts-tooltip-cursor,
+rect.recharts-tooltip-cursor,
+path.recharts-tooltip-cursor {
+  fill: transparent !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.recharts-tooltip-wrapper {
+  pointer-events: none !important;
+  z-index: 1000 !important;
+  transition: transform 0.04s ease-out !important;
+}
+
+.recharts-pie-sector {
+  transition: opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+  outline: none;
+}
+
+.recharts-pie-sector:hover {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
 }
 
 a {

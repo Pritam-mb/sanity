@@ -84,14 +84,12 @@ export const Navigation = React.memo(() => {
           </span>
         </Link>
 
-        {/* Center: Perfectly aligned & centered routing options */}
+        {/* Center: Perfectly aligned & centered routing options for landing page only */}
         <div className="hidden md:flex nav-pill-center bg-white/5 border border-white/10 rounded-full px-2 py-1 shadow-inner">
           {[
             { href: "#features", label: "Capabilities" },
             { href: "#how-it-works", label: "How It Works" },
             { href: "#feedback", label: "Customer Stories" },
-            { href: "/clause-tree", label: "Clause Tree" },
-            { href: "/dashboard", label: "Dashboard" },
           ].map((l) => (
             <a
               key={l.label}
@@ -103,17 +101,11 @@ export const Navigation = React.memo(() => {
           ))}
         </div>
 
-        {/* Right: Actions */}
+        {/* Right: Actions - Only Sign In */}
         <div className="hidden md:flex items-center gap-2.5 shrink-0 z-10">
           <Link href="/login">
-            <Button type="button" variant="ghost" size="sm">
-              Sign In
-            </Button>
-          </Link>
-          <Link href="/dashboard">
             <Button type="button" variant="default" size="sm">
-              Open Workspace
-              <ArrowRight size={14} />
+              Sign In
             </Button>
           </Link>
         </div>
@@ -135,7 +127,6 @@ export const Navigation = React.memo(() => {
               { href: "#features", label: "Capabilities" },
               { href: "#how-it-works", label: "How It Works" },
               { href: "#feedback", label: "Customer Stories" },
-              { href: "/dashboard", label: "Live Dashboard" },
             ].map((l) => (
               <a
                 key={l.label}
@@ -146,15 +137,10 @@ export const Navigation = React.memo(() => {
                 {l.label}
               </a>
             ))}
-            <div className="flex gap-2 pt-3">
-              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="flex-1">
-                <Button type="button" variant="secondary" size="sm" className="w-full justify-center">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="flex-1">
+            <div className="pt-3">
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full">
                 <Button type="button" variant="default" size="sm" className="w-full justify-center">
-                  Open Workspace
+                  Sign In
                 </Button>
               </Link>
             </div>
@@ -291,7 +277,9 @@ export const Hero = React.memo(() => {
         <span><strong>100% precision · 100% recall</strong> on 31 planted drift anomalies</span>
       </div>
 
-      <LedgerPreviewCard />
+      <div id="features" className="scroll-mt-24 w-full flex justify-center">
+        <LedgerPreviewCard />
+      </div>
 
       <div className="hero-trust-row">
         {["R1-R5 deterministic scanner", "Human-gated releases", "Immutable audit ledger"].map((t) => (
@@ -471,13 +459,13 @@ export function Footer() {
   );
 }
 
-// -- Page: Blog7 is the features section (imageless) --------------
+// -- Page: Blog7 is the customer stories section (imageless) --------------
 export default function Component() {
   return (
     <main className="landing-root">
       <Navigation />
       <Hero />
-      <div id="features">
+      <div id="feedback" className="scroll-mt-20">
         <Blog7 />
       </div>
       <HowItWorksSection />
